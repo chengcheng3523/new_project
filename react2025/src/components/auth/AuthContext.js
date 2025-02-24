@@ -75,61 +75,75 @@ export const AuthProvider = ({ children }) => {
               (user) =>
                 user.username === username && user.plain_password === password
             );
-            let role = "user";
+            // let role = "user";
 
             if (user) {
               const token = "user-token";
               const userId = user.ID;
-              const unitName = user.unit_name;
+              const unitName = user.unit_name || "Default Unit"; // 使用者的單位名稱
               const role = "user";
               localStorage.setItem(
                 "shopee:auth.state",
-                JSON.stringify({ token, userId, unitName, role })
+                JSON.stringify({ 
+                  token, 
+                  userId, 
+                  unitName, 
+                  role })
               );
               setInAuthenticated(true); // 設定為已登入
               setUserId(userId); // 設定使用者 ID
               setUnitName(unitName); // 設定單位名稱
               setRole(role); // 設定使用者角色
               return { token }; // 回傳 token
-            } else if (username === "admin" && password === "123456") {
-              role = "admin";
-              // 如果是系統管理員
-              localStorage.setItem(
-                "shopee:auth.state",
-                JSON.stringify({
-                  token: "admin-token",
-                  userId: 0,
-                  unitName: "Admin Unit",
-                  role,
-                })
-              );
-              setInAuthenticated(true);
-              setUserId(0);
-              setUnitName("Admin Unit");
-              setRole(role);
-              return { token: "admin-token" };
-            } else if (username === "users" && password === "123456") {
-              role = "user";
-              // 如果是一般使用者
-              localStorage.setItem(
-                "shopee:auth.state",
-                JSON.stringify({
-                  token: "user-token",
-                  userId: 1,
-                  unitName: "User Unit",
-                  role,
-                })
-              );
-              setInAuthenticated(true);
-              setUserId(1);
-              setUnitName("User Unit");
-              setRole(role);
-              return { token: "user-token" };
+            // } else if (username === "admin" && password === "123456") {
+            //   role = "admin";
+            //   // 如果是系統管理員
+            //   localStorage.setItem(
+            //     "shopee:auth.state",
+            //     JSON.stringify({
+            //       token: "admin-token",
+            //       userId: 0,
+            //       unitName: "Admin Unit",
+            //       role,
+            //     })
+            //   );
+            //   setInAuthenticated(true);
+            //   setUserId(0);
+            //   setUnitName("Admin Unit");
+            //   setRole(role);
+            //   return { token: "admin-token" };
+            // } else if (username === "user" && password === "123456") {
+            //   role = "user";
+            //   // 如果是一般使用者
+            //   localStorage.setItem(
+            //     "shopee:auth.state",
+            //     JSON.stringify({
+            //       token: "user-token",
+            //       userId: 1,
+            //       unitName: "User Unit",
+            //       role,
+            //     })
+            //   );
+            //   setInAuthenticated(true);
+            //   setUserId(1);
+            //   setUnitName("User Unit");
+            //   setRole(role);
+            //   return { token: "user-token" };
             } else if (data.token) {
               const decoded = jwtDecode(data.token);
-              localStorage.setItem("shopee:auth.token", data.token);
+              const unitName = decoded.unit_name || "Default Unit"; // 使用者的單位名稱
+              localStorage.setItem(
+                "shopee:auth.state",
+                JSON.stringify({
+                  token: data.token,
+                  userId: decoded.userId,
+                  unitName,
+                  role: decoded.role,
+                })
+              );
               setInAuthenticated(true); // 設定為已登入
               setUserId(decoded.userId); // 設定使用者 ID
+              setUnitName(unitName); // 設定單位名稱
               setRole(decoded.role); // 設定使用者角色
               return { token: data.token }; // 回傳 token
             } else {
@@ -147,6 +161,7 @@ export const AuthProvider = ({ children }) => {
           setUnitName("");
           setRole("guest");
           localStorage.removeItem("shopee:auth.state");
+          localStorage.removeItem("shopee:auth.token");
         },
         filterDataByRole,
       }}

@@ -66,8 +66,10 @@ const Header = (className) => {
             {isAuthenticated ? (
               <div>
                 <a href="#!">{unitName}</a>
+                <span>|</span>
                 <span onClick={() => {
                   logout();
+                  console.log("unitName:", unitName);
                   window.location.reload(); // 重载页面以更新状态
                 }}>登出</span>
               </div>

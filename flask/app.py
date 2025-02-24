@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token
 
 app = Flask(__name__)   # 創建 Flask 應用程式實例
-CORS(app)               # 啟用 CORS（跨來源資源共享），允許所有來源存取 API
+
 CORS( app,resources={r"/api/*": {"origins": "http://localhost:3000"}}) # 針對特定 API 路徑設置 CORS，限制存取路徑
 ma = Marshmallow(app)   # 初始化 Marshmallow，提供資料序列化和驗證功能
 
@@ -53,7 +53,7 @@ class users(db.Model):
     unit_name = db.Column(db.String(255))       # 'unit_name' 欄位：字串類型 (最多 255 個字元)，不可為空，代表所屬單位名稱
     land_parcel_id = db.Column(db.String(20))   # 'land_parcel_id' 欄位：字串類型 (最多 20 個字元)，不可為空，代表土地地段編號
 
-    plain_password = db.Column(db.String(255), comment='原始密碼')
+    plain_password = db.Column(db.String(255), comment='原始密碼')  # '這個之後可移除
     farmer_name = db.Column(db.String(50), comment='經營農戶姓名')
     phone = db.Column(db.String(50), comment='聯絡電話')
     fax = db.Column(db.String(50), comment='傳真')
@@ -126,6 +126,12 @@ def update_users(id):
     try:
         data = request.get_json()  # 獲取 JSON 數據
         user = users.query.get(id)  # 查詢指定的使用者
+
+        if 'password' in data:
+            if data['password']:
+                user.password = generate_password_hash(data['password'])
+
+
         if not user:
             return jsonify({'error': '使用者未找到'}), 404
 
@@ -176,9 +182,13 @@ def login():
     password = data.get('password')
     user = users.query.filter_by(username=username).first()
     if user and check_password_hash(user.password, password):
-        access_token = create_access_token(identity={'userId': user.id, 'role': 'user'})
+        access_token = create_access_token(identity={'userId': user.id, 'role': 'user', 'unit_name': user.unit_name})
         return jsonify(token=access_token), 200
-    return jsonify(error='帳號或密碼錯誤'), 401
+
+    if not user:
+        return jsonify(error='帳號不存在'), 404
+    elif not check_password_hash(user.password, password):  
+        return jsonify(error='密碼錯誤'), 401
 
 # 在應用程式啟動時測試資料庫連線
 if __name__ == '__main__':
