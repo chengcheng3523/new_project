@@ -19,15 +19,22 @@ CREATE TABLE users(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+ALTER TABLE users ADD COLUMN land_parcel_id VARCHAR(20);
 ALTER TABLE users MODIFY password VARCHAR(255) NOT NULL COMMENT '加密後的密碼';
 -- 資料示例users（使用者基本資料）
 INSERT INTO users (username, plain_password, password, unit_name, farmer_name, phone, fax, mobile, address, email, total_area, notes)
-VALUES  ('帳號', '原始密碼', '加密後的密碼', '單位名稱', '經營農戶姓名', '聯絡電話', '傳真', '行動電話', '住址', 'e-mail',  5.5, '備註'),
-        ('farmer1', '原始密碼', 'hashed_password', '農場 A', '張三', '02-12345678', '02-87654321', '0912-345678', '住址', 'farmer1@example.com', 5.5, 'notes'),
-        ('farmer2', '原始密碼', 'hashed_password', '農場 B', '張三', '02-12345678', '02-87654321', '0912-345678', '台北市XX路', 'farmer1@example.com', 5.5, 'notes');
-
--- 查詢使用者基本資料
-
+VALUES
+    ('帳號', '原始密碼', '加密後的密碼', '單位名稱', '經營農戶姓名', '聯絡電話', '傳真', '行動電話', '住址', 'e-mail',  5.5, '備註', 1),
+    ('farmer1', '原始密碼', 'hashed_password', '農場 A', '張三', '02-12345678', '02-87654321', '0912-345678', '住址', 'farmer1@example.com', 5.5, 'notes',2),
+    ('farmer2', '原始密碼', 'hashed_password', '農場 B', '張三', '02-12345678', '02-87654321', '0912-345678', '台北市XX路', 'farmer1@example.com', 5.5, 'notes',3);
+-- 插入 admin 和 user 帳號
+INSERT INTO users (username, plain_password, password, unit_name, farmer_name, phone, fax, mobile, address, email, total_area, notes, land_parcel_id)
+VALUES 
+    ('admin', '123456', '$2b$12$KIX8e1G1Q1k1Q1k1Q1k1QO', 'Admin Unit', 'Admin', '123456789', '123456789', '123456789', 'Admin Address', 'admin@example.com', 0, 'Admin notes', 'LP000'),
+    ('user', '123456', '$2b$12$KIX8e1G1Q1k1Q1k1Q1k1QO', 'User Unit', 'User', '123456789', '123456789', '123456789', 'User Address', 'user@example.com', 0, 'User notes', 'LP001');
+-- 更新資料庫中的密碼哈希
+UPDATE users SET password = 'scrypt:32768:8:1$GecnsTV9ESdKmZ6l$87571fe224e1a108335d3061c51aca78e66d1a4d7f3a42cf3bcbdee24a6cb38bb08f3c36d411cbb4b0a173639f5ef7b77d3e1810497db66c43586e52c40afc85' WHERE username = 'admin';
+UPDATE users SET password = 'scrypt:32768:8:1$GecnsTV9ESdKmZ6l$87571fe224e1a108335d3061c51aca78e66d1a4d7f3a42cf3bcbdee24a6cb38bb08f3c36d411cbb4b0a173639f5ef7b77d3e1810497db66c43586e52c40afc85' WHERE username = 'user';
 
 -- land_parcels（農地資訊）
 CREATE TABLE land_parcels (
@@ -45,9 +52,10 @@ CREATE TABLE land_parcels (
 );
 -- 資料示例land_parcels（農地資訊）
 INSERT INTO land_parcels (user_id, number, land_parcel_number, area, crop, notes)
-VALUES (1, '農地編號', '農地地籍號碼', 1.2, '種植作物', '備註'),
-       (2, 'LP001', '123456-7890', 1.2, '小白菜', '土壤肥沃，適合蔬菜種植'),
-       (1, 'LP002', '123456-7891', 2.5, '玉米', '土壤較乾燥，適合玉米種植');
+VALUES
+    (1, '農地編號', '農地地籍號碼', 1.2, '種植作物', '備註'),
+    (2, 'LP001', '123456-7890', 1.2, '小白菜', '土壤肥沃，適合蔬菜種植'),
+    (1, 'LP002', '123456-7891', 2.5, '玉米', '土壤較乾燥，適合玉米種植');
 
 -- 查詢農戶的所有農地
 SELECT u.username, u.farmer_name, l.number, l.land_parcel_number, l.area, l.crop, l.notes

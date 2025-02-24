@@ -31,6 +31,7 @@ const RegisterPage = () => {
     email: '',
     total_area: '0',
     notes: '',
+    land_parcel_id: "LP123"
   });
   const navigate = useNavigate();
 
@@ -51,6 +52,7 @@ const RegisterPage = () => {
       // localStorage.setItem('users', JSON.stringify(users));
       const payload = { 
         ...formData, 
+        plain_password: formData.password // 確保 plain_password 與 password 一致
     };
       const response = await axios.post('http://127.0.0.1:5000/api/users/post', payload);
       if (response.status === 201) {
@@ -106,6 +108,10 @@ const RegisterPage = () => {
           <input name="email" className="form-control" placeholder="請輸入電子郵件" onChange={handleChange} />
         </div>
         <div className="mb-3">
+          <label className="form-label">田地編號</label>
+          <input name="land_parcel_id" className="form-control" placeholder="請輸入田地編號" onChange={handleChange} />
+        </div>
+        <div className="mb-3">
           <label className="form-label">總面積</label>
           <input name="total_area" className="form-control" placeholder="請輸入總面積" onChange={handleChange} />
         </div>
@@ -113,6 +119,8 @@ const RegisterPage = () => {
           <label className="form-label">備註</label>
           <input name="notes" className="form-control" placeholder="請輸入備註" onChange={handleChange} />
         </div>
+
+
         <button type="submit" className="btn btn-primary">註冊</button>
         <button type="button" onClick={() => navigate('/login')} className="btn btn-secondary ms-2">返回登入</button>
       </form>

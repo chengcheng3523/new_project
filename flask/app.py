@@ -4,7 +4,8 @@ from flask_mysqldb import MySQL
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
 from datetime import datetime
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import JWTManager, create_access_token
 
 app = Flask(__name__)   # 創建 Flask 應用程式實例
 CORS(app)               # 啟用 CORS（跨來源資源共享），允許所有來源存取 API
@@ -13,14 +14,17 @@ ma = Marshmallow(app)   # 初始化 Marshmallow，提供資料序列化和驗證
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost/new_database'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'  # 設置 JWT 密鑰
+app.config['SECRET_KEY'] = 'your_secret_key'  # 設置 Flask 密鑰
 db = SQLAlchemy(app)
+jwt = JWTManager(app)  # 初始化 JWTManager 並與 Flask 應用程式關聯
 
 
 #Database connection settings
 app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'   #MYSQL 使用者
+app.config['MYSQL_USER'] = 'root'       #MYSQL 使用者
 app.config['MYSQL_PASSWORD'] = 'root'   #MYSQL 密碼
-app.config['MYSQL_DB'] = 'new_database'  #MYSQL 名稱
+app.config['MYSQL_DB'] = 'new_database' #MYSQL 名稱
 mysql = MySQL(app)
 
 # 檢查 MySQL 資料庫連線是否正常。
@@ -33,7 +37,7 @@ def test_db_connection():
     except Exception as e:
         print(f"Database connection failed: {str(e)}")
 
-# 创建数据库表
+# 建立資料
 with app.app_context():
     db.create_all()
 
@@ -62,13 +66,12 @@ class users(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
-# 新增使用者
+# 新增users
 @app.route('/api/users/post', methods=['POST'])
 def create_users():
     try:
         data = request.get_json()  # 獲取 JSON 數據
-        print("Received Data:", data)  # Debug 輸出
-        
+        print("Received Data:", data)  # Debug 輸出    
         if not data:
             return jsonify({'error': '請求的 JSON 格式錯誤或 Content-Type 錯誤'}), 400
         
@@ -83,6 +86,7 @@ def create_users():
             password=password_hash,  # 使用加密後的密碼
             plain_password=data.get('plain_password'),
             unit_name=data.get('unit_name'),
+            land_parcel_id=data.get('land_parcel_id'),
             farmer_name=data.get('farmer_name'),
             phone=data.get('phone'),
             fax=data.get('fax'),
@@ -100,7 +104,7 @@ def create_users():
         print(f"Error occurred: {str(e)}")  # 输出错误信息
         return jsonify({'error': str(e)}), 500  # 返回錯誤訊息
 
-# 查詢所有使用者
+# 查詢users-all
 @app.route('/api/users/get', methods=['GET'])
 def get_users():
     try:
@@ -114,9 +118,9 @@ def get_users():
         cur.close()
         return jsonify(users)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500  # 返回錯誤訊息
+        return jsonify({'error': str(e)}), 500
 
-# 修改使用者資訊
+# 修改users
 @app.route('/api/users/<int:id>', methods=['PUT'])
 def update_users(id):
     try:
@@ -145,24 +149,36 @@ def update_users(id):
         if 'notes' in data:
             user.notes = data['notes']
 
-        db.session.commit()  # 提交變更
-        return jsonify({'status': '使用者資料更新成功'}), 200  # 回應成功訊息
+        db.session.commit()  
+        return jsonify({'status': '使用者資料更新成功'}), 200 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500  # 返回錯誤訊息
+        return jsonify({'error': str(e)}), 500
 
-# 刪除使用者
+# 刪除users
 @app.route('/api/users/<int:id>', methods=['DELETE'])
 def delete_users(id):
     try:
-        user = users.query.get(id)  # 查詢指定的使用者
+        user = users.query.get(id) 
         if not user:
             return jsonify({'error': '使用者未找到'}), 404
 
-        db.session.delete(user)  # 刪除使用者
-        db.session.commit()  # 提交變更
-        return jsonify({'status': '使用者已刪除'}), 200  # 回應成功訊息
+        db.session.delete(user)  
+        db.session.commit()  
+        return jsonify({'status': '使用者已刪除'}), 200
     except Exception as e:
-        return jsonify({'error': str(e)}), 500  # 返回錯誤訊息
+        return jsonify({'error': str(e)}), 500
+
+# 登入
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    user = users.query.filter_by(username=username).first()
+    if user and check_password_hash(user.password, password):
+        access_token = create_access_token(identity={'userId': user.id, 'role': 'user'})
+        return jsonify(token=access_token), 200
+    return jsonify(error='帳號或密碼錯誤'), 401
 
 # 在應用程式啟動時測試資料庫連線
 if __name__ == '__main__':

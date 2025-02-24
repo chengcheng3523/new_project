@@ -7,6 +7,7 @@
 
 
 ## 套件
+<!-- pip install flask-jwt-extended werkzeug -->
 ``` 
 npm install react-router-dom antd @ant-design/icons styled-components
 ```
