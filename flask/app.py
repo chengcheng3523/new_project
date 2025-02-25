@@ -180,15 +180,19 @@ def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-    user = users.query.filter_by(username=username).first()
-    if user and check_password_hash(user.password, password):
-        access_token = create_access_token(identity={'userId': user.id, 'role': 'user', 'unit_name': user.unit_name})
-        return jsonify(token=access_token), 200
 
-    if not user:
-        return jsonify(error='帳號不存在'), 404
-    elif not check_password_hash(user.password, password):  
-        return jsonify(error='密碼錯誤'), 401
+    user = users.query.filter_by(username=username).first()
+
+    if user and check_password_hash(user.password, password):
+
+        access_token = create_access_token(identity={
+            'userId': user.id, 
+            'role': 'user',
+            'unitName': user.unit_name  # ✅ 添加 unitName
+        })
+        return jsonify(token=access_token), 200
+    
+    return jsonify(error='帳號或密碼錯誤'), 401
 
 # 在應用程式啟動時測試資料庫連線
 if __name__ == '__main__':

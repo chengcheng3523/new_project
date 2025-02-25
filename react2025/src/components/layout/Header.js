@@ -2,8 +2,8 @@ import React ,{ useContext }from "react";
 import styled from "styled-components";
 import Container from "../common/Container";
 import Logo from "../images/logo.png";
-import { Input } from "antd"; // 導入 Input 元素
-import { ShoppingCartOutlined  } from "@ant-design/icons"; // 從 @ant-design/icons 導入 ShoppingCartOutlined
+import { Input } from "antd"; 
+import { ShoppingCartOutlined  } from "@ant-design/icons"; 
 import { Link } from "react-router-dom";
 import AuthContext from "../auth/AuthContext";
 
@@ -49,6 +49,11 @@ const Box = styled.div`
 
 const Header = (className) => {
   const{isAuthenticated, unitName, logout} =useContext(AuthContext);
+  console.log("AuthContext 数据:", { isAuthenticated, unitName });
+  console.log("localStorage 数据:", localStorage.getItem("shopee:auth.state"));
+  console.log("isAuthenticated:", isAuthenticated);
+  console.log("logout:", logout);
+  console.log("unitName:", unitName);
   return (
     <StyledHeader className={className}>
       <Container> 
@@ -64,14 +69,16 @@ const Header = (className) => {
             <a href="#!">幫助中心</a>
             {/* <a href="#!">登入/註冊</a>*/}
             {isAuthenticated ? (
-              <div>
-                <a href="#!">{unitName}</a>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <a href="#!" style={{ marginRight: 8 }}>{unitName}</a> {/* 将单位名称放在登出按钮左侧 */}
                 <span>|</span>
                 <span onClick={() => {
-                  logout();
-                  console.log("unitName:", unitName);
-                  window.location.reload(); // 重载页面以更新状态
-                }}>登出</span>
+                    logout();
+                    console.log("unitName:", unitName);
+                    window.location.reload(); // 重载页面以更新状态
+                }}
+                style={{ marginLeft: 8, cursor: "pointer" }} // 添加 cursor 样式以指示可点击
+              >登出</span>
               </div>
             ) : (
               <Link to="/login">登入/註冊</Link>
@@ -87,7 +94,7 @@ const Header = (className) => {
             <Input.Search
               style={{ marginRight: 8 }}
               placeholder="搜尋"
-              omSearch={(value) => console.log(value)}
+              onSearch={(value) => console.log(value)}
               enterButton
             />
             <Link to="/cart">

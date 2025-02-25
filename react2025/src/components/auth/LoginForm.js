@@ -9,6 +9,7 @@ const LoginForm = () => {
 
   // 處理登入邏輯，呼叫 login 方法
   const handleLogin = () => {
+
     login(username, password).then(({token,error}) => {
         if (token) {
           alert('登入成功'); // 登入成功提示
@@ -16,6 +17,7 @@ const LoginForm = () => {
           alert(error || '登入失敗');// 登入失敗提示
         }
     });
+    
   };
 
 // 當使用者已登入，會自動導向首頁

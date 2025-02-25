@@ -1,24 +1,30 @@
+// React：使用 useState、createContext 和 useEffect 來管理狀態和建立 Context
+// jwtDecode：用來解析 JWT（JSON Web Token），獲取使用者資訊
 import React, { useState, createContext, useEffect } from "react";
 import { jwtDecode } from 'jwt-decode';
 
+// 設定初始的Context的預設值，在使用者未登入時適用
 const defaultContextValue = {
-  isAuthenticated: false,
-  userId: null,
-  unitName: "",
-  role: "guest",
+  isAuthenticated: false, // 預設為未登入
+  userId: null, // 預設沒有使用者 ID
+  unitName: "", // 預設沒有單位名稱
+  role: "guest", // 預設角色為訪客
 };
-
+// 創建 AuthContext 來提供全域的認證狀態
 const AuthContext = createContext(defaultContextValue);
 
-
+// 建立 AuthProvider 來管理認證狀態， Context 的提供者，讓整個應用程式的組件都能使用它
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setInAuthenticated] = useState(
-    defaultContextValue.isAuthenticated
-  ); // 狀態：判斷使用者是否已登入
-  const [userId, setUserId] = useState(defaultContextValue.userId); // 狀態：儲存登入後的使用者 ID
-  const [unitName, setUnitName] = useState(defaultContextValue.unitName); // 狀態：儲存登入後的單位名稱
+   // isAuthenticated 儲存使用者是否已登入，預設為 false
+  const [isAuthenticated, setInAuthenticated] = useState(defaultContextValue.isAuthenticated);
+  // userId 儲存使用者 ID，預設為 null
+  const [userId, setUserId] = useState(defaultContextValue.userId);
+  // unitName 儲存使用者單位名稱，預設為空字串
+  const [unitName, setUnitName] = useState(defaultContextValue.unitName);
+  // role 儲存使用者角色，預設為 "guest"
   const [role, setRole] = useState(defaultContextValue.role);
-
+  
+  // 檢查 LocalStorage 以恢復登入狀態
   useEffect(() => {
     try {
       const authState = JSON.parse(localStorage.getItem("shopee:auth.state"));
@@ -26,40 +32,44 @@ export const AuthProvider = ({ children }) => {
       if (authState && authState.token) {
         setInAuthenticated(true);
         setUserId(authState.userId);
-        setUnitName(authState.unitName);
+        setUnitName(authState.unitName); // 確保 unitName 被正確恢復
         setRole(authState.role || "user");
       } else if (token) {
-        const decoded = jwtDecode(token); // 解析 JWT token
-        setInAuthenticated(true); // 設定為已登入
-        setUserId(decoded.userId); // 載入儲存的使用者 ID
-        setRole(decoded.role); // 載入儲存的角色
+        const decoded = jwtDecode(token);
+        setInAuthenticated(true);
+        setUserId(decoded.sub.userId); // 从 sub 中获取 userId
+        setUnitName(decoded.sub.unitName); // 从 sub 中获取 unitName
+        setRole(decoded.sub.role || "user"); // 从 sub 中获取 role
       }
     } catch (error) {
       console.error("Failed to parse auth state from localStorage", error);
     }
   }, []);
 
+  // 定義依角色過濾資料的方法
+  // admin 看到所有資料，一般使用者只能看到自己的資料
   const filterDataByRole = (data) => {
     return role === "admin"
       ? data
       : data.filter((item) => item.user_id === userId);
   };
 
-  return (
-    <AuthContext.Provider
+    return (
+      // 將 AuthContext 內的值提供給子組件
+      // 透過 AuthContext.Provider 提供 isAuthenticated、userId、role 等狀態，讓其他組件能使用。
+      <AuthContext.Provider
       value={{
         isAuthenticated,
         userId,
         unitName,
         role,
 
-        // 登入方法，透過 API 進行身份驗證
+        // 提供登入方法，檢查使用者是否輸入帳號和密碼
         login: async (username, password) => {
           if (!username || !password) {
             return { token: null, error: "請輸入帳號和密碼" };
           }
           try {
-            // 透過 API 進行身份驗證，取得 token，JWT token 有效期限為 1 小時
             const response = await fetch("http://127.0.0.1:5000/api/login", {
               method: "POST",
               headers: {
@@ -68,84 +78,26 @@ export const AuthProvider = ({ children }) => {
               body: JSON.stringify({ username, password }),
             });
             const data = await response.json();
-
-            // 模擬登入
-            const users = JSON.parse(localStorage.getItem("users")) || [];
-            const user = users.find(
-              (user) =>
-                user.username === username && user.plain_password === password
-            );
-            // let role = "user";
-
-            if (user) {
-              const token = "user-token";
-              const userId = user.ID;
-              const unitName = user.unit_name || "Default Unit"; // 使用者的單位名稱
-              const role = "user";
-              localStorage.setItem(
-                "shopee:auth.state",
-                JSON.stringify({ 
-                  token, 
-                  userId, 
-                  unitName, 
-                  role })
-              );
-              setInAuthenticated(true); // 設定為已登入
-              setUserId(userId); // 設定使用者 ID
-              setUnitName(unitName); // 設定單位名稱
-              setRole(role); // 設定使用者角色
-              return { token }; // 回傳 token
-            // } else if (username === "admin" && password === "123456") {
-            //   role = "admin";
-            //   // 如果是系統管理員
-            //   localStorage.setItem(
-            //     "shopee:auth.state",
-            //     JSON.stringify({
-            //       token: "admin-token",
-            //       userId: 0,
-            //       unitName: "Admin Unit",
-            //       role,
-            //     })
-            //   );
-            //   setInAuthenticated(true);
-            //   setUserId(0);
-            //   setUnitName("Admin Unit");
-            //   setRole(role);
-            //   return { token: "admin-token" };
-            // } else if (username === "user" && password === "123456") {
-            //   role = "user";
-            //   // 如果是一般使用者
-            //   localStorage.setItem(
-            //     "shopee:auth.state",
-            //     JSON.stringify({
-            //       token: "user-token",
-            //       userId: 1,
-            //       unitName: "User Unit",
-            //       role,
-            //     })
-            //   );
-            //   setInAuthenticated(true);
-            //   setUserId(1);
-            //   setUnitName("User Unit");
-            //   setRole(role);
-            //   return { token: "user-token" };
-            } else if (data.token) {
+            if (data.token) {
               const decoded = jwtDecode(data.token);
-              const unitName = decoded.unit_name || "Default Unit"; // 使用者的單位名稱
+              console.log("Decoded JWT:", decoded);
+              console.log("Unit Name:", decoded.sub.unitName); // 確保 unitName 在這裡有值
               localStorage.setItem(
                 "shopee:auth.state",
                 JSON.stringify({
                   token: data.token,
-                  userId: decoded.userId,
-                  unitName,
-                  role: decoded.role,
+                  userId: decoded.sub.userId,
+                  unitName: decoded.sub.unitName,  // 確保 unitName 被存入
+                  role: decoded.sub.role,
                 })
               );
-              setInAuthenticated(true); // 設定為已登入
-              setUserId(decoded.userId); // 設定使用者 ID
-              setUnitName(unitName); // 設定單位名稱
-              setRole(decoded.role); // 設定使用者角色
-              return { token: data.token }; // 回傳 token
+        
+              // 更新 useState 狀態，並回傳 token 或錯誤訊息
+              setInAuthenticated(true);
+              setUserId(decoded.sub.userId);
+              setRole(decoded.sub.role);
+              setUnitName(decoded.sub.unitName); // 確保 unitName 正確解析
+              return { token: data.token };
             } else {
               return { token: null, error: "帳號或密碼錯誤" };
             }
@@ -154,21 +106,23 @@ export const AuthProvider = ({ children }) => {
             return { token: null, error: "登入失敗，請稍後再試" };
           }
         },
-        // 登出方法，清除登入狀態
+        // 提供登出方法
+        // 登出時，將 isAuthenticated 設為 false，清空 userId、unitName 和 role
         logout: async () => {
           setInAuthenticated(false);
           setUserId(null);
           setUnitName("");
           setRole("guest");
+          // 移除 localStorage 中的登入資訊
           localStorage.removeItem("shopee:auth.state");
           localStorage.removeItem("shopee:auth.token");
         },
         filterDataByRole,
       }}
     >
-      {children}
+    {children}
     </AuthContext.Provider>
   );
 };
 
-export default AuthContext;
+export default AuthContext;// 匯出 AuthContext，供其他組件使用。
