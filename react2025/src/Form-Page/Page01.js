@@ -1,21 +1,20 @@
-import React, { useState , useEffect , useContext, useCallback  } from 'react';
+import React, { useState, useEffect, useContext ,useCallback } from 'react';
 import Clearfix from "../components/common/Clearfix";
-// import axios from 'axios';
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthContext from '../components/auth/AuthContext';
 import FormField from '../components/common/FormField';
 import moment from 'moment';
 import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
-import Mock from 'mockjs';
+
 
 const Page01 = () => {
-  const { role, filterDataByRole ,userId } = useContext(AuthContext); // 獲取使用者角色和過濾方法
-  // const isAdmin = role === 'admin'; // 判斷是否為管理員
+  const { role, userId } = useContext(AuthContext);
   const isAdmin = role?.toLowerCase() === "admin"; // 判斷是否為管理員
   const [formData, setFormData] = useState({
     id: null,
-    user_id: userId, // 新增 user_id
+    user_id: userId,
     unit_name: '',
     farmer_name: '',
     phone: '',
@@ -31,55 +30,34 @@ const Page01 = () => {
     Crop: '',
   });
 
-  const [data, setData] = useState([]); // 保存數據到狀態，定義 value 狀態
+  const [data, setData] = useState([]); // 保存數據到狀態 
   const [loading, setLoading] = useState(false); // 控制提交按鈕的加載狀態
-
-  // 模擬獲取數據
+ 
   const fetchData = useCallback(async () => {
     try {
-      const response = Mock.mock({
-        'data|7': [
-          [
-            '@increment', // 自增 ID
-            userId, // 使用者 ID
-            '@word', // 單位名稱
-            '@name', // 農戶姓名
-            '@phone', // 電話
-            '@phone', // 傳真
-            '@phone', // 行動電話
-            '@county(true)', // 地址
-            '@EMAIL', // 電子郵件
-            '@float(1, 100, 2, 2)', // 面積
-            '@sentence(3, 5)', // 備註
-            '@word', // 編號
-            '@word', // 地籍號碼
-            '@float(1, 100, 2, 2)', // 面積
-            '@word', // 作物
-          ],
-        ],
-      });
+      const response = await axios.get('http://127.0.0.1:5000/api/users/get');
       console.log('原始數據:', response.data); // 打印原始數據確認結構
       if (Array.isArray(response.data)) {
         const transformedData = response.data.map(item => ({
-          id:  item[0],
-          user_id: item[1],
-          unit_name: item[2],
-          farmer_name: item[3],
-          phone: item[4],
-          fax: item[5],
-          mobile: item[6],
-          address: item[7],
-          email: item[8],
-          total_area: item[9],
-          notes: item[10],
-          Number: item[11],
-          LandParcelNumber: item[12],
-          Area: item[13],
-          Crop: item[14],
+          id: item[0],  
+          user_id: item[1], 
+          password: item[2], 
+          unit_name: item[4],  
+          farmer_name: item[5],
+          phone: item[6],
+          fax: item[7],
+          mobile: item[8],
+          address: item[9],
+          email: item[10],
+          total_area: item[11],
+          notes: item[12],
+          operation_date: item[13],
+          created_date: item[14],
+          land_parcel_number: item[15],
         }));
-        const filteredData = filterDataByRole(transformedData);
-        console.log('過濾後的數據:', filteredData); // 打印過濾後的數據
-        setData(filteredData);
+ 
+        setData( transformedData ); // 設置數據狀態
+        console.log('Data state after setting:', transformedData ); 
       } else {
         alert('伺服器返回錯誤，請稍後重試！');
       }
@@ -87,14 +65,13 @@ const Page01 = () => {
       console.error('獲取數據失敗:', error);
       alert('無法載入數據，請檢查您的伺服器或網絡連接！');
     }
-  }, [filterDataByRole, userId]);
+  }, [ ]);
 
-  
   useEffect(() => {
     console.log('Data to be displayed:');
     console.log('Fetching data...');
     fetchData(); // 組件加載時獲取數據
-  }, [fetchData]); // 這裡 fetchData 依賴於 useCallback
+  }, [fetchData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -112,29 +89,19 @@ const Page01 = () => {
       if (formData.OperationDate) {
         formData.OperationDate = moment(formData.OperationDate).format('YYYY-MM-DD HH:mm:ss');
       }
-      // const response = await axios.post('http://localhost:5000/api/records03/post', formData);
+
       let response;
       if (formData.id) {
         // 更新現有資料
-        response = {
-          data: data.map(item => item.id === formData.id ? { ...formData, id: item.id } : item),
-        };
+        response = await axios.put(`http://127.0.0.1:5000/api/users/${formData.id}`, formData);
       } else {
         // 新增資料
-        response = {
-          data: [
-            ...data,
-            {
-              id: data.length + 1,
-              ...formData,
-            },
-          ],
-        };
+        response = await axios.post('http://127.0.0.1:5000/api/users/post', formData);
       }
-      setData(response.data); // 更新表格數據
+      fetchData(); // 更新表格數據
       setFormData({
         id: null,
-        user_id: userId, // 新增 user_id
+        user_id: userId,
         unit_name: '',
         farmer_name: '',
         phone: '',
@@ -162,14 +129,10 @@ const Page01 = () => {
   const handleDelete = async (id) => {
     if (!isAdmin) return; // 如果不是管理員，則返回
     try {
-      // const response = await axios.delete(`http://localhost:5000/api/records03/delete/${id}`);
-      // 模擬刪除數據
-      const response = {
-        data: data.filter(record => record.id !== id),
-      };
-      setData(filterDataByRole(response.data)); // 更新表格數據並過濾
+      await axios.delete(`http://127.0.0.1:5000/api/users/${id}`);
+      fetchData(); // 重新獲取數據
       alert('成功刪除資料！'); // 成功提示
-      console.log('成功刪除資料，回應:', response.data);
+
     } catch (error) {
       console.error('刪除請求失敗:', error);
       alert('刪除失敗，請稍後重試！'); // 錯誤提示
@@ -324,7 +287,7 @@ const Page01 = () => {
         <thead>
           <tr>
             <th>id</th>
-            <th>user_id</th>
+            <th>帳號</th>
             <th>單位名稱</th>
             <th>經營農戶姓名</th>
             <th>聯絡電話</th>
