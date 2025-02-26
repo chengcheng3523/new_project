@@ -110,11 +110,7 @@ const Page01 = () => {
         address: '',
         email: '',
         total_area: '',
-        notes: '',
-        Number: '',
-        LandParcelNumber: '',
-        Area: '',
-        Crop: '',
+        notes: ''
       }); // 清空表單
       alert('成功儲存資料！'); // 成功提示
       console.log('成功發送請求，回應:', response.data);
@@ -245,38 +241,6 @@ const Page01 = () => {
           onChange={handleChange}
           label="備註:"
         />
-        <FormField
-          id="Number"
-          name="Number"
-          type="text"
-          value={formData.Number}
-          onChange={handleChange}
-          label="編號:"
-        />
-        <FormField
-          id="LandParcelNumber"
-          name="LandParcelNumber"
-          type="text"
-          value={formData.LandParcelNumber}
-          onChange={handleChange}
-          label="農地地籍號碼:"
-        />
-        <FormField
-          id="Area"
-          name="Area"
-          type="text"
-          value={formData.Area}
-          onChange={handleChange}
-          label="面積:"
-        />
-        <FormField
-        id="Crop"
-        name="Crop"
-        type="text"
-        value={formData.Crop}
-        onChange={handleChange}
-        label="種植作物:"
-      />
         <Button type="submit" disabled={loading}>
           {loading ? '儲存中...' : '儲存'}
         </Button>
