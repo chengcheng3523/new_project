@@ -11,7 +11,8 @@ import Mock from 'mockjs';
 
 const Page01 = () => {
   const { role, filterDataByRole ,userId } = useContext(AuthContext); // 獲取使用者角色和過濾方法
-  const isAdmin = role === 'admin'; // 判斷是否為管理員
+  // const isAdmin = role === 'admin'; // 判斷是否為管理員
+  const isAdmin = role?.toLowerCase() === "admin"; // 判斷是否為管理員
   const [formData, setFormData] = useState({
     id: null,
     user_id: userId, // 新增 user_id

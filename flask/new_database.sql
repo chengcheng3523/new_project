@@ -27,13 +27,14 @@ VALUES
     ('帳號', '原始密碼', '加密後的密碼', '單位名稱', '經營農戶姓名', '聯絡電話', '傳真', '行動電話', '住址', 'e-mail',  5.5, '備註', 1),
     ('farmer1', '原始密碼', 'hashed_password', '農場 A', '張三', '02-12345678', '02-87654321', '0912-345678', '住址', 'farmer1@example.com', 5.5, 'notes',2),
     ('farmer2', '原始密碼', 'hashed_password', '農場 B', '張三', '02-12345678', '02-87654321', '0912-345678', '台北市XX路', 'farmer1@example.com', 5.5, 'notes',3);
--- 插入 admin 和 user 帳號
+-- 插入 user 帳號
 INSERT INTO users (username, plain_password, password, unit_name, farmer_name, phone, fax, mobile, address, email, total_area, notes, land_parcel_id)
 VALUES 
-    ('admin', '123456', '$2b$12$KIX8e1G1Q1k1Q1k1Q1k1QO', 'Admin Unit', 'Admin', '123456789', '123456789', '123456789', 'Admin Address', 'admin@example.com', 0, 'Admin notes', 'LP000'),
-    ('user', '123456', '$2b$12$KIX8e1G1Q1k1Q1k1Q1k1QO', 'User Unit', 'User', '123456789', '123456789', '123456789', 'User Address', 'user@example.com', 0, 'User notes', 'LP001');
+    ('newuser', 'password123', '加密後的密碼', 'New User Unit', 'New User', '987654321', '987654321', '987654321', 'New User Address', 'newuser@example.com', 0, 'New user notes', 'LP002'),
+    ('user', '123456', '加密後的密碼', 'User Unit', 'User', '123456789', '123456789', '123456789', 'User Address', 'user@example.com', 0, 'User notes', 'LP001');
+
 -- 更新資料庫中的密碼哈希
-UPDATE users SET password = 'scrypt:32768:8:1$GecnsTV9ESdKmZ6l$87571fe224e1a108335d3061c51aca78e66d1a4d7f3a42cf3bcbdee24a6cb38bb08f3c36d411cbb4b0a173639f5ef7b77d3e1810497db66c43586e52c40afc85' WHERE username = 'admin';
+UPDATE users SET password = 'scrypt:32768:8:1$GecnsTV9ESdKmZ6l$87571fe224e1a108335d3061c51aca78e66d1a4d7f3a42cf3bcbdee24a6cb38bb08f3c36d411cbb4b0a173639f5ef7b77d3e1810497db66c43586e52c40afc85' WHERE username = 'newuser';
 UPDATE users SET password = 'scrypt:32768:8:1$GecnsTV9ESdKmZ6l$87571fe224e1a108335d3061c51aca78e66d1a4d7f3a42cf3bcbdee24a6cb38bb08f3c36d411cbb4b0a173639f5ef7b77d3e1810497db66c43586e52c40afc85' WHERE username = 'user';
 
 -- land_parcels（農地資訊）
