@@ -54,7 +54,7 @@ const RegisterPage = () => {
         ...formData, 
         plain_password: formData.password // 確保 plain_password 與 password 一致
     };
-      const response = await axios.post('http://127.0.0.1:5000/api/users/post', payload);
+      const response = await axios.post('http://127.0.0.1:5000/api/register/post', payload);
       if (response.status === 201) {
       alert('註冊成功');
       navigate('/login'); 

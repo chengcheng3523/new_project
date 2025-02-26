@@ -297,10 +297,6 @@ const Page01 = () => {
             <th>e-mail</th>
             <th>栽培總面積</th>
             <th>備註</th>
-            <th>編號</th>
-            <th>農地地籍號碼</th>
-            <th>面積</th>
-            <th>種植作物</th>
           </tr>
         </thead>
         <tbody>
@@ -317,10 +313,6 @@ const Page01 = () => {
               <td>{record.email}</td>
               <td>{record.total_area}</td>
               <td>{record.notes}</td>
-              <td>{record.Number}</td>
-              <td>{record.LandParcelNumber}</td>
-              <td>{record.Area}</td>
-              <td>{record.Crop}</td>
               {isAdmin && (
                 <td>
                 <EditButton className="btn btn-warning btn-sm" onClick={() => handleEdit(record)}>更正</EditButton>
