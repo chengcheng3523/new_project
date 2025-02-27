@@ -12,6 +12,8 @@ import LoginPage from './pages/LoginPage';
 import ScrollToTop from './components/common/ScrollToTop';
 
 import RegisterPage from './pages/RegisterPage';
+import Lands from './Form-Page/Lands'; // 土地資料
+
 
 import Page01 from './Form-Page/Page01'; // 表1-1
 import Page02 from './Form-Page/Page02'; // 表1-2 未完成
@@ -50,6 +52,7 @@ const App = () => {
           <Route path="/:productname" element={<ProductPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
+          <Route path="/Lands" element={< Lands />} />
           
           <Route path="/Page01" element={< Page01 />} />  
           <Route path="/Page02" element={< Page02 />} />

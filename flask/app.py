@@ -18,7 +18,7 @@ app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'  # 設置 JWT 密鑰
 app.config['SECRET_KEY'] = 'your_secret_key'  # 設置 Flask 密鑰
 db = SQLAlchemy(app)
 jwt = JWTManager(app)  # 初始化 JWTManager 並與 Flask 應用程式關聯
-
+CORS(app)
 
 #Database connection settings
 app.config['MYSQL_HOST'] = 'localhost'
@@ -64,6 +64,23 @@ class users(db.Model):
     notes = db.Column(db.String(50), comment='備註')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+# 定义 land_parcels 数据模型
+class LandParcel(db.Model):
+    __tablename__ = 'land_parcels'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    number = db.Column(db.String(50), nullable=False)
+    land_parcel_number = db.Column(db.String(50), nullable=False)
+    area = db.Column(db.Numeric(10, 2), nullable=False)
+    crop = db.Column(db.String(100))
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+
 
 # 註冊 API
 @app.route('/api/register/post', methods=['POST'])
@@ -148,6 +165,11 @@ def create_user_profile():
     except Exception as e:
         print(f"Error occurred while updating profile: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+
+
+
+
 
 
 # 查詢users-all
@@ -249,6 +271,102 @@ def login():
         return jsonify(token=access_token), 200
     
     return jsonify(error='帳號或密碼錯誤'), 401
+
+
+# 農地資訊
+
+# 添加農地資訊 API
+@app.route('/api/land_parcels', methods=['POST'])
+def add_land_parcel():
+    print("Received POST request")  # 添加调试信息
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '请求的 JSON 格式错误'}), 400
+
+    user_id = data.get('user_id')
+    number = data.get('number')
+    land_parcel_number = data.get('land_parcel_number')
+    area = data.get('area')
+    crop = data.get('crop')
+    notes = data.get('notes')
+
+    new_land_parcel = LandParcel(
+        user_id=user_id,
+        number=number,
+        land_parcel_number=land_parcel_number,
+        area=area,
+        crop=crop,
+        notes=notes
+    )
+
+    db.session.add(new_land_parcel)
+    db.session.commit()
+
+    return jsonify({'status': '農地資訊添加成功', 'land_parcel_id': new_land_parcel.id}), 201
+
+# 更新農地資訊 API
+@app.route('/api/land_parcels/<int:id>', methods=['PUT'])
+def update_land_parcel(id):
+    data = request.get_json()
+    land_parcel = LandParcel.query.get(id)
+
+    if not land_parcel:
+        return jsonify({'error': '農地資訊未找到'}), 404
+
+    land_parcel.number = data.get('number', land_parcel.number)
+    land_parcel.land_parcel_number = data.get('land_parcel_number', land_parcel.land_parcel_number)
+    land_parcel.area = data.get('area', land_parcel.area)
+    land_parcel.crop = data.get('crop', land_parcel.crop)
+    land_parcel.notes = data.get('notes', land_parcel.notes)
+
+    db.session.commit()
+    return jsonify({'status': '農地資訊更新成功'}), 200
+
+# 删除農地資訊 API
+@app.route('/api/land_parcels/<int:id>', methods=['DELETE'])
+def delete_land_parcel(id):
+    print(f"Attempting to delete ID: {id}")  # 添加调试信息
+    land_parcel = LandParcel.query.get(id)
+    if not land_parcel:
+        print(f"ID {id} not found")  # 添加调试信息
+        return jsonify({'error': '農地資訊未找到'}), 404
+
+    db.session.delete(land_parcel)
+    db.session.commit()
+    return jsonify({'status': '農地資訊已删除'}), 200
+
+
+# 查询所有農地資訊 API
+@app.route('/api/land_parcels', methods=['GET'])
+def get_land_parcels():
+    results = db.session.query(
+        LandParcel,
+        users.farmer_name
+    ).join(users).all()
+
+    land_parcels = [
+        {
+            'id': result.LandParcel.id,
+            'user_id': result.LandParcel.user_id,
+            'farmer_name': result.farmer_name,
+            'number': result.LandParcel.number,
+            'land_parcel_number': result.LandParcel.land_parcel_number,
+            'area': str(result.LandParcel.area),
+            'crop': result.LandParcel.crop,
+            'notes': result.LandParcel.notes
+        }
+        for result in results
+    ]
+
+    return jsonify(land_parcels)
+
+
+# 農地資訊
+
+
+
+
+
 
 # 在應用程式啟動時測試資料庫連線
 if __name__ == '__main__':

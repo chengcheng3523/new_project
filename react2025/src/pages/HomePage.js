@@ -4,6 +4,8 @@ import Clearfix from '../components/common/Clearfix';
 import styled from 'styled-components';
 import TitleCard from '../components/product/TitleCard.js';
 import AuthContext from '../components/auth/AuthContext.js';
+
+import Lands from '../Form-Page/Lands';
 import Page01 from '../Form-Page/Page01';
 import Page02 from '../Form-Page/Page02';
 import Page002 from '../Form-Page/Page002';
@@ -47,6 +49,9 @@ const HomePage =()=> {
   const handleCardClick = (title) => {
     if (title === 'Page01') {
       setSelectedForm(isAuthenticated ? <Page01 /> : <div>資料紀錄: Page01</div>);
+
+    } else if (title === 'Lands') {
+      setSelectedForm(isAuthenticated ? <Lands /> : <div>資料紀錄: Lands</div>);
     } else if (title === 'Page02') {
       setSelectedForm(isAuthenticated ? <Page02 /> : <div>資料紀錄: Page02</div>);
     } else if (title === 'Page002') {
@@ -67,6 +72,9 @@ const HomePage =()=> {
       <ProductCollectionContainer>
         <ProductContainer onClick={() => handleCardClick('Page01')}>
           <TitleCard title="使用者基本資料" />
+        </ProductContainer>
+        <ProductContainer onClick={() => handleCardClick('Lands')}>
+          <TitleCard title="農地資料" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page02')}>
           <TitleCard title="生產計畫" />
@@ -92,4 +100,4 @@ const HomePage =()=> {
      </DefaultLayout>
     );
 };
-export default HomePage;  
+export default HomePage;

@@ -1,20 +1,20 @@
 import React, { useState , useEffect , useContext, useCallback  } from 'react';
 import Clearfix from "../components/common/Clearfix";
-// import axios from 'axios';
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthContext from '../components/auth/AuthContext';
 import FormField from '../components/common/FormField';
 import moment from 'moment';
 import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
-import Mock from 'mockjs';
+
 
 const Page02 = () => {
-  const { role, filterDataByRole ,userId } = useContext(AuthContext); // 獲取使用者角色和過濾方法
-  const isAdmin = role === 'admin'; // 判斷是否為管理員
+  const { role, filterDataByRole ,userId } = useContext(AuthContext);
+  const isAdmin = role === 'admin'; 
   const [formData, setFormData] = useState({
     id: null,
-    user_id: userId, // 新增 user_id
+    user_id: userId, 
     area_code: '',
     area_size: '',
     month: '',
@@ -22,25 +22,13 @@ const Page02 = () => {
     notes: '',
   });
 
-  const [data, setData] = useState([]); // 保存數據到狀態，定義 value 狀態
-  const [loading, setLoading] = useState(false); // 控制提交按鈕的加載狀態
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false); 
 
   // 模擬獲取數據
   const fetchData = useCallback(async () => {
     try {
-      const response = Mock.mock({
-        'data|7': [
-          [            
-            '@increment', // 自增 ID
-            userId, // 使用者 ID
-            '@word', // 場區代號
-            '@float(1, 100, 2, 2)', // 場區面積
-            '@month', // 月份
-            '@sentence(3, 5)', // 種植作物種類、產期、預估產量（公斤）
-            '@sentence(3, 5)', // 備註
-          ],
-      ],
-    });
+      const response = await axios.get('http://localhost:5000/api/records03/get');
       console.log('原始數據:', response.data); // 打印資料確認結構
       // setData(response.data);
       if (Array.isArray(response.data)) {
