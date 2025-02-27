@@ -7,7 +7,7 @@ import FormField from '../components/common/FormField';
 import moment from 'moment';
 import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
-
+import { useNavigate } from 'react-router-dom';
 
 const Page01 = () => {
   const { role, userId } = useContext(AuthContext);
@@ -24,15 +24,14 @@ const Page01 = () => {
     email: '',
     total_area: '',
     notes: '',
-    Number: '',
-    LandParcelNumber: '',
-    Area: '',
-    Crop: '',
+    land_parcel_id: '',
+
   });
 
   const [data, setData] = useState([]); // 保存數據到狀態 
   const [loading, setLoading] = useState(false); // 控制提交按鈕的加載狀態
- 
+  const navigate = useNavigate();
+
   const fetchData = useCallback(async () => {
     try {
       const response = await axios.get('http://127.0.0.1:5000/api/users/get');
@@ -54,6 +53,7 @@ const Page01 = () => {
           operation_date: item[13],
           created_date: item[14],
           land_parcel_number: item[15],
+          land_parcel_id: item[16],
         }));
  
         setData( transformedData ); // 設置數據狀態
@@ -68,13 +68,20 @@ const Page01 = () => {
   }, [ ]);
 
   useEffect(() => {
-    console.log('Data to be displayed:');
-    console.log('Fetching data...');
+    if (!userId) {
+      alert('請先登入！');
+      navigate('/login'); // 重定向到登入頁面
+      return;
+    }
     fetchData(); // 組件加載時獲取數據
-  }, [fetchData]);
+  }, [fetchData, navigate, userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // 如果不是管理员并且字段是 user_id，则不更新该字段
+    if (!isAdmin && name === 'user_id') {
+      return;
+    }
     setFormData({
       ...formData,
       [name]: value,
@@ -84,16 +91,27 @@ const Page01 = () => {
   const handleSubmit = async (e) => {
     e.preventDefault(); // 阻止表單默認提交行為
     setLoading(true); // 開啟加載狀態
+
+    // 格式化日期為 MySQL 支持的格式
+    if (formData.OperationDate) {
+      formData.OperationDate = moment(formData.OperationDate).format('YYYY-MM-DD HH:mm:ss');
+    }
+
     try {
-      // 格式化日期為 MySQL 支持的格式
-      if (formData.OperationDate) {
-        formData.OperationDate = moment(formData.OperationDate).format('YYYY-MM-DD HH:mm:ss');
-      }
 
       let response;
       if (formData.id) {
+
+        // 如果是管理員，則可以更新現有資料
+        if (isAdmin) {
         // 更新現有資料
         response = await axios.put(`http://127.0.0.1:5000/api/users/${formData.id}`, formData);
+        } else {
+          alert('您沒有權限更新資料！');
+          setLoading(false);
+          return;
+        }
+
       } else {
         // 新增資料
         response = await axios.post('http://127.0.0.1:5000/api/users/post', formData);
@@ -110,10 +128,12 @@ const Page01 = () => {
         address: '',
         email: '',
         total_area: '',
-        notes: ''
+        notes: '',
+        land_parcel_id: '',
       }); // 清空表單
       alert('成功儲存資料！'); // 成功提示
       console.log('成功發送請求，回應:', response.data);
+      navigate('/'); // 跳轉到主頁
     } catch (error) {
       console.error('發送請求失敗:', error);
       alert('儲存失敗，請稍後重試！'); // 錯誤提示
@@ -149,10 +169,7 @@ const Page01 = () => {
       email: record.email,
       total_area: record.total_area,
       notes: record.notes,
-      Number: record.Number,
-      LandParcelNumber: record.LandParcelNumber,
-      Area: record.Area,
-      Crop: record.Crop,
+      land_parcel_id: record.land_parcel_id,
     });
   };
 
@@ -161,14 +178,6 @@ const Page01 = () => {
       <Clearfix height="100px" />
       <Form onSubmit={handleSubmit}>
         <h4>表1-1.使用者基本資料</h4>
-        <FormField
-          id="user_id"
-          name="user_id"
-          type="text"
-          value={formData.user_id}
-          onChange={handleChange}
-          label="user_id:"
-        />
         <FormField
           id="unit_name"
           name="unit_name"
@@ -241,6 +250,14 @@ const Page01 = () => {
           onChange={handleChange}
           label="備註:"
         />
+        <FormField
+          id="land_parcel_id"
+          name="land_parcel_id"
+          type="text"
+          value={formData.land_parcel_id}
+          onChange={handleChange}
+          label="農地區號:" 
+        />
         <Button type="submit" disabled={loading}>
           {loading ? '儲存中...' : '儲存'}
         </Button>
@@ -261,6 +278,8 @@ const Page01 = () => {
             <th>e-mail</th>
             <th>栽培總面積</th>
             <th>備註</th>
+            <th>農地區號</th>
+            {isAdmin && <th>操作</th>} {/* 只有管理员显示操作按钮 */}
           </tr>
         </thead>
         <tbody>
@@ -277,6 +296,7 @@ const Page01 = () => {
               <td>{record.email}</td>
               <td>{record.total_area}</td>
               <td>{record.notes}</td>
+              <td>{record.land_parcel_number}</td>
               {isAdmin && (
                 <td>
                 <EditButton className="btn btn-warning btn-sm" onClick={() => handleEdit(record)}>更正</EditButton>

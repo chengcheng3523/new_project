@@ -65,44 +65,90 @@ class users(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-
-# 新增users
-@app.route('/api/users/post', methods=['POST'])
-def create_users():
+# 註冊 API
+@app.route('/api/register/post', methods=['POST'])
+def register_user():
     try:
-        data = request.get_json()  # 獲取 JSON 數據
-        print("Received Data:", data)  # Debug 輸出    
+        data = request.get_json()
+        print("Received Data (Register):", data)  # Debug 輸出    
+
         if not data:
             return jsonify({'error': '請求的 JSON 格式錯誤或 Content-Type 錯誤'}), 400
-        
+
+        username = data.get('username')
         password = data.get('password')
-        if not password:
-            return jsonify({'error': '密碼不能為空'}), 400
+        plain_password = data.get('plain_password')  # 取得原始密碼
+        
 
-        password_hash = generate_password_hash(password)  # 加密密碼
+        if not username or not password or not plain_password:
+            return jsonify({'error': '帳號、密碼或原始密碼不能為空'}), 400
 
-        new_users = users(
-            username=data.get('username'),
-            password=password_hash,  # 使用加密後的密碼
-            plain_password=data.get('plain_password'),
-            unit_name=data.get('unit_name'),
-            land_parcel_id=data.get('land_parcel_id'),
-            farmer_name=data.get('farmer_name'),
-            phone=data.get('phone'),
-            fax=data.get('fax'),
-            mobile=data.get('mobile'),
-            address=data.get('address'),
-            email=data.get('email'),
-            total_area=data.get('total_area'),
-            notes=data.get('notes')
+        # 檢查密碼與確認密碼是否相同
+        if password != plain_password:
+            return jsonify({'error': '密碼與確認密碼不一致'}), 400
+        
+        # 檢查帳號是否已存在
+        existing_user = users.query.filter_by(username=username).first()
+        if existing_user:
+            return jsonify({'error': '帳號已存在'}), 400
+        
+        # 加密密碼
+        password_hash = generate_password_hash(password)
+
+        # 創建使用者（帳號、加密密碼、原始密碼）
+        new_user = users(
+            username=username,
+            password=password_hash,
+            plain_password=plain_password  # 存入原始密碼
+        
         )
 
-        db.session.add(new_users)  # 新增使用者資料
-        db.session.commit()        # 提交變更
-        return jsonify({'status': '使用者創建成功'}), 201  # 回應成功訊息
+        db.session.add(new_user)
+        db.session.commit()
+
+        return jsonify({'status': '註冊成功', 'user_id': new_user.id}), 201  # 返回使用者 ID
     except Exception as e:
-        print(f"Error occurred: {str(e)}")  # 输出错误信息
-        return jsonify({'error': str(e)}), 500  # 返回錯誤訊息
+        print(f"Error occurred during registration: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# 新增/更新基本資料 API
+@app.route('/api/users/post', methods=['POST'])
+def create_user_profile():
+    try:
+        data = request.get_json()
+        print("Received Data (User Profile):", data)  # Debug 輸出    
+
+        if not data:
+            return jsonify({'error': '請求的 JSON 格式錯誤或 Content-Type 錯誤'}), 400
+
+        user_id = data.get('user_id')  # 確保提供 user_id
+        if not user_id:
+            return jsonify({'error': '缺少 user_id'}), 400
+
+        # 查找是否有該使用者
+        existing_user = users.query.get(user_id)
+        if not existing_user:
+            return jsonify({'error': '找不到對應的使用者'}), 404
+
+        # 更新使用者的基本資料
+        existing_user.unit_name = data.get('unit_name')
+        existing_user.land_parcel_id = data.get('land_parcel_id')
+        existing_user.farmer_name = data.get('farmer_name')
+        existing_user.phone = data.get('phone')
+        existing_user.fax = data.get('fax')
+        existing_user.mobile = data.get('mobile')
+        existing_user.address = data.get('address')
+        existing_user.email = data.get('email')
+        existing_user.total_area = data.get('total_area')
+        existing_user.notes = data.get('notes')
+
+        db.session.commit()
+
+        return jsonify({'status': '使用者資料更新成功'}), 200
+    except Exception as e:
+        print(f"Error occurred while updating profile: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 
 # 查詢users-all
 @app.route('/api/users/get', methods=['GET'])
@@ -126,6 +172,14 @@ def update_users(id):
     try:
         data = request.get_json()  # 獲取 JSON 數據
         user = users.query.get(id)  # 查詢指定的使用者
+
+        user_id = data.get('user_id')
+        if not user_id:
+            return jsonify({'error': '缺少 user_id'}), 400
+
+        existing_user = users.query.get(user_id)
+        if not existing_user:
+            return jsonify({'error': '找不到對應的使用者'}), 404
 
         if 'password' in data:
             if data['password']:
@@ -154,6 +208,8 @@ def update_users(id):
             user.total_area = data['total_area']
         if 'notes' in data:
             user.notes = data['notes']
+        if 'land_parcel_id' in data:
+            user.land_parcel_id = data['land_parcel_id']
 
         db.session.commit()  
         return jsonify({'status': '使用者資料更新成功'}), 200 

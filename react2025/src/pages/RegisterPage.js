@@ -21,17 +21,7 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    plain_password: '',
-    unit_name: '',
-    farmer_name: '',
-    phone: '',
-    fax: '',
-    mobile: '',
-    address: '',
-    email: '',
-    total_area: '0',
-    notes: '',
-    land_parcel_id: "LP123"
+    plain_password: ''
   });
   const navigate = useNavigate();
 
@@ -44,24 +34,32 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+      // 前端驗證：檢查密碼是否一致
+    if (formData.password !== formData.plain_password) {
+      alert("密碼與確認密碼不一致");
+      return;
+    }
     try {
-      // await createUser(formData);
-      // 將註冊資料儲存在 localStorage 中
-      // const users = JSON.parse(localStorage.getItem('users')) || [];
-      // users.push(formData);
-      // localStorage.setItem('users', JSON.stringify(users));
       const payload = { 
-        ...formData, 
-        plain_password: formData.password // 確保 plain_password 與 password 一致
-    };
+        username: formData.username, 
+        password: formData.password,
+        plain_password: formData.plain_password
+      };
+  
       const response = await axios.post('http://127.0.0.1:5000/api/register/post', payload);
+      
       if (response.status === 201) {
-      alert('註冊成功');
-      navigate('/login'); 
+        alert('註冊成功');
+        localStorage.setItem('user_id', response.data.user_id); // 存 user_id
+        navigate('/login'); // 跳轉到的頁面
       }
     } catch (error) {
       console.error('註冊失敗', error);
-      alert('註冊失敗，請檢查輸入資料或稍後再試');
+      if (error.response && error.response.data.error) {
+        alert(error.response.data.error); // 顯示後端錯誤訊息
+      } else {
+        alert('註冊失敗，請稍後再試');
+      }
     }
   };
 
@@ -80,46 +78,9 @@ const RegisterPage = () => {
           <input name="password" type="password" className="form-control" placeholder="請輸入密碼" onChange={handleChange} />
         </div>
         <div className="mb-3">
-          <label className="form-label">單位名稱</label>
-          <input name="unit_name" className="form-control" placeholder="請輸入單位名稱" onChange={handleChange} />
+          <label className="form-label">確認密碼</label>
+          <input name="plain_password" type="password" className="form-control" placeholder="請再次輸入密碼" onChange={handleChange} />
         </div>
-        <div className="mb-3">
-          <label className="form-label">農友姓名</label>
-          <input name="farmer_name" className="form-control" placeholder="請輸入農友姓名" onChange={handleChange} />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">電話</label>
-          <input name="phone" className="form-control" placeholder="請輸入電話" onChange={handleChange} />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">傳真</label>
-          <input name="fax" className="form-control" placeholder="請輸入傳真" onChange={handleChange} />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">手機</label>
-          <input name="mobile" className="form-control" placeholder="請輸入手機" onChange={handleChange} />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">地址</label>
-          <input name="address" className="form-control" placeholder="請輸入地址" onChange={handleChange} />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">電子郵件</label>
-          <input name="email" className="form-control" placeholder="請輸入電子郵件" onChange={handleChange} />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">田地編號</label>
-          <input name="land_parcel_id" className="form-control" placeholder="請輸入田地編號" onChange={handleChange} />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">總面積</label>
-          <input name="total_area" className="form-control" placeholder="請輸入總面積" onChange={handleChange} />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">備註</label>
-          <input name="notes" className="form-control" placeholder="請輸入備註" onChange={handleChange} />
-        </div>
-
 
         <button type="submit" className="btn btn-primary">註冊</button>
         <button type="button" onClick={() => navigate('/login')} className="btn btn-secondary ms-2">返回登入</button>
