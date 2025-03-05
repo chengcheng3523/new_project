@@ -68,7 +68,6 @@ WHERE u.username = 'farmer1';
 CREATE TABLE form002 (
     id               INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id          INT NOT NULL,                    -- 關聯 `users` 表
-    land_parcel_id   INT NOT NULL,                    -- 關聯 `land_parcels` 表
     area_code        VARCHAR(20) NOT NULL,            -- 場區代號
     area_size        DECIMAL(10,2) NOT NULL,          -- 場區面積（公頃）
     month            VARCHAR(10) NOT NULL,            -- 月份（1月-12月）
@@ -76,21 +75,19 @@ CREATE TABLE form002 (
     notes            TEXT,                            -- 備註
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (land_parcel_id) REFERENCES land_parcels(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 -- 資料示例form002（生產計畫）
-INSERT INTO form002 (user_id, land_parcel_id, area_code, area_size, month, crop_info, notes)
+INSERT INTO form002 (user_id, area_code, area_size, month, crop_info, notes)
 VALUES 
-    (1, 1, '場區代號', 2.5, '月份', '種植作物種類、產期、預估產量（公斤）', '備註'),
-    (1, 1, 'AC123456', 2.5, '3月', '小白菜/1000', '間作及敷蓋稻草'),
-    (1, 2, 'AC654321', 1.8, '6月', '玉米/500', '施有機肥'),
-    (2, 3, 'AC987654', 3.2, '9月', '水稻/2000', '水源充足');
+    (1,  '場區代號', 2.5, '月份', '種植作物種類、產期、預估產量（公斤）', '備註'),
+    (1,  'AC123456', 2.5, '3月', '小白菜/1000', '間作及敷蓋稻草'),
+    (1,  'AC654321', 1.8, '6月', '玉米/500', '施有機肥'),
+    (2,  'AC987654', 3.2, '9月', '水稻/2000', '水源充足');
 --  查詢某農戶的生產計畫 
 SELECT u.username, u.farmer_name, l.number, f.area_code, f.area_size, f.month, f.crop_info, f.notes
 FROM form002 f
 JOIN users u ON f.user_id = u.id
-JOIN land_parcels l ON f.land_parcel_id = l.id
 WHERE u.username = 'farmer1';
 
 --  form02（種子(苗)登記表）

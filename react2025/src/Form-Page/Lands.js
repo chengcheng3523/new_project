@@ -1,3 +1,4 @@
+// 農地資訊
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Clearfix from "../components/common/Clearfix";
 import axios from 'axios';
@@ -168,7 +169,7 @@ const Lands = () => {
           type="text"
           value={formData.number}
           onChange={handleChange}
-          label="場區代號:"
+          label="編號:"
         />
         <FormField
           id="land_parcel_number"
@@ -176,7 +177,7 @@ const Lands = () => {
           type="text"
           value={formData.land_parcel_number}
           onChange={handleChange}
-          label="農地區號:"
+          label="農地地籍號碼:"
         />
         <FormField
           id="area"
@@ -184,7 +185,7 @@ const Lands = () => {
           type="text"
           value={formData.area}
           onChange={handleChange}
-          label="場區面積:"
+          label="面積:"
         />
         <FormField
           id="crop"
@@ -211,9 +212,9 @@ const Lands = () => {
         <thead>
           <tr>
             <th>id</th>
-            <th>場區代號</th>
-            <th>農地區號</th>
-            <th>場區面積</th>
+            <th>編號</th>
+            <th>農地地籍號碼</th>
+            <th>面積</th>
             <th>種植作物</th>
             <th>備註</th>
             {isAdmin && <th>操作</th>}

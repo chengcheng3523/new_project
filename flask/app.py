@@ -79,9 +79,23 @@ class LandParcel(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+# 生產計畫模型
+class Form002(db.Model):
+    __tablename__ = 'form002'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    area_code = db.Column(db.String(20), nullable=False)
+    area_size = db.Column(db.Numeric(10, 2), nullable=False)
+    month = db.Column(db.String(10), nullable=False)
+    crop_info = db.Column(db.String(255), nullable=False)
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 
+
+# ----------------------------------------------------------------------------------------------
 # 註冊 API
 @app.route('/api/register/post', methods=['POST'])
 def register_user():
@@ -165,12 +179,6 @@ def create_user_profile():
     except Exception as e:
         print(f"Error occurred while updating profile: {str(e)}")
         return jsonify({'error': str(e)}), 500
-
-
-
-
-
-
 
 # 查詢users-all
 @app.route('/api/users/get', methods=['GET'])
@@ -272,7 +280,7 @@ def login():
     
     return jsonify(error='帳號或密碼錯誤'), 401
 
-
+# ----------------------------------------------------------------------------------------
 # 農地資訊
 
 # 添加農地資訊 API
@@ -360,8 +368,216 @@ def get_land_parcels():
 
     return jsonify(land_parcels)
 
-
 # 農地資訊
+# ----------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 添加生產計畫
+@app.route('/api/form002', methods=['POST'])
+def add_form002():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+
+    user_id = data.get('user_id')
+    area_code = data.get('area_code')
+    area_size = data.get('area_size')
+    month = data.get('month')
+    crop_info = data.get('crop_info')
+    notes = data.get('notes')
+
+    # 檢查必要欄位是否存在
+    if not user_id:
+        return jsonify({'error': '缺少 user_id'}), 400
+    if not area_code:
+        return jsonify({'error': '缺少 area_code'}), 400
+    if not area_size:
+        return jsonify({'error': '缺少 area_size'}), 400
+    if not month:
+        return jsonify({'error': '缺少 month'}), 400
+    if not crop_info:
+        return jsonify({'error': '缺少 crop_info'}), 400
+
+    try:
+        new_form = Form002(
+            user_id=user_id,
+            area_code=area_code,
+            area_size=area_size,
+            month=month,
+            crop_info=crop_info,
+            notes=notes
+        )
+
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '生產計畫添加成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form002: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# 更新生產計畫
+@app.route('/api/form002/<int:id>', methods=['PUT'])
+def update_form002(id):
+    data = request.get_json()
+    form = Form002.query.get(id)
+    if not form:
+        return jsonify({'error': '生產計畫未找到'}), 404
+    
+    form.area_code = data.get('area_code', form.area_code)
+    form.area_size = data.get('area_size', form.area_size)
+    form.month = data.get('month', form.month)
+    form.crop_info = data.get('crop_info', form.crop_info)
+    form.notes = data.get('notes', form.notes)
+    
+    db.session.commit()
+    return jsonify({'status': '生產計畫更新成功'}), 200
+
+# 刪除生產計畫
+@app.route('/api/form002/<int:id>', methods=['DELETE'])
+def delete_form002(id):
+    form = Form002.query.get(id)
+    if not form:
+        return jsonify({'error': '生產計畫未找到'}), 404
+    
+    db.session.delete(form)
+    db.session.commit()
+    return jsonify({'status': '生產計畫已刪除'}), 200
+
+# 查詢某農戶的生產計畫
+@app.route('/api/form002/user/<int:user_id>', methods=['GET'])
+def get_user_form002(user_id):
+    results = db.session.query(
+        Form002, db.column('users.farmer_name')
+    ).join(
+        db.table('users'), Form002.user_id == db.column('users.id')
+    ).filter(
+        Form002.user_id == user_id
+    ).all()
+
+    form_list = [
+        {
+            'id': result.Form002.id,
+            'user_id': result.Form002.user_id,
+            'area_code': result.Form002.area_code,
+            'area_size': str(result.Form002.area_size),
+            'month': result.Form002.month,
+            'crop_info': result.Form002.crop_info,
+            'notes': result.Form002.notes
+        }
+        for result in results
+    ]
+    return jsonify(form_list)
+
+# 查询所有生產計畫 API
+@app.route('/api/form002', methods=['GET'])
+def get_all_form002():
+    results = db.session.query(Form002, users.farmer_name).\
+        join(users, users.id == Form002.user_id).all()
+
+    forms = [
+        {
+            'id': result.Form002.id,
+            'user_id': result.Form002.user_id,
+            'farmer_name': result.farmer_name,
+            'area_code': result.Form002.area_code,
+            'area_size': str(result.Form002.area_size),
+            'month': result.Form002.month,
+            'crop_info': result.Form002.crop_info,
+            'notes': result.Form002.notes
+        }
+        for result in results
+    ]
+
+    return jsonify(forms)
+
+
+# 生產計畫
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
