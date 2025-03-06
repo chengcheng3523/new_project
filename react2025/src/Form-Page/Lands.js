@@ -208,8 +208,10 @@ const Lands = () => {
         </Button>
       </Form>
       <Clearfix height="50px" />
-      <table className="table table-striped table-bordered table-hover">
-        <thead>
+      {/* 表格顯示 */}
+      <table className="table table-bordered table-hover table-responsive table caption-top">
+        <caption>農地資訊</caption>
+      <thead class="table-light">
           <tr>
             <th>id</th>
             <th>編號</th>

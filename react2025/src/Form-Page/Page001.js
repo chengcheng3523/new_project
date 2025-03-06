@@ -10,7 +10,7 @@ import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
 import { useNavigate } from 'react-router-dom';
 
-const Page01 = () => {
+const Page001 = () => {
   const { role, userId } = useContext(AuthContext);
   const isAdmin = role?.toLowerCase() === "admin"; // 判斷是否為管理員
   const [formData, setFormData] = useState({
@@ -265,8 +265,9 @@ const Page01 = () => {
       </Form>
       <Clearfix height="50px" />
       {/* 表格顯示 */}
-      <table className="table table-striped table-bordered table-hover">
-        <thead>
+      <table className="table table-bordered table-hover table-responsive table caption-top">
+        <caption>使用者基本資料</caption>
+        <thead class="table-light">
           <tr>
             <th>id</th>
             <th>帳號</th>
@@ -313,4 +314,4 @@ const Page01 = () => {
   );
 };
 
-export default Page01;
+export default Page001;

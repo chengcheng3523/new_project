@@ -90,11 +90,10 @@ FROM form002 f
 JOIN users u ON f.user_id = u.id
 WHERE u.username = 'farmer1';
 
---  form02（種子(苗)登記表）
+-- form02（種子(苗)登記表）
 CREATE TABLE form02 (
     id                   INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id              INT NOT NULL,                    -- 關聯 `users` 表
-    land_parcel_id       INT NOT NULL,                    -- 關聯 `land_parcels` 表
     cultivated_crop      VARCHAR(100) NOT NULL,           -- 栽培作物
     crop_variety         VARCHAR(100) NOT NULL,           -- 栽培品種
     seed_source          VARCHAR(255) NOT NULL,           -- 種子(苗)來源
@@ -103,26 +102,26 @@ CREATE TABLE form02 (
     notes                TEXT,                            -- 備註
     created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (land_parcel_id) REFERENCES land_parcels(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
 -- 資料示例form02（種子(苗)登記表）
-INSERT INTO form02 (user_id, land_parcel_id, cultivated_crop, crop_variety, seed_source, seedling_purchase_date, seedling_purchase_type, notes)
+INSERT INTO form02 (user_id, cultivated_crop, crop_variety, seed_source, seedling_purchase_date, seedling_purchase_type, notes)
 VALUES 
-    (1, 1, '高麗菜', '高麗菜', '自行育苗', '2025-02-01', '種苗', '間作及敷蓋稻草'),
-    (1, 2, '高麗菜', '高麗菜', '購買來源：XYZ公司', '2025-03-15', '種子', '施有機肥');
+    (1,  '高麗菜', '高麗菜', '自行育苗', '2025-02-01', '種苗', '間作及敷蓋稻草'),
+    (1,  '高麗菜', '高麗菜', '購買來源：XYZ公司', '2025-03-15', '種子', '施有機肥');
+
 -- 查詢某農戶的所有種子登記
-SELECT u.username, u.farmer_name, l.number, f.cultivated_crop, f.crop_variety, f.seed_source, f.seedling_purchase_date, f.seedling_purchase_type, f.notes
+SELECT u.username, u.farmer_name, f.cultivated_crop, f.crop_variety, f.seed_source, f.seedling_purchase_date, f.seedling_purchase_type, f.notes
 FROM form02 f
 JOIN users u ON f.user_id = u.id
-JOIN land_parcels l ON f.land_parcel_id = l.id
 WHERE u.username = 'farmer1';
 
 -- form03（栽培工作紀錄）
 CREATE TABLE form03 (
     id                   INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id              INT NOT NULL,                    -- 關聯 `users` 表
-    land_parcel_id       INT NOT NULL,                    -- 關聯 `land_parcels` 表
+
     operation_date       DATE NOT NULL,                   -- 作業日期
     field_code           VARCHAR(50) NOT NULL,            -- 田區代號
     crop                 VARCHAR(100) NOT NULL,           -- 作物
@@ -130,21 +129,22 @@ CREATE TABLE form03 (
     notes                TEXT,                            -- 備註
     created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (land_parcel_id) REFERENCES land_parcels(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    -- FOREIGN KEY (land_parcel_id) REFERENCES land_parcels(id) ON DELETE CASCADE
 );
 
 -- 資料示例form03（栽培工作紀錄）
-INSERT INTO form03 (user_id, land_parcel_id, operation_date, field_code, crop, crop_content, notes)
+INSERT INTO form03 (user_id, operation_date, field_code, crop, crop_content, notes)
 VALUES 
-    (1, 1, '2025-02-01', 'F000-0000', '高麗菜', '1-1 整地, 4-2 灌溉', '間作及敷蓋稻草'),
-    (1, 2, '2025-02-05', 'F000-0001', '高麗菜', '2-1 介質消毒, 5-2 追肥', '使用有機肥料'),
-    (2, 3, '2025-03-15', 'F000-0002', '小黃瓜', '4-3 培土, 6-6 除草', '增加水源');
+    (1, '2025-02-01', 'F000-0000', '高麗菜', '1-1 整地, 4-2 灌溉', '間作及敷蓋稻草'),
+    (1, '2025-02-05', 'F000-0001', '高麗菜', '2-1 介質消毒, 5-2 追肥', '使用有機肥料'),
+    (2, '2025-03-15', 'F000-0002', '小黃瓜', '4-3 培土, 6-6 除草', '增加水源');
+
 -- 查詢某農戶的所有栽培工作紀錄
-SELECT u.username, u.farmer_name, l.number, f.operation_date, f.field_code, f.crop, f.crop_content, f.notes
+SELECT u.username, u.farmer_name, f.operation_date, f.field_code, f.crop, f.crop_content, f.notes
 FROM form03 f
 JOIN users u ON f.user_id = u.id
-JOIN land_parcels l ON f.land_parcel_id = l.id
+
 WHERE u.username = 'farmer1';
 
 -- form04（養液配製紀錄）
@@ -176,20 +176,24 @@ WHERE u.username = 'farmer1';
 
 -- form05（養液配製資材與代碼對照表）
 CREATE TABLE form05 (
+    id                   INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
+    user_id              INT NOT NULL,                    -- 關聯 `users` 表
     nutrient_material_code VARCHAR(20) PRIMARY KEY,  -- 養液配製資材代碼
     nutrient_material_name VARCHAR(100) NOT NULL,     -- 養液配製資材名稱
     notes                 TEXT,                        -- 備註
     created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 -- 資料示例form05（養液配製資材與代碼對照表）
 INSERT INTO form05 (nutrient_material_code, nutrient_material_name, notes)
 VALUES 
-    ('M000-0000', 'ooxx資材', '備註'),
-    ('M000-0001', 'yyzz資材', '需要存放於陰涼處');
+    (1, 'M000-0000', 'ooxx資材', '備註'),
+    (2, 'M000-0001', 'yyzz資材', '需要存放於陰涼處');
 --  查詢養液配製資材代碼及名稱
-SELECT nutrient_material_code, nutrient_material_name, notes
-FROM form05
+SELECT u.username, u.farmer_name, f.nutrient_material_code, f.nutrient_material_name, f.notes
+FROM form05  f
+JOIN users u ON f.user_id = u.id
 WHERE nutrient_material_code = 'M000-0000';
 
 -- form06（肥料施用紀錄）

@@ -84,6 +84,7 @@ class Form002(db.Model):
     __tablename__ = 'form002'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
     area_code = db.Column(db.String(20), nullable=False)
     area_size = db.Column(db.Numeric(10, 2), nullable=False)
     month = db.Column(db.String(10), nullable=False)
@@ -92,6 +93,37 @@ class Form002(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+
+
+# 種苗登記表
+class Form02(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    cultivated_crop = db.Column(db.String(100), nullable=False)
+    crop_variety = db.Column(db.String(100), nullable=False)
+    seed_source = db.Column(db.String(255), nullable=False)
+    seedling_purchase_date = db.Column(db.Date, nullable=False)
+    seedling_purchase_type = db.Column(db.String(50), nullable=False)
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+
+
+
+# 栽培工作模型
+class Form03(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    operation_date = db.Column(db.Date, nullable=False)
+    field_code = db.Column(db.String(50), nullable=False)
+    crop = db.Column(db.String(100), nullable=False)
+    crop_content = db.Column(db.Text, nullable=False)
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 
@@ -371,73 +403,6 @@ def get_land_parcels():
 # 農地資訊
 # ----------------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # 添加生產計畫
 @app.route('/api/form002', methods=['POST'])
 def add_form002():
@@ -556,8 +521,318 @@ def get_all_form002():
 
     return jsonify(forms)
 
-
 # 生產計畫
+# ----------------------------------------------------------------------------------------------
+
+#新增種子(苗)登記
+@app.route('/api/form02', methods=['POST'])
+def add_form02():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+
+    user_id = data.get('user_id')
+    cultivated_crop = data.get('cultivated_crop')
+    crop_variety = data.get('crop_variety')
+    seed_source = data.get('seed_source')
+    seedling_purchase_date = datetime.strptime(data.get('seedling_purchase_date'), '%Y-%m-%d')
+    seedling_purchase_type = data.get('seedling_purchase_type')
+    notes = data.get('notes')
+
+    # 檢查必要欄位是否存在
+    if not user_id:
+        return jsonify({'error': '缺少 user_id'}), 400
+    if not cultivated_crop:
+        return jsonify({'error': '缺少 cultivated_crop'}), 400
+    if not crop_variety:
+        return jsonify({'error': '缺少 crop_variety'}), 400
+    if not seed_source:
+        return jsonify({'error': '缺少 seed_source'}), 400
+    if not seedling_purchase_date:
+        return jsonify({'error': '缺少 seedling_purchase_date'}), 400
+    if not seedling_purchase_type:
+        return jsonify({'error': '缺少 seedling_purchase_type'}), 400
+    
+
+    try:
+        new_form = Form02(
+            user_id=user_id,
+            cultivated_crop=cultivated_crop,
+            crop_variety=crop_variety,
+            seed_source=seed_source,
+            seedling_purchase_date=seedling_purchase_date,
+            seedling_purchase_type=seedling_purchase_type,
+            notes=notes
+        )
+
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '種苗登記，添加成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form02: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+#更新種子(苗)登記
+@app.route('/api/form02/<int:id>', methods=['PUT'])
+def update_form02(id):
+    data = request.get_json()
+    form = Form02.query.get(id)
+    if not form:
+        return jsonify({'error': '種子(苗)登記未找到'}), 404
+    
+    form.cultivated_crop = data['cultivated_crop']
+    form.crop_variety = data['crop_variety']
+    form.seed_source = data['seed_source']
+    form.seedling_purchase_date = datetime.strptime(data['seedling_purchase_date'], '%Y-%m-%d')
+    form.seedling_purchase_type = data['seedling_purchase_type']
+    form.notes = data.get('notes') 
+    db.session.commit()
+    return jsonify({'status': '種子(苗)登記更新成功'}), 200
+
+#刪除種子(苗)登記
+@app.route('/api/form02/<int:id>', methods=['DELETE'])
+def delete_form02(id):
+    record = Form02.query.get(id)
+    if not record:
+        return jsonify({"error": "Record not found"}), 404
+
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({"message": "Record deleted successfully"})
+
+
+
+#查詢所有種子(苗)登記
+@app.route('/api/form02', methods=['GET'])
+def get_all_form02():
+    results = db.session.query(Form02, users.farmer_name).\
+        join(users, users.id == Form02.user_id).all()
+
+    forms = [
+        {
+            'id': result.Form02.id,
+            'user_id': result.Form02.user_id,
+            'farmer_name': result.farmer_name,
+            'cultivated_crop': result.Form02.cultivated_crop,
+            'crop_variety': result.Form02.crop_variety,
+            'seed_source': result.Form02.seed_source,
+            'seedling_purchase_date': result.Form02.seedling_purchase_date.strftime('%Y-%m-%d'),
+            'seedling_purchase_type': result.Form02.seedling_purchase_type,
+            'notes': result.Form02.notes
+        }
+        for result in results
+    ]
+
+    return jsonify(forms)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ----------------------------------------------------------------------------------------------
+# 新增栽培工作紀錄
+@app.route('/api/form03', methods=['POST'])
+def add_form03():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    user_id = data.get('user_id')
+    operation_date =  datetime.strptime(data.get('operation_date'), '%Y-%m-%d')
+    field_code = data.get('field_code')
+    crop = data.get('crop')
+    crop_content = data.get('crop_content')
+    notes = data.get('notes')
+
+    # 檢查必要欄位是否存在
+    if not user_id:
+        return jsonify({'error': '缺少 user_id'}), 400
+    if not operation_date:
+        return jsonify({'error': '缺少 operation_date'}), 400
+    if not field_code:
+        return jsonify({'error': '缺少 field_code'}), 400
+    if not crop:
+        return jsonify({'error': '缺少 crop'}), 400
+    if not crop_content:
+        return jsonify({'error': '缺少 crop_content'}), 400
+    
+    try:
+        new_form = Form03(
+            user_id=user_id,
+            operation_date=operation_date,
+            field_code=field_code,
+            crop=crop,
+            crop_content=crop_content,
+            notes=notes
+        )
+
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '栽培工作添加成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form03: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+
+# 更新栽培工作紀錄
+@app.route('/api/form03/<int:id>', methods=['PUT'])
+def update_form03(id):
+    data = request.get_json()
+    form = Form03.query.get(id)
+    if not form:
+        return jsonify({'error': '栽培工作紀錄 not found未找到'}), 404
+    
+    form.operation_date = datetime.strptime(data['operation_date'], '%Y-%m-%d')
+    form.field_code = data['field_code']
+    form.crop = data['crop']
+    form.crop_content = data['crop_content']
+    form.notes = data.get('notes')
+    db.session.commit()
+    return jsonify({'message': '栽培工作紀錄更新成功'})
+
+# 刪除栽培工作紀錄
+@app.route('/api/form03/<int:id>', methods=['DELETE'])
+def delete_form03(id):
+    record = Form03.query.get(id)
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'message': 'Record deleted successfully'})
+
+
+# 查詢所有農戶的栽培紀錄
+@app.route('/api/form03', methods=['GET'])
+def get_all_form03(): 
+    results = db.session.query(Form03, users.farmer_name).\
+        join(users, users.id == Form03.user_id).all()
+    
+    forms = [
+        {
+            "id": result.Form03.id,
+            "user_id": result.Form03.user_id,
+            "farmer_name": result.farmer_name,
+            "operation_date": result.Form03.operation_date.strftime('%Y-%m-%d'),
+            "field_code": result.Form03.field_code,
+            "crop": result.Form03.crop,
+            "crop_content": result.Form03.crop_content,
+            "notes": result.Form03.notes
+        }
+        for result in results
+    ]
+
+    return jsonify(forms)
+
+# 栽培工作紀錄
+# ----------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

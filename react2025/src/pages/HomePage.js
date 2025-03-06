@@ -6,10 +6,10 @@ import TitleCard from '../components/product/TitleCard.js';
 import AuthContext from '../components/auth/AuthContext.js';
 
 import Lands from '../Form-Page/Lands';
-import Page01 from '../Form-Page/Page01';
+import Page001 from '../Form-Page/Page001';
 import Page02 from '../Form-Page/Page02';
 import Page002 from '../Form-Page/Page002';
-import Page003 from '../Form-Page/Page003';
+import Page03 from '../Form-Page/Page03';
 // import Page004 from '../Form-Page/Page004';
 // import Page005 from '../Form-Page/Page005';
 // import Page006 from '../Form-Page/Page006';
@@ -47,17 +47,17 @@ const HomePage =()=> {
   const [selectedForm, setSelectedForm] = useState(null);
 
   const handleCardClick = (title) => {
-    if (title === 'Page01') {
-      setSelectedForm(isAuthenticated ? <Page01 /> : <div>資料紀錄: Page01</div>);
+    if (title === 'Page001') {
+      setSelectedForm(isAuthenticated ? <Page001 /> : <div>資料紀錄: Page001</div>);
 
     } else if (title === 'Lands') {
       setSelectedForm(isAuthenticated ? <Lands /> : <div>資料紀錄: Lands</div>);
-    } else if (title === 'Page02') {
-      setSelectedForm(isAuthenticated ? <Page02 /> : <div>資料紀錄: Page02</div>);
     } else if (title === 'Page002') {
       setSelectedForm(isAuthenticated ? <Page002 /> : <div>資料紀錄: Page002</div>);
-    } else if (title === 'Page003') {
-      setSelectedForm(isAuthenticated ? <Page003 /> : <div>資料紀錄: Page003</div>);
+    } else if (title === 'Page02') {
+      setSelectedForm(isAuthenticated ? <Page02 /> : <div>資料紀錄: Page02</div>);
+    } else if (title === 'Page03') {
+      setSelectedForm(isAuthenticated ? <Page03 /> : <div>資料紀錄: Page03</div>);
     } else {
       setSelectedForm(null);
     }
@@ -70,25 +70,25 @@ const HomePage =()=> {
       {isAuthenticated && <h1>歡迎回來</h1>} {/* 如果已登入，顯示歡迎訊息 */}
       
       <ProductCollectionContainer>
-        <ProductContainer onClick={() => handleCardClick('Page01')}>
+        <ProductContainer onClick={() => handleCardClick('Page001')}>
           <TitleCard title="使用者基本資料" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Lands')}>
           <TitleCard title="農地資料" />
         </ProductContainer>
-        <ProductContainer onClick={() => handleCardClick('Page02')}>
+        <ProductContainer onClick={() => handleCardClick('Page002')}>
           <TitleCard title="生產計畫" />
         </ProductContainer>
-        <ProductContainer onClick={() => handleCardClick('Page002')}>
+        <ProductContainer onClick={() => handleCardClick('Page02')}>
           <TitleCard title="種子(苗)紀錄" />
         </ProductContainer>
-        <ProductContainer onClick={() => handleCardClick('Page003')}>
+        <ProductContainer onClick={() => handleCardClick('Page03')}>
           <TitleCard title="栽培工作" />
         </ProductContainer>
-        <ProductContainer onClick={() => handleCardClick('Page004')}>
+        <ProductContainer onClick={() => handleCardClick('Page04')}>
           <TitleCard title="養液配製" />
         </ProductContainer>
-        <ProductContainer onClick={() => handleCardClick('Page005')}>
+        <ProductContainer onClick={() => handleCardClick('Page05')}>
           <TitleCard title="資材與代碼對照表" />
         </ProductContainer>
       </ProductCollectionContainer>

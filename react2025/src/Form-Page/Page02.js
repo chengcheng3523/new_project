@@ -1,13 +1,15 @@
-// 生產計畫
+// 種子(苗)登記表
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Clearfix from "../components/common/Clearfix";
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthContext from '../components/auth/AuthContext';
 import FormField from '../components/common/FormField';
+import SelectField from '../components/common/SelectField';
 import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
 import { useNavigate } from 'react-router-dom';
+import moment from 'moment';
 
 const Page02 = () => {
   const { role, userId } = useContext(AuthContext);
@@ -15,10 +17,11 @@ const Page02 = () => {
   const [formData, setFormData] = useState({
     id: null,
     user_id: userId, 
-    area_code: '',
-    area_size: '',
-    month: '',
-    crop_info: '',
+    cultivated_crop: '',
+    crop_variety: '',
+    seed_source: '',
+    seedling_purchase_date: '',
+    seedling_purchase_type: '',
     notes: '',
   });
 
@@ -28,16 +31,17 @@ const Page02 = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:5000/api/form002');
+      const response = await axios.get('http://127.0.0.1:5000/api/form02');
       console.log('原始數據:', response.data); // 打印原始數據確認結構
       if (Array.isArray(response.data)) {
         const transformedData = response.data.map(item => ({
           id: item.id, // 使用 land_parcel_number 作为唯一标识符
           user_id: item.user_id,
-          area_code: item.area_code,
-          area_size: item.area_size,
-          month: item.month,
-          crop_info: item.crop_info,
+          cultivated_crop: item.cultivated_crop,
+          crop_variety: item.crop_variety,
+          seed_source: item.seed_source,
+          seedling_purchase_date: item.seedling_purchase_date,
+          seedling_purchase_type: item.seedling_purchase_type,
           notes: item.notes,
         }));
 
@@ -78,7 +82,7 @@ const Page02 = () => {
     setLoading(true);
 
   // 檢查必要欄位是否填寫
-  const requiredFields = ['area_code', 'area_size', 'month', 'crop_info'];
+  const requiredFields = ['cultivated_crop', 'crop_variety', 'seed_source', 'seedling_purchase_type' ];
   for (const field of requiredFields) {
     if (!formData[field]) {
       alert(`請填寫 ${field} 欄位！`);
@@ -92,7 +96,7 @@ const Page02 = () => {
     if (formData.id) {
       // 更新現有資料，使用 PUT 請求
       if (isAdmin) {
-        response = await axios.put(`http://127.0.0.1:5000/api/form002/${formData.id}`, formData);
+        response = await axios.put(`http://127.0.0.1:5000/api/form02/${formData.id}`, formData);
       } else {
         alert('您沒有權限更新資料！');
         setLoading(false);
@@ -100,12 +104,13 @@ const Page02 = () => {
       }
       } else {
         // 新增資料
-        response = await axios.post('http://127.0.0.1:5000/api/form002', {
+        response = await axios.post('http://127.0.0.1:5000/api/form02', {
           user_id: userId,
-          area_code: formData.area_code,
-          area_size: formData.area_size,
-          month: formData.month,
-          crop_info: formData.crop_info,
+          cultivated_crop: formData.cultivated_crop,
+          crop_variety: formData.crop_variety,
+          seed_source: formData.seed_source,
+          seedling_purchase_date: formData.seedling_purchase_date,
+          seedling_purchase_type: formData.seedling_purchase_type,
           notes: formData.notes,
         });
       }
@@ -113,10 +118,11 @@ const Page02 = () => {
       setFormData({
         id: null,
         user_id: userId,
-        area_code: '',
-        area_size: '',
-        month: '',
-        crop_info: '',
+        cultivated_crop: '',
+        crop_variety: '',
+        seed_source: '',
+        seedling_purchase_date: '',
+        seedling_purchase_type: '',
         notes: '',
       });
       alert('成功儲存資料！');
@@ -137,7 +143,7 @@ const Page02 = () => {
       return;
     }
     try {
-      const response = await axios.delete(`http://127.0.0.1:5000/api/form002/${id}`);
+      const response = await axios.delete(`http://127.0.0.1:5000/api/form02/${id}`);
       console.log('删除成功:', response.data);
       fetchData(); // 刷新数据
       alert('成功刪除資料！');
@@ -147,16 +153,16 @@ const Page02 = () => {
     }
   };
 
+
   const handleEdit = (record) => {
-    if (!isAdmin) return;
-    console.log(record); // 确认记录内容
+    if (!isAdmin) return; // 如果不是管理員，則返回
     setFormData({
       id: record.id,
-      user_id: record.user_id,
-      area_code: record.area_code,
-      area_size: record.area_size,
-      month: record.month,
-      crop_info: record.crop_info,
+      cultivated_crop: record.cultivated_crop,
+      crop_variety: record.crop_variety,
+      seed_source: record.seed_source,
+      seedling_purchase_date: record.seedling_purchase_date,
+      seedling_purchase_type: record.seedling_purchase_type,
       notes: record.notes,
     });
   };
@@ -165,35 +171,48 @@ const Page02 = () => {
     <div className="container">
       <Clearfix height="100px" />
       <Form onSubmit={handleSubmit}>
-        <h4>表1-2.生產計畫</h4>
+        <h4>表2.種子(苗)登記表</h4>
         <FormField
-          label="場區代號"
-          name="area_code"
-          value={formData.area_code}
+          label="栽培作物"
+          name="cultivated_crop"
+          value={formData.cultivated_crop}
+          onChange={handleChange}
+          disabled={loading}
+
+        />
+        <FormField
+          label="栽培品種"
+          name="crop_variety"
+          value={formData.crop_variety}
+          onChange={handleChange}
+          disabled={loading}
+        />
+        <FormField
+          label="種子(苗)來源"
+          name="seed_source"
+          value={formData.seed_source}
+          onChange={handleChange}
+          disabled={loading}
+        />
+        <FormField
+          label="育苗(購入)日期"
+          name="seedling_purchase_date"
+          type="date"
+          value={moment(formData.seedling_purchase_date).format('YYYY-MM-DD')}  // 格式化为 YYYY-MM-DD
+          onChange={handleChange}
+          disabled={loading}
+        />
+        <SelectField
+          label="育苗(購入)種類"
+          name="seedling_purchase_type"
+          value={formData.seedling_purchase_type}
           onChange={handleChange}
           required
-          disabled={loading}
-        />
-        <FormField
-          label="場區面積"
-          name="area_size"
-          value={formData.area_size}
-          onChange={handleChange}
-          disabled={loading}
-        />
-        <FormField
-          label="月份"
-          name="month"
-          value={formData.month}
-          onChange={handleChange}
-          disabled={loading}
-        />
-        <FormField
-          label="種植作物種類、產期、預估產量（公斤）"
-          name="crop_info"
-          value={formData.crop_info}
-          onChange={handleChange}
-          disabled={loading}
+          options={[
+            { value: '自行育苗', label: '自行育苗' },
+            { value: '購買來源：', label: '購買來源：' },
+          ]}
+          inputOption="購買來源：" // 新增這一行
         />
         <FormField
           label="備註"
@@ -208,14 +227,16 @@ const Page02 = () => {
       </Form>
       <Clearfix height="50px" />
       {/* 表格顯示 */}
-      <table className="table table-striped table-bordered table-hover">
-        <thead>
+      <table className="table table-bordered table-hover table-responsive table caption-top">
+        <caption>表2.種子(苗)登記表</caption>
+        <thead class="table-light">
           <tr>
             <th>id</th>
-            <th>場區代號</th>
-            <th>場區面積</th>
-            <th>月份</th>
-            <th>種植作物種類、產期、預估產量(公斤)ex：小白菜/1000</th>
+            <th>栽培作物</th>
+            <th>栽培品種</th>
+            <th>種子(苗)來源</th>
+            <th>育苗(購入)日期</th>
+            <th>育苗(購入)種類</th>
             <th>備註</th>
             {isAdmin && <th>操作</th>}
           </tr>
@@ -224,10 +245,11 @@ const Page02 = () => {
           {data.map((record) => (
             <tr key={record.id || record.FieldCode}>
               <td>{record.id}</td>
-              <td>{record.area_code}</td>
-              <td>{record.area_size}</td>
-              <td>{record.month}</td>
-              <td>{record.crop_info}</td>
+              <td>{record.cultivated_crop}</td>
+              <td>{record.crop_variety}</td>
+              <td>{record.seed_source}</td>
+              <td>{moment(record.seedling_purchase_date).format('YYYY-MM-DD')}</td>
+              <td>{record.seedling_purchase_type}</td>
               <td>{record.notes}</td>
               {isAdmin && (
                 <td>
@@ -248,5 +270,6 @@ const Page02 = () => {
     </div>
   );
 };
+
 
 export default Page02;
