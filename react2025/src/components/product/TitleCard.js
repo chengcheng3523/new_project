@@ -20,6 +20,9 @@ const Card = styled.div`
 const CardTitle = styled.h3`
     margin: 0 0 16px 0; // 卡片標題的外邊距
     font-size: 1.25em; // 卡片標題的字體大小
+    overflow: hidden; // 如果標題過長，隱藏超出部分
+    text-overflow: ellipsis; // 文字過長時顯示省略號
+    white-space: nowrap; // 防止文字換行
 `;
 
 // TitleCard 元件，用於顯示產品卡片
