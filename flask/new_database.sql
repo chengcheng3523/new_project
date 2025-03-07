@@ -4,7 +4,7 @@ USE new_database;
 -- users（使用者基本資料）
 CREATE TABLE users(
     ID          INT AUTO_INCREMENT PRIMARY KEY,
-    username    VARCHAR(50) NOT NULL COMMENT '帳號',
+    username    VARCHAR(50) NOT NULL UNIQUE COMMENT '帳號',
     plain_password  VARCHAR(255) COMMENT '原始密碼',
     password    VARCHAR(255) NOT NULL COMMENT '加密後的密碼',
     unit_name   VARCHAR(50) COMMENT '單位名稱',
@@ -16,20 +16,17 @@ CREATE TABLE users(
     email       VARCHAR(50) COMMENT 'e-mail',
     total_area  DECIMAL(10,2) COMMENT '栽培總面積',
     notes       VARCHAR(50) COMMENT '備註',
+    land_parcel_id  VARCHAR(20) COMMENT '地號',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-ALTER TABLE users ADD COLUMN land_parcel_id VARCHAR(20);
-ALTER TABLE users MODIFY password VARCHAR(255) NOT NULL COMMENT '加密後的密碼';
--- 資料示例users（使用者基本資料）
-INSERT INTO users (username, plain_password, password, unit_name, farmer_name, phone, fax, mobile, address, email, total_area, notes)
-VALUES
-    ('帳號', '原始密碼', '加密後的密碼', '單位名稱', '經營農戶姓名', '聯絡電話', '傳真', '行動電話', '住址', 'e-mail',  5.5, '備註', 1),
-    ('farmer1', '原始密碼', 'hashed_password', '農場 A', '張三', '02-12345678', '02-87654321', '0912-345678', '住址', 'farmer1@example.com', 5.5, 'notes',2),
-    ('farmer2', '原始密碼', 'hashed_password', '農場 B', '張三', '02-12345678', '02-87654321', '0912-345678', '台北市XX路', 'farmer1@example.com', 5.5, 'notes',3);
--- 插入 user 帳號
+
+-- 插入使用者資料
 INSERT INTO users (username, plain_password, password, unit_name, farmer_name, phone, fax, mobile, address, email, total_area, notes, land_parcel_id)
-VALUES 
+VALUES
+    ('帳號', '原始密碼', '加密後的密碼', '單位名稱', '經營農戶姓名', '聯絡電話', '傳真', '行動電話', '住址', 'e-mail', 5.5, '備註', 'LP003'),
+    ('farmer1', '原始密碼', 'hashed_password', '農場 A', '張三', '02-12345678', '02-87654321', '0912-345678', '住址', 'farmer1@example.com', 5.5, 'notes', 'LP004'),
+    ('farmer2', '原始密碼', 'hashed_password', '農場 B', '張三', '02-12345678', '02-87654321', '0912-345678', '台北市XX路', 'farmer1@example.com', 5.5, 'notes', 'LP0025'),
     ('newuser', 'password123', '加密後的密碼', 'New User Unit', 'New User', '987654321', '987654321', '987654321', 'New User Address', 'newuser@example.com', 0, 'New user notes', 'LP002'),
     ('user', '123456', '加密後的密碼', 'User Unit', 'User', '123456789', '123456789', '123456789', 'User Address', 'user@example.com', 0, 'User notes', 'LP001');
 

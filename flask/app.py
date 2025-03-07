@@ -227,56 +227,31 @@ def get_users():
         return jsonify(users)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-# 修改users
+    
+# 修改使用者資料
 @app.route('/api/users/<int:id>', methods=['PUT'])
 def update_users(id):
     try:
-        data = request.get_json()  # 獲取 JSON 數據
-        user = users.query.get(id)  # 查詢指定的使用者
-
-        user_id = data.get('user_id')
-        if not user_id:
-            return jsonify({'error': '缺少 user_id'}), 400
-
-        existing_user = users.query.get(user_id)
-        if not existing_user:
-            return jsonify({'error': '找不到對應的使用者'}), 404
-
-        if 'password' in data:
-            if data['password']:
-                user.password = generate_password_hash(data['password'])
-
-
+        data = request.get_json()
+        user = users.query.get(id)
         if not user:
             return jsonify({'error': '使用者未找到'}), 404
 
-        # 更新欄位
-        if 'unit_name' in data:
-            user.unit_name = data['unit_name']
-        if 'farmer_name' in data:
-            user.farmer_name = data['farmer_name']
-        if 'phone' in data:
-            user.phone = data['phone']
-        if 'fax' in data:
-            user.fax = data['fax']
-        if 'mobile' in data:
-            user.mobile = data['mobile']
-        if 'address' in data:
-            user.address = data['address']
-        if 'email' in data:
-            user.email = data['email']
-        if 'total_area' in data:
-            user.total_area = data['total_area']
-        if 'notes' in data:
-            user.notes = data['notes']
-        if 'land_parcel_id' in data:
-            user.land_parcel_id = data['land_parcel_id']
+        # 更新密碼
+        if data.get('password'):
+            user.password = generate_password_hash(data['password'])
 
-        db.session.commit()  
-        return jsonify({'status': '使用者資料更新成功'}), 200 
+        # 更新其他欄位
+        for field in ['unit_name', 'farmer_name', 'phone', 'fax', 'mobile', 
+                      'address', 'email', 'total_area', 'notes', 'land_parcel_id']:
+            if field in data:
+                setattr(user, field, data[field])
+
+        db.session.commit()
+        return jsonify({'status': '使用者資料更新成功'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 # 刪除users
 @app.route('/api/users/<int:id>', methods=['DELETE'])

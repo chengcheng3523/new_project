@@ -51,10 +51,7 @@ const Page001 = () => {
           email: item[10],
           total_area: item[11],
           notes: item[12],
-          operation_date: item[13],
-          created_date: item[14],
-          land_parcel_number: item[15],
-          land_parcel_id: item[16],
+          land_parcel_id: item[13],
         }));
  
         setData( transformedData ); // 設置數據狀態
@@ -298,7 +295,7 @@ const Page001 = () => {
               <td>{record.email}</td>
               <td>{record.total_area}</td>
               <td>{record.notes}</td>
-              <td>{record.land_parcel_number}</td>
+              <td>{record.land_parcel_id}</td>
               {isAdmin && (
                 <td>
                 <EditButton className="btn btn-warning btn-sm" onClick={() => handleEdit(record)}>更正</EditButton>
