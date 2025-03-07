@@ -150,7 +150,7 @@ CREATE TABLE form04 (
     user_id              INT NOT NULL,                    -- 關聯 `users` 表
     preparation_date     DATE NOT NULL,                   -- 配製日期
     material_code_or_name VARCHAR(100) NOT NULL,          -- 資材代碼或資材名稱
-    usage_amount         DECIMAL(10, 2) NOT NULL,         -- 使用量(公斤/公升)
+    usage_amount         VARCHAR(100) NOT NULL,         -- 使用量(公斤/公升)
     preparation_process  TEXT,                            -- 配製流程簡述
     final_ph_value       DECIMAL(5, 2),                   -- 最終 pH 值
     final_ec_value       DECIMAL(5, 2),                   -- 最終 EC 值(mS/cm)
@@ -178,6 +178,7 @@ CREATE TABLE form05 (
     nutrient_material_code VARCHAR(20) NOT NULL,  -- 養液配製資材代碼
     nutrient_material_name VARCHAR(100) NOT NULL, -- 養液配製資材名稱
     notes TEXT,                         -- 備註
+    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -198,15 +199,15 @@ WHERE nutrient_material_code = 'M000-0000';
 -- form06（肥料施用紀錄）
 CREATE TABLE form06 (
     id                 INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
-    user_id            INT NOT NULL,               -- 關聯 `users` 表
-    date_used          DATE NOT NULL,                   -- 使用日期
-    field_code         VARCHAR(20) NOT NULL,            -- 田區代號
-    crop               VARCHAR(50) NOT NULL,            -- 作物
-    fertilizer_type    VARCHAR(100) NOT NULL,           -- 施肥別 (基肥, 追肥)
+    user_id            INT NOT NULL,           -- 關聯 `users` 表
+    date_used          DATE NOT NULL,           -- 使用日期
+    field_code         VARCHAR(20) NOT NULL,           -- 田區代號
+    crop               VARCHAR(50),           -- 作物
+    fertilizer_type    VARCHAR(100),           -- 施肥別 (基肥, 追肥)
     material_code_or_name VARCHAR(100) NOT NULL,       -- 資材代碼或資材名稱
-    fertilizer_amount  DECIMAL(10, 2) NOT NULL,         -- 肥料使用量 (公斤/公升)
-    dilution_factor    DECIMAL(5, 2),                  -- 稀釋倍數 (液肥適用)
-    operator           VARCHAR(100) NOT NULL,           -- 操作人員
+    fertilizer_amount  DECIMAL(10, 2),           -- 肥料使用量 (公斤/公升)
+    dilution_factor    DECIMAL(5, 2),           -- 稀釋倍數 (液肥適用)
+    operator           VARCHAR(100),           -- 操作人員
     process            TEXT,                            -- 製作流程
     notes              TEXT,                            -- 備註
     created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

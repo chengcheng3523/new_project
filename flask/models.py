@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
+# 创建一个全局的 db 实例
 db = SQLAlchemy()
 
 # Python SQLAlchemy 類定義：

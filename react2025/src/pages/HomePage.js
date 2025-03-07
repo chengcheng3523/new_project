@@ -10,9 +10,14 @@ import Page001 from '../Form-Page/Page001';
 import Page02 from '../Form-Page/Page02';
 import Page002 from '../Form-Page/Page002';
 import Page03 from '../Form-Page/Page03';
-// import Page004 from '../Form-Page/Page004';
-// import Page005 from '../Form-Page/Page005';
-// import Page006 from '../Form-Page/Page006';
+
+import Page04 from '../Form-Page/Page04';
+import Page05 from '../Form-Page/Page05';
+import Page06 from '../Form-Page/Page06';
+import Page07 from '../Form-Page/Page07';
+import Page08 from '../Form-Page/Page08';
+import Page09 from '../Form-Page/Page09';
+import Page10 from '../Form-Page/Page10';
 
 
 
@@ -58,6 +63,22 @@ const HomePage =()=> {
       setSelectedForm(isAuthenticated ? <Page02 /> : <div>資料紀錄: Page02</div>);
     } else if (title === 'Page03') {
       setSelectedForm(isAuthenticated ? <Page03 /> : <div>資料紀錄: Page03</div>);
+    } else if (title === 'Page04') {
+      setSelectedForm(isAuthenticated ? <Page04 /> : <div>資料紀錄: Page04</div>);
+    } else if (title === 'Page05') {
+      setSelectedForm(isAuthenticated ? <Page05 /> : <div>資料紀錄: Page05</div>);
+    } else if (title === 'Page06') {
+      setSelectedForm(isAuthenticated ? <Page06 /> : <div>資料紀錄: Page06</div>);
+    } else if (title === 'Page07') {
+      setSelectedForm(isAuthenticated ? <Page07 /> : <div>資料紀錄: Page07</div>);
+    } else if (title === 'Page08') {
+      setSelectedForm(isAuthenticated ? <Page08 /> : <div>資料紀錄: Page08</div>);
+    } else if (title === 'Page09') {
+      setSelectedForm(isAuthenticated ? <Page09 /> : <div>資料紀錄: Page09</div>);
+    } else if (title === 'Page10') {
+      setSelectedForm(isAuthenticated ? <Page10 /> : <div>資料紀錄: Page10</div>);
+
+
     } else {
       setSelectedForm(null);
     }
@@ -74,13 +95,13 @@ const HomePage =()=> {
           <TitleCard title="使用者基本資料" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Lands')}>
-          <TitleCard title="農地資料" />
+          <TitleCard title="農地資訊" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page002')}>
           <TitleCard title="生產計畫" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page02')}>
-          <TitleCard title="種子(苗)紀錄" />
+          <TitleCard title="種子(苗)登記" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page03')}>
           <TitleCard title="栽培工作" />
@@ -89,8 +110,36 @@ const HomePage =()=> {
           <TitleCard title="養液配製" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page05')}>
-          <TitleCard title="資材與代碼對照表" />
+          <TitleCard title="養液配製資材與代碼" />
         </ProductContainer>
+        <ProductContainer onClick={() => handleCardClick('Page06')}>
+          <TitleCard title="肥料施用" />
+        </ProductContainer>
+        <ProductContainer onClick={() => handleCardClick('Page07')}>
+          <TitleCard title="肥料資材與代碼" />
+        </ProductContainer>
+        <ProductContainer onClick={() => handleCardClick('Page08')}>
+          <TitleCard title="肥料入出庫" />
+        </ProductContainer>
+        <ProductContainer onClick={() => handleCardClick('Page09')}>
+          <TitleCard title="有害生物防治或環境消毒資材施用" />
+        </ProductContainer>
+        <ProductContainer onClick={() => handleCardClick('Page10')}>
+          <TitleCard title=".防治資材與代碼" />
+        </ProductContainer>
+
+
+
+
+
+
+
+
+
+
+
+
+
       </ProductCollectionContainer>
 
       <div>
