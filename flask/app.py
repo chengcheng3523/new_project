@@ -16,7 +16,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost/new_databas
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'  # 設置 JWT 密鑰
 app.config['SECRET_KEY'] = 'your_secret_key'  # 設置 Flask 密鑰
-db = SQLAlchemy(app)
 jwt = JWTManager(app)  # 初始化 JWTManager 並與 Flask 應用程式關聯
 CORS(app)
 
@@ -37,14 +36,16 @@ def test_db_connection():
     except Exception as e:
         print(f"Database connection failed: {str(e)}")
 
+# ----------------------------------------------------------------------------------------------
+# 定義資料表模型
+from models import db  # 从 models.py 导入 db 实例
+from models import users, LandParcel, Form002, Form02, Form03, Form04, Form05
+
+db.init_app(app)  # 初始化 SQLAlchemy 並與 Flask 應用程式關聯
+
 # 建立資料
 with app.app_context():
     db.create_all()
-
-# ----------------------------------------------------------------------------------------------
-# 定義資料表模型
-
-from models import db, users, LandParcel, Form002, Form02, Form03, Form04, Form05  # 導入模型
 
 # ----------------------------------------------------------------------------------------------
 # 註冊 API

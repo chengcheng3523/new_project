@@ -344,18 +344,5 @@ class Form22(db.Model):
     complaint = db.Column(db.Text, nullable=False)  # 客訴內容
     resolution = db.Column(db.Text, nullable=False)  # 處理結果
     processor = db.Column(db.String(255), nullable=False)  # 處理人簽名/日期
-    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 建立時間
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 更新時間
-
-    user = db.relationship('User', backref=db.backref('form22s', lazy=True))
-
-    def __init__(self, id, user_id, date, customer_name, customer_phone, complaint, resolution, processor):
-        self.id = id
-        self.user_id = user_id
-        self.date = date
-        self.customer_name = customer_name
-        self.customer_phone = customer_phone
-        self.complaint = complaint
-        self.resolution = resolution
-        self.processor = processor
