@@ -41,6 +41,8 @@ def test_db_connection():
 with app.app_context():
     db.create_all()
 
+# ----------------------------------------------------------------------------------------------
+# 定義資料表模型
 
 class users(db.Model):
     # 定義 'users' 資料表的 ORM 類別，對應到 MySQL 資料庫中的 'users' 表。
@@ -109,10 +111,6 @@ class Form02(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-
-
-
-
 # 栽培工作模型
 class Form03(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -124,6 +122,46 @@ class Form03(db.Model):
     notes = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+# 養液配製紀錄
+class Form04(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    preparation_date = db.Column(db.Date, nullable=False)
+    material_code_or_name = db.Column(db.String(50), nullable=False)
+    usage_amount = db.Column(db.Numeric(10, 2), nullable=False)
+    preparation_process = db.Column(db.Text, nullable=False)
+    final_ph_value = db.Column(db.Numeric(10, 2), nullable=False)
+    final_ec_value = db.Column(db.Numeric(10, 2), nullable=False)
+    preparer_name = db.Column(db.String(50), nullable=False)
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -173,7 +211,8 @@ def register_user():
     except Exception as e:
         print(f"Error occurred during registration: {str(e)}")
         return jsonify({'error': str(e)}), 500
-
+    
+# ----------------------------------------------------------------------------------------------
 # 新增/更新基本資料 API
 @app.route('/api/users/post', methods=['POST'])
 def create_user_profile():
@@ -375,8 +414,8 @@ def get_land_parcels():
 
     return jsonify(land_parcels)
 
-# 農地資訊
 # ----------------------------------------------------------------------------------------
+# 生產計畫
 
 # 添加生產計畫
 @app.route('/api/form002', methods=['POST'])
@@ -496,8 +535,8 @@ def get_all_form002():
 
     return jsonify(forms)
 
-# 生產計畫
 # ----------------------------------------------------------------------------------------------
+# 種子(苗)登記
 
 #新增種子(苗)登記
 @app.route('/api/form02', methods=['POST'])
@@ -528,7 +567,6 @@ def add_form02():
     if not seedling_purchase_type:
         return jsonify({'error': '缺少 育苗(購入)種類'}), 400
     
-
     try:
         new_form = Form02(
             user_id=user_id,
@@ -575,8 +613,6 @@ def delete_form02(id):
     db.session.commit()
     return jsonify({"message": "Record deleted successfully"})
 
-
-
 #查詢所有種子(苗)登記
 @app.route('/api/form02', methods=['GET'])
 def get_all_form02():
@@ -600,35 +636,9 @@ def get_all_form02():
 
     return jsonify(forms)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # ----------------------------------------------------------------------------------------------
+# 栽培工作紀錄
+
 # 新增栽培工作紀錄
 @app.route('/api/form03', methods=['POST'])
 def add_form03():
@@ -651,9 +661,9 @@ def add_form03():
     if not field_code:
         return jsonify({'error': '缺少 田區代號'}), 400
     if not crop:
-        return jsonify({'error': '缺少 作物'}), 400
+        return jsonify({'error': '缺少 crop'}), 400
     if not crop_content:
-        return jsonify({'error': '缺少 作業內容(可填寫代碼)'}), 400
+        return jsonify({'error': '缺少 crop_content'}), 400
     
     try:
         new_form = Form03(
@@ -671,8 +681,6 @@ def add_form03():
     except Exception as e:
         print(f"Error occurred while adding form03: {str(e)}")
         return jsonify({'error': str(e)}), 500
-
-
 
 # 更新栽培工作紀錄
 @app.route('/api/form03/<int:id>', methods=['PUT'])
@@ -701,7 +709,6 @@ def delete_form03(id):
     db.session.commit()
     return jsonify({'message': 'Record deleted successfully'})
 
-
 # 查詢所有農戶的栽培紀錄
 @app.route('/api/form03', methods=['GET'])
 def get_all_form03(): 
@@ -723,9 +730,106 @@ def get_all_form03():
     ]
 
     return jsonify(forms)
-
-# 栽培工作紀錄
 # ----------------------------------------------------------------------------------------------
+# 養液配製紀錄
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ----------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
