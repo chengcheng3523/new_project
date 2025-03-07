@@ -396,13 +396,13 @@ def add_form002():
     if not user_id:
         return jsonify({'error': '缺少 user_id'}), 400
     if not area_code:
-        return jsonify({'error': '缺少 area_code'}), 400
+        return jsonify({'error': '缺少 場區代號'}), 400
     if not area_size:
-        return jsonify({'error': '缺少 area_size'}), 400
+        return jsonify({'error': '缺少 場區面積(公頃)'}), 400
     if not month:
-        return jsonify({'error': '缺少 month'}), 400
+        return jsonify({'error': '缺少 月份'}), 400
     if not crop_info:
-        return jsonify({'error': '缺少 crop_info'}), 400
+        return jsonify({'error': '缺少 種植作物種類、產期、預估產量（公斤）'}), 400
 
     try:
         new_form = Form002(
@@ -518,15 +518,15 @@ def add_form02():
     if not user_id:
         return jsonify({'error': '缺少 user_id'}), 400
     if not cultivated_crop:
-        return jsonify({'error': '缺少 cultivated_crop'}), 400
+        return jsonify({'error': '缺少 栽培作物'}), 400
     if not crop_variety:
-        return jsonify({'error': '缺少 crop_variety'}), 400
+        return jsonify({'error': '缺少 栽培品種'}), 400
     if not seed_source:
-        return jsonify({'error': '缺少 seed_source'}), 400
+        return jsonify({'error': '缺少 種子(苗)來源'}), 400
     if not seedling_purchase_date:
-        return jsonify({'error': '缺少 seedling_purchase_date'}), 400
+        return jsonify({'error': '缺少 育苗(購入)日期'}), 400
     if not seedling_purchase_type:
-        return jsonify({'error': '缺少 seedling_purchase_type'}), 400
+        return jsonify({'error': '缺少 育苗(購入)種類'}), 400
     
 
     try:
@@ -647,13 +647,13 @@ def add_form03():
     if not user_id:
         return jsonify({'error': '缺少 user_id'}), 400
     if not operation_date:
-        return jsonify({'error': '缺少 operation_date'}), 400
+        return jsonify({'error': '缺少 作業日期'}), 400
     if not field_code:
-        return jsonify({'error': '缺少 field_code'}), 400
+        return jsonify({'error': '缺少 田區代號'}), 400
     if not crop:
-        return jsonify({'error': '缺少 crop'}), 400
+        return jsonify({'error': '缺少 作物'}), 400
     if not crop_content:
-        return jsonify({'error': '缺少 crop_content'}), 400
+        return jsonify({'error': '缺少 作業內容(可填寫代碼)'}), 400
     
     try:
         new_form = Form03(

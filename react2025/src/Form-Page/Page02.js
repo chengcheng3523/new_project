@@ -82,14 +82,14 @@ const Page02 = () => {
     setLoading(true);
 
   // 檢查必要欄位是否填寫
-  const requiredFields = ['cultivated_crop', 'crop_variety', 'seed_source', 'seedling_purchase_type' ];
-  for (const field of requiredFields) {
-    if (!formData[field]) {
-      alert(`請填寫 ${field} 欄位！`);
-      setLoading(false);
-      return;
-    }
-  }
+  // const requiredFields = ['cultivated_crop', 'crop_variety', 'seed_source', 'seedling_purchase_type' ];
+  // for (const field of requiredFields) {
+  //   if (!formData[field]) {
+  //     alert(`請填寫 ${field} 欄位！`);
+  //     setLoading(false);
+  //     return;
+  //   }
+  // }
 
   try {
     let response;
