@@ -173,23 +173,25 @@ WHERE u.username = 'farmer1';
 
 -- form05（養液配製資材與代碼對照表）
 CREATE TABLE form05 (
-    id                   INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
-    user_id              INT NOT NULL,                    -- 關聯 `users` 表
-    nutrient_material_code VARCHAR(20) PRIMARY KEY,  -- 養液配製資材代碼
-    nutrient_material_name VARCHAR(100) NOT NULL,     -- 養液配製資材名稱
-    notes                 TEXT,                        -- 備註
-    created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    id INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
+    user_id INT NOT NULL,               -- 關聯 `users` 表
+    nutrient_material_code VARCHAR(20) NOT NULL,  -- 養液配製資材代碼
+    nutrient_material_name VARCHAR(100) NOT NULL, -- 養液配製資材名稱
+    notes TEXT,                         -- 備註
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
 -- 資料示例form05（養液配製資材與代碼對照表）
-INSERT INTO form05 (nutrient_material_code, nutrient_material_name, notes)
+INSERT INTO form05 (user_id, nutrient_material_code, nutrient_material_name, notes)
 VALUES 
     (1, 'M000-0000', 'ooxx資材', '備註'),
     (2, 'M000-0001', 'yyzz資材', '需要存放於陰涼處');
---  查詢養液配製資材代碼及名稱
+
+-- 查詢養液配製資材代碼及名稱
 SELECT u.username, u.farmer_name, f.nutrient_material_code, f.nutrient_material_name, f.notes
-FROM form05  f
+FROM form05 f
 JOIN users u ON f.user_id = u.id
 WHERE nutrient_material_code = 'M000-0000';
 

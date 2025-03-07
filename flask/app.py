@@ -734,11 +734,115 @@ def get_all_form03():
 # 養液配製紀錄
 
 
+# 新增養液配製紀錄
+@app.route('/api/form04', methods=['POST'])
+def add_form04():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    user_id = data.get('user_id')
+    preparation_date =  datetime.strptime(data.get('preparation_date'), '%Y-%m-%d')
+    material_code_or_name = data.get('material_code_or_name')
+    usage_amount = data.get('usage_amount')
+    preparation_process = data.get('preparation_process')
+    final_ph_value = data.get('final_ph_value')
+    final_ec_value = data.get('final_ec_value')
+    preparer_name = data.get('preparer_name')
+    notes = data.get('notes')
 
+    # 檢查必要欄位是否存在
+    if not user_id:
+        return jsonify({'error': '缺少 user_id'}), 400
+    if not preparation_date:
+        return jsonify({'error': '缺少 preparation_date'}), 400
+    if not usage_amount:
+        return jsonify({'error': '缺少 usage_amount'}), 400
+    if not preparation_process:
+        return jsonify({'error': '缺少 preparation_process'}), 400
+    if not final_ph_value:
+        return jsonify({'error': '缺少 final_ph_value'}), 400
+    if not final_ec_value:
+        return jsonify({'error': '缺少 final_ec_value'}), 400
+    if not preparer_name:
+        return jsonify({'error': '缺少 preparer_name'}), 400
+    
+    try:
+        new_form = Form04(
+            user_id=user_id,
+            preparation_date=preparation_date,
+            material_code_or_name=material_code_or_name,
+            usage_amount=usage_amount,
+            preparation_process=preparation_process,
+            final_ph_value=final_ph_value,
+            final_ec_value=final_ec_value,
+            preparer_name=preparer_name,
+            notes=notes
+        )
 
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '養液配製紀錄添加成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form04: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
+# 更新養液配製紀錄
+@app.route('/api/form04/<int:id>', methods=['PUT'])
+def update_form04(id):
+    data = request.get_json()
+    form = Form04.query.get(id)
+    if not form:
+        return jsonify({'error': '養液配製紀錄 未找到'}), 404
+    
+    form.preparation_date = datetime.strptime(data['preparation_date'], '%Y-%m-%d')
+    form.material_code_or_name = data['material_code_or_name']
+    form.usage_amount = data['usage_amount']
+    form.preparation_process = data['preparation_process']
+    form.final_ph_value = data['final_ph_value']
+    form.final_ec_value = data['final_ec_value']
+    form.preparer_name = data['preparer_name']
+    form.notes = data.get('notes')
+    db.session.commit()
+    return jsonify({'message': '養液配製紀錄更新成功'})
 
+# 刪除養液配製紀錄
+@app.route('/api/form04/<int:id>', methods=['DELETE'])
+def delete_form04(id):
+    record = Form04.query.get(id)
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'message': 'Record deleted successfully'})
 
+# 查詢所有農戶的養液配製紀錄
+@app.route('/api/form04', methods=['GET'])
+def get_all_form04(): 
+    results = db.session.query(Form04, users.farmer_name).\
+        join(users, users.id == Form04.user_id).all()
+    
+    forms = [
+        {
+            "id": result.Form04.id,
+            "user_id": result.Form04.user_id,
+            "farmer_name": result.farmer_name,
+            "preparation_date": result.Form04.preparation_date.strftime('%Y-%m-%d'),
+            "material_code_or_name": result.Form04.material_code_or_name,
+            "usage_amount": str(result.Form04.usage_amount),
+            "preparation_process": result.Form04.preparation_process,
+            "final_ph_value": str(result.Form04.final_ph_value),
+            "final_ec_value": str(result.Form04.final_ec_value),
+            "preparer_name": result.Form04.preparer_name,
+            "notes": result.Form04.notes
+        }
+        for result in results
+    ]
+
+    return jsonify(forms)
+
+# ----------------------------------------------------------------------------------------------
 
 
 
