@@ -125,7 +125,7 @@ const HomePage =()=> {
           <TitleCard title="有害生物防治或環境消毒資材施用" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page10')}>
-          <TitleCard title=".防治資材與代碼" />
+          <TitleCard title="防治資材與代碼" />
         </ProductContainer>
 
 

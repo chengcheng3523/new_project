@@ -257,12 +257,12 @@ CREATE TABLE form08 (
     material_name VARCHAR(100) NOT NULL,                    -- 資材名稱
     manufacturer VARCHAR(100),                              -- 廠商
     supplier VARCHAR(100),                                  -- 供應商
-    packaging_unit VARCHAR(100) NOT NULL, -- 包裝單位
-    packaging_volume VARCHAR(50) NOT NULL,                  -- 包裝容量（如：公克、公斤、毫升、公升等）
-    date DATE NOT NULL,                                     -- 日期
-    purchase_quantity DECIMAL(10, 2) NOT NULL,              -- 購入量
-    usage_quantity DECIMAL(10, 2) NOT NULL,                 -- 使用量
-    remaining_quantity DECIMAL(10, 2) NOT NULL,            -- 剩餘量
+    packaging_unit VARCHAR(100), -- 包裝單位
+    packaging_volume VARCHAR(50),                  -- 包裝容量（如：公克、公斤、毫升、公升等）
+    date DATE,                                     -- 日期
+    purchase_quantity DECIMAL(10, 2),              -- 購入量
+    usage_quantity DECIMAL(10, 2),                 -- 使用量
+    remaining_quantity DECIMAL(10, 2),            -- 剩餘量
     notes TEXT,                                             -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,

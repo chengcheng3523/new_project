@@ -1140,8 +1140,7 @@ def update_form08(id):
     if not form:
         return jsonify({'error': '肥料入出庫紀錄未找到'}), 404
     
-    form.material_name = data['material'
-    'name']
+    form.material_name = data['material_name']
     form.manufacturer = data['manufacturer']
     form.supplier = data['supplier']
     form.packaging_unit = data['packaging_unit']
