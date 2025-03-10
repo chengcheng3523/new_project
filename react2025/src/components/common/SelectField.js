@@ -46,54 +46,64 @@ const Input = styled.input`
   }
 `;
 
-const SelectField = ({ id, name, value = [], onChange, label, required, options, inputOption }) => {
-  const [selectedValues, setSelectedValues] = useState(Array.isArray(value) ? value : [value]);
+const SelectField = ({ id, name, value = '', onChange, label, required, options, inputOption }) => {
+
+  const [selectedValue, setSelectedValue] = useState(value || '');
   const [showInput, setShowInput] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
+  // 修改：根據 value 初始化 showInput 和 inputValue
   useEffect(() => {
-    setShowInput(selectedValues.includes(inputOption));
-  }, [selectedValues, inputOption]);
+    const isOther = value && !options.some(opt => opt.value === value); // 檢查 value 是否不在預設選項中
+    setSelectedValue(isOther ? inputOption : value); // 如果是「其他」，設為 inputOption
+    setShowInput(isOther && inputOption === value);  // 如果選擇「其他」，顯示輸入框
+    setInputValue(isOther ? value : '');             // 如果是「其他」，提取自訂值
+  }, [value, inputOption, options]);
 
+  // 修改：處理單選邏輯，並在選擇「其他」時顯示輸入框
   const handleSelectChange = (e) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
-    setSelectedValues(selectedOptions);
-    onChange({ target: { name, value: selectedOptions } });
-  };
-
-  const handleInputChange = (e) => {
     const newValue = e.target.value;
-    setInputValue(newValue);
-    onChange({
-      target: { name, value: selectedValues.includes(inputOption) ? [...selectedValues.filter(v => v !== inputOption), `${inputOption}${newValue}`] : selectedValues }
-    });
+    setSelectedValue(newValue);
+    setShowInput(newValue === inputOption); // 當選擇「其他」時顯示輸入框
+    if (newValue !== inputOption) {
+      onChange({ target: { name, value: newValue } }); // 直接傳遞選擇的值
+    }
   };
 
+  // 修改：處理「其他」選項的自訂輸入，並將最終值傳回父組件
+  const handleInputChange = (e) => {
+    const newInput = e.target.value;
+    setInputValue(newInput);
+    onChange({ target: { name, value: newInput } }); // 傳遞自訂值
+  };
+ 
+  
   return (
     <Container>
       <StyledLabel htmlFor={id}>
         {label} {required && <Required>*</Required>}
-      </StyledLabel>
+      </StyledLabel> 
       <Select
         id={id}
         name={name}
-        multiple // 允许多选
-        value={selectedValues}
+        value={selectedValue}
         required={required}
         onChange={handleSelectChange}
       >
+        <option value="">請選擇</option> 
         {options && options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
         ))}
-      </Select>
+      </Select> 
       {showInput && (
         <Input
           type="text"
-          placeholder="請填寫"
+          placeholder="請填寫其他單位"
           value={inputValue}
           onChange={handleInputChange}
+          required  
         />
       )}
     </Container>

@@ -21,6 +21,7 @@ const Page03 = () => {
     field_code: '',
     crop: '',
     crop_content: '',
+    crop_content_other: '', // 新增：當選擇「其他」時的單位輸入
     notes: '',
   });
   
@@ -91,12 +92,17 @@ const Page03 = () => {
     }
   }
 
+  // 合併 
+  const crop_content = formData.crop_content === '其他' ? formData.crop_content_other : formData.crop_content;
+ 
   try {
     let response;
     if (formData.id) {
-      // 更新現有資料，使用 PUT 請求
       if (isAdmin) {
-        response = await axios.put(`http://127.0.0.1:5000/api/form03/${formData.id}`, formData);
+        response = await axios.put(`http://127.0.0.1:5000/api/form03/${formData.id}`, {
+          ...formData,
+          crop_content, 
+        });
       } else {
         alert('您沒有權限更新資料！');
         setLoading(false);
@@ -109,7 +115,7 @@ const Page03 = () => {
           operation_date: formData.operation_date,
           field_code: formData.field_code,
           crop: formData.crop,
-          crop_content: formData.crop_content,
+          crop_content ,
           notes: formData.notes,
         });
       }
@@ -120,7 +126,8 @@ const Page03 = () => {
         operation_date: '',
         field_code: '',
         crop: '',
-        crop_content: '',
+        crop_content: '', 
+        crop_content_other: '',
         notes: '',
       });
       alert('成功儲存資料！');
@@ -146,20 +153,37 @@ const Page03 = () => {
       fetchData(); // 刷新数据
       alert('成功刪除資料！');
     } catch (error) {
-      console.error('刪除請求失敗:', error.response ? error.response.data : error.message);
-      alert('刪除失敗，請稍後重試！');
+      alert(`刪除請求失敗：${error.response?.data?.message || error.message}`);
+      console.error('刪除請求失敗:', error.response ? error.response.data : error.message); 
     }
   };
 
 
   const handleEdit = (record) => {
-    if (!isAdmin) return; // 如果不是管理員，則返回
+    if (!isAdmin) return; // 如果不是管理員，則返回 
+
+    const isOtherUnit = ![
+      '(1-1) 整地', '(1-2) 作畦', '(1-3) 配置灌溉/澆水管線',
+      '(1-4) 土壤改良', '(1-5) 土壤消毒', '(1-6) 設施操作',
+      '(1-7) 開溝', '(1-8) 清園', '(1-9) 立支柱',
+      '(1-10)遮蔭網', '(2-1) 介質消毒', '(2-2) 裝袋作業',
+      '(2-3) 上架', '(2-4) 介質調配', '(2-5) 養液配置',
+      '(3-1) 播種', '(3-2) 育苗', '(3-3) 定植(移植)',
+      '(3-4) 播種前種子處理', '(4-1) 中耕', '(4-2) 灌溉/澆水',
+      '(4-3) 培土', '(4-4) 摘葉', '(4-5) 缺株補植',
+      '(4-6) 整蔓', '(4-7) 授粉', '(4-8) 套袋',
+      '(5-1) 基肥', '(5-2) 追肥', '(5-3) 液肥',
+      '(6-1) 施用防治資材', '(6-2) 栽培防治', '(6-3) 物理防治',
+      '(6-4) 生物防治', '(6-5) 忌避作物', '(6-6) 除草',
+      '(6-7) 覆蓋','(7-1) 採收', '(7-2) 產季結束'
+    ].includes(record.crop_content);
     setFormData({
       id: record.id,
       operation_date: record.operation_date,
       field_code: record.field_code,
       crop: record.crop,
-      crop_content: record.crop_content,
+      crop_content: isOtherUnit ? '其他' : record.crop_content || '',
+      crop_content_other: isOtherUnit ? record.crop_content : '',
       notes: record.notes,
     });
   };
@@ -239,11 +263,19 @@ const Page03 = () => {
             { value: '(6-7) 覆蓋', label: '(6-7) 覆蓋' },
             { value: '(7-1) 採收', label: '(7-1) 採收' },
             { value: '(7-2) 產季結束', label: '(7-2) 產季結束' },
-            { value: '8.其他，若非上述內容，請填寫其他並註明工作內容。', label: '8.其他，若非上述內容，請填寫其他並註明工作內容。' },
-
+            { value: '其他', label: '其他' },
           ]}
-            inputOption="8.其他，若非上述內容，請填寫其他並註明工作內容。"
-        />
+          />
+          {formData.crop_content === '其他' && (
+            <FormField
+              label="8. 其他(若非上述內容，請填寫其他並註明工作內容)"
+              name="crop_content_other"
+              value={formData.crop_content_other}
+              onChange={handleChange}
+              required
+            />
+          )}
+
         <FormField
           label="備註"
           name="notes"
@@ -276,7 +308,7 @@ const Page03 = () => {
               <td>{record.operation_date}</td>
               <td>{record.field_code}</td>
               <td>{record.crop}</td>
-              <td>{record.crop_content}</td>
+              <td>{record.crop_content || '-'}</td>
               <td>{record.notes}</td>
               {isAdmin && (
                 <td>

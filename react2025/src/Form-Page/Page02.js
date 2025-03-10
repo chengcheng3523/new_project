@@ -22,6 +22,7 @@ const Page02 = () => {
     seed_source: '',
     seedling_purchase_date: '',
     seedling_purchase_type: '',
+    seedling_purchase_type_other: '', // 新增：當選擇「購買來源」時的單位輸入
     notes: '',
   });
 
@@ -82,21 +83,25 @@ const Page02 = () => {
     setLoading(true);
 
   // 檢查必要欄位是否填寫
-  // const requiredFields = ['cultivated_crop', 'crop_variety', 'seed_source', 'seedling_purchase_type' ];
-  // for (const field of requiredFields) {
-  //   if (!formData[field]) {
-  //     alert(`請填寫 ${field} 欄位！`);
-  //     setLoading(false);
-  //     return;
-  //   }
-  // }
-
+  const requiredFields = ['cultivated_crop', 'crop_variety', 'seed_source', 'seedling_purchase_type' ];
+  for (const field of requiredFields) {
+    if (!formData[field]) {
+      alert(`請填寫 ${field} 欄位！`);
+      setLoading(false);
+      return;
+    }
+  }
+  // 合併「育苗(購入)種類」和「育苗(購入)種類 (購買來源)」
+  const seedling_purchase_type = formData.seedling_purchase_type === '購買來源' ? formData.seedling_purchase_type_other : formData.seedling_purchase_type;
+ 
   try {
     let response;
     if (formData.id) {
-      // 更新現有資料，使用 PUT 請求
       if (isAdmin) {
-        response = await axios.put(`http://127.0.0.1:5000/api/form02/${formData.id}`, formData);
+        response = await axios.put(`http://127.0.0.1:5000/api/form02/${formData.id}`, {
+          ...formData,
+          seedling_purchase_type, 
+        });
       } else {
         alert('您沒有權限更新資料！');
         setLoading(false);
@@ -110,7 +115,7 @@ const Page02 = () => {
           crop_variety: formData.crop_variety,
           seed_source: formData.seed_source,
           seedling_purchase_date: formData.seedling_purchase_date,
-          seedling_purchase_type: formData.seedling_purchase_type,
+          seedling_purchase_type ,
           notes: formData.notes,
         });
       }
@@ -123,6 +128,7 @@ const Page02 = () => {
         seed_source: '',
         seedling_purchase_date: '',
         seedling_purchase_type: '',
+        seedling_purchase_type_other: '',
         notes: '',
       });
       alert('成功儲存資料！');
@@ -156,16 +162,21 @@ const Page02 = () => {
 
   const handleEdit = (record) => {
     if (!isAdmin) return; // 如果不是管理員，則返回
+
+    const isOtherUnit = !['自行育苗'].includes(record.seedling_purchase_type);
     setFormData({
       id: record.id,
       cultivated_crop: record.cultivated_crop,
       crop_variety: record.crop_variety,
       seed_source: record.seed_source,
-      seedling_purchase_date: record.seedling_purchase_date,
-      seedling_purchase_type: record.seedling_purchase_type,
+      seedling_purchase_type: isOtherUnit ? '購買來源' : record.seedling_purchase_type || '',
+      seedling_purchase_type_other: isOtherUnit ? record.seedling_purchase_type : '',
+      seedling_purchase_date: record.seedling_purchase_date, 
       notes: record.notes,
     });
   };
+
+
 
   return (
     <div className="container">
@@ -202,6 +213,7 @@ const Page02 = () => {
           onChange={handleChange}
           disabled={loading}
         />
+
         <SelectField
           label="育苗(購入)種類"
           name="seedling_purchase_type"
@@ -210,10 +222,19 @@ const Page02 = () => {
           required
           options={[
             { value: '自行育苗', label: '自行育苗' },
-            { value: '購買來源：', label: '購買來源：' },
+            { value: '購買來源', label: '購買來源' },
           ]}
-          inputOption="購買來源：" // 新增這一行
         />
+        {formData.seedling_purchase_type === '購買來源' && (
+          <FormField
+            label="育苗(購入)種類 (購買來源)"
+            name="seedling_purchase_type_other"
+            value={formData.seedling_purchase_type_other}
+            onChange={handleChange}
+            required
+          />
+        )}
+
         <FormField
           label="備註"
           name="notes"
@@ -248,8 +269,8 @@ const Page02 = () => {
               <td>{record.cultivated_crop}</td>
               <td>{record.crop_variety}</td>
               <td>{record.seed_source}</td>
-              <td>{moment(record.seedling_purchase_date).format('YYYY-MM-DD')}</td>
-              <td>{record.seedling_purchase_type}</td>
+              <td>{moment(record.seedling_purchase_date).format('YYYY-MM-DD')}</td> 
+              <td>{record.seedling_purchase_type || '-'}</td>
               <td>{record.notes}</td>
               {isAdmin && (
                 <td>
