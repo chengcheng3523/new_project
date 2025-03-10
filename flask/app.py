@@ -1283,7 +1283,7 @@ def update_form09(id):
     form.dilution_factor = data['dilution_factor']
     form.safety_harvest_period = data['safety_harvest_period']
     form.operator_method = data['operator_method']
-    form.operator_name = data['operator_name']
+    form.operator = data['operator']
     form.notes = data.get('notes')
     db.session.commit()
     return jsonify({'message': '有害生物防治或環境消毒資材施用紀錄更新成功'})
