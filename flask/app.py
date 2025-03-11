@@ -309,17 +309,17 @@ def add_form002():
     crop_info = data.get('crop_info')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not area_code:
-        return jsonify({'error': '缺少 場區代號'}), 400
-    if not area_size:
-        return jsonify({'error': '缺少 場區面積(公頃)'}), 400
-    if not month:
-        return jsonify({'error': '缺少 月份'}), 400
-    if not crop_info:
-        return jsonify({'error': '缺少 種植作物種類、產期、預估產量（公斤）'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not area_code:
+    #     return jsonify({'error': '缺少 場區代號'}), 400
+    # if not area_size:
+    #     return jsonify({'error': '缺少 場區面積(公頃)'}), 400
+    # if not month:
+    #     return jsonify({'error': '缺少 月份'}), 400
+    # if not crop_info:
+    #     return jsonify({'error': '缺少 種植作物種類、產期、預估產量（公斤）'}), 400
 
     try:
         new_form = Form002(
@@ -430,19 +430,19 @@ def add_form02():
     seedling_purchase_type = data.get('seedling_purchase_type')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not cultivated_crop:
-        return jsonify({'error': '缺少 栽培作物'}), 400
-    if not crop_variety:
-        return jsonify({'error': '缺少 栽培品種'}), 400
-    if not seed_source:
-        return jsonify({'error': '缺少 種子(苗)來源'}), 400
-    if not seedling_purchase_date:
-        return jsonify({'error': '缺少 育苗(購入)日期'}), 400
-    if not seedling_purchase_type:
-        return jsonify({'error': '缺少 育苗(購入)種類'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not cultivated_crop:
+    #     return jsonify({'error': '缺少 栽培作物'}), 400
+    # if not crop_variety:
+    #     return jsonify({'error': '缺少 栽培品種'}), 400
+    # if not seed_source:
+    #     return jsonify({'error': '缺少 種子(苗)來源'}), 400
+    # if not seedling_purchase_date:
+    #     return jsonify({'error': '缺少 育苗(購入)日期'}), 400
+    # if not seedling_purchase_type:
+    #     return jsonify({'error': '缺少 育苗(購入)種類'}), 400
     
     try:
         new_form = Form02(
@@ -529,17 +529,17 @@ def add_form03():
     crop_content = data.get('crop_content')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not operation_date:
-        return jsonify({'error': '缺少 作業日期'}), 400
-    if not field_code:
-        return jsonify({'error': '缺少 田區代號'}), 400
-    if not crop:
-        return jsonify({'error': '缺少 crop'}), 400
-    if not crop_content:
-        return jsonify({'error': '缺少 crop_content'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not operation_date:
+    #     return jsonify({'error': '缺少 作業日期'}), 400
+    # if not field_code:
+    #     return jsonify({'error': '缺少 田區代號'}), 400
+    # if not crop:
+    #     return jsonify({'error': '缺少 crop'}), 400
+    # if not crop_content:
+    #     return jsonify({'error': '缺少 crop_content'}), 400
     
     try:
         new_form = Form03(
@@ -626,21 +626,21 @@ def add_form04():
     preparer_name = data.get('preparer_name')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not preparation_date:
-        return jsonify({'error': '缺少 preparation_date'}), 400
-    if not usage_amount:
-        return jsonify({'error': '缺少 usage_amount'}), 400
-    if not preparation_process:
-        return jsonify({'error': '缺少 preparation_process'}), 400
-    if not final_ph_value:
-        return jsonify({'error': '缺少 final_ph_value'}), 400
-    if not final_ec_value:
-        return jsonify({'error': '缺少 final_ec_value'}), 400
-    if not preparer_name:
-        return jsonify({'error': '缺少 preparer_name'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not preparation_date:
+    #     return jsonify({'error': '缺少 preparation_date'}), 400
+    # if not usage_amount:
+    #     return jsonify({'error': '缺少 usage_amount'}), 400
+    # if not preparation_process:
+    #     return jsonify({'error': '缺少 preparation_process'}), 400
+    # if not final_ph_value:
+    #     return jsonify({'error': '缺少 final_ph_value'}), 400
+    # if not final_ec_value:
+    #     return jsonify({'error': '缺少 final_ec_value'}), 400
+    # if not preparer_name:
+    #     return jsonify({'error': '缺少 preparer_name'}), 400
     
     try:
         new_form = Form04(
@@ -732,13 +732,13 @@ def add_form05():
     nutrient_material_name = data.get('nutrient_material_name')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not nutrient_material_code:
-        return jsonify({'error': '缺少 nutrient_material_code'}), 400
-    if not nutrient_material_name:
-        return jsonify({'error': '缺少 nutrient_material_name'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not nutrient_material_code:
+    #     return jsonify({'error': '缺少 nutrient_material_code'}), 400
+    # if not nutrient_material_name:
+    #     return jsonify({'error': '缺少 nutrient_material_name'}), 400
     
     try:
         new_form = Form05(
@@ -821,27 +821,27 @@ def add_form06():
     process = data.get('process')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not date_used:
-        return jsonify({'error': '缺少 date_used'}), 400
-    if not field_code:
-        return jsonify({'error': '缺少 field_code'}), 400
-    if not crop:
-        return jsonify({'error': '缺少 crop'}), 400
-    if not fertilizer_type:
-        return jsonify({'error': '缺少 fertilizer_type'}), 400
-    if not material_code_or_name:
-        return jsonify({'error': '缺少 material_code_or_name'}), 400
-    if not fertilizer_amount:
-        return jsonify({'error': '缺少 fertilizer_amount'}), 400
-    if not dilution_factor:
-        return jsonify({'error': '缺少 dilution_factor'}), 400
-    if not operator:
-        return jsonify({'error': '缺少 operator'}), 400
-    if not process:
-        return jsonify({'error': '缺少 process'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not date_used:
+    #     return jsonify({'error': '缺少 date_used'}), 400
+    # if not field_code:
+    #     return jsonify({'error': '缺少 field_code'}), 400
+    # if not crop:
+    #     return jsonify({'error': '缺少 crop'}), 400
+    # if not fertilizer_type:
+    #     return jsonify({'error': '缺少 fertilizer_type'}), 400
+    # if not material_code_or_name:
+    #     return jsonify({'error': '缺少 material_code_or_name'}), 400
+    # if not fertilizer_amount:
+    #     return jsonify({'error': '缺少 fertilizer_amount'}), 400
+    # if not dilution_factor:
+    #     return jsonify({'error': '缺少 dilution_factor'}), 400
+    # if not operator:
+    #     return jsonify({'error': '缺少 operator'}), 400
+    # if not process:
+    #     return jsonify({'error': '缺少 process'}), 400
 
     try:
         new_form = Form06(
@@ -939,13 +939,13 @@ def add_form07():
     fertilizer_material_name = data.get('fertilizer_material_name')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not fertilizer_material_code:
-        return jsonify({'error': '缺少 fertilizer_material_code'}), 400
-    if not fertilizer_material_name:
-        return jsonify({'error': '缺少 fertilizer_material_name'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not fertilizer_material_code:
+    #     return jsonify({'error': '缺少 fertilizer_material_code'}), 400
+    # if not fertilizer_material_name:
+    #     return jsonify({'error': '缺少 fertilizer_material_name'}), 400
     
     try:
         new_form = Form07(
@@ -1028,27 +1028,27 @@ def add_form08():
     remaining_quantity = data.get('remaining_quantity')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not material_name:
-        return jsonify({'error': '缺少 material_name'}), 400
-    if not manufacturer:
-        return jsonify({'error': '缺少 manufacturer'}), 400
-    if not supplier:
-        return jsonify({'error': '缺少 supplier'}), 400
-    if not packaging_unit:
-        return jsonify({'error': '缺少 packaging_unit'}), 400
-    if not packaging_volume:
-        return jsonify({'error': '缺少 packaging_volume'}), 400
-    if not date:
-        return jsonify({'error': '缺少 date'}), 400
-    if not purchase_quantity:
-        return jsonify({'error': '缺少 purchase_quantity'}), 400
-    if not usage_quantity:
-        return jsonify({'error': '缺少 usage_quantity'}), 400
-    if not remaining_quantity:
-        return jsonify({'error': '缺少 remaining_quantity'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not material_name:
+    #     return jsonify({'error': '缺少 material_name'}), 400
+    # if not manufacturer:
+    #     return jsonify({'error': '缺少 manufacturer'}), 400
+    # if not supplier:
+    #     return jsonify({'error': '缺少 supplier'}), 400
+    # if not packaging_unit:
+    #     return jsonify({'error': '缺少 packaging_unit'}), 400
+    # if not packaging_volume:
+    #     return jsonify({'error': '缺少 packaging_volume'}), 400
+    # if not date:
+    #     return jsonify({'error': '缺少 date'}), 400
+    # if not purchase_quantity:
+    #     return jsonify({'error': '缺少 purchase_quantity'}), 400
+    # if not usage_quantity:
+    #     return jsonify({'error': '缺少 usage_quantity'}), 400
+    # if not remaining_quantity:
+    #     return jsonify({'error': '缺少 remaining_quantity'}), 400
     
     try:
         new_form = Form08(
@@ -1154,31 +1154,31 @@ def add_form09():
     operator = data.get('operator')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not date_used:
-        return jsonify({'error': '缺少 date_used'}), 400
-    if not field_code:  
-        return jsonify({'error': '缺少 field_code'}), 400
-    if not crop:
-        return jsonify({'error': '缺少 crop'}), 400
-    if not pest_target:
-        return jsonify({'error': '缺少 pest_target'}), 400
-    if not material_code_or_name:
-        return jsonify({'error': '缺少 material_code_or_name'}), 400
-    if not water_volume:
-        return jsonify({'error': '缺少 water_volume'}), 400
-    if not chemical_usage:
-        return jsonify({'error': '缺少 chemical_usage'}), 400
-    if not dilution_factor:
-        return jsonify({'error': '缺少 dilution_factor'}), 400
-    if not safety_harvest_period:
-        return jsonify({'error': '缺少 safety_harvest_period'}), 400
-    if not operator_method:
-        return jsonify({'error': '缺少 operator_method'}), 400
-    if not operator:
-        return jsonify({'error': '缺少 operator'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not date_used:
+    #     return jsonify({'error': '缺少 date_used'}), 400
+    # if not field_code:  
+    #     return jsonify({'error': '缺少 field_code'}), 400
+    # if not crop:
+    #     return jsonify({'error': '缺少 crop'}), 400
+    # if not pest_target:
+    #     return jsonify({'error': '缺少 pest_target'}), 400
+    # if not material_code_or_name:
+    #     return jsonify({'error': '缺少 material_code_or_name'}), 400
+    # if not water_volume:
+    #     return jsonify({'error': '缺少 water_volume'}), 400
+    # if not chemical_usage:
+    #     return jsonify({'error': '缺少 chemical_usage'}), 400
+    # if not dilution_factor:
+    #     return jsonify({'error': '缺少 dilution_factor'}), 400
+    # if not safety_harvest_period:
+    #     return jsonify({'error': '缺少 safety_harvest_period'}), 400
+    # if not operator_method:
+    #     return jsonify({'error': '缺少 operator_method'}), 400
+    # if not operator:
+    #     return jsonify({'error': '缺少 operator'}), 400
     
     try:
         new_form = Form09(
@@ -1281,13 +1281,13 @@ def add_form10():
     pest_control_material_name = data.get('pest_control_material_name')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not pest_control_material_code:
-        return jsonify({'error': '缺少 pest_control_material_code'}), 400
-    if not pest_control_material_name:
-        return jsonify({'error': '缺少 pest_control_material_name'}), 400  
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not pest_control_material_code:
+    #     return jsonify({'error': '缺少 pest_control_material_code'}), 400
+    # if not pest_control_material_name:
+    #     return jsonify({'error': '缺少 pest_control_material_name'}), 400  
     
     try:
         new_form = Form10(
@@ -1371,29 +1371,29 @@ def add_form11():
     remaining_quantity = data.get('remaining_quantity')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not material_name:
-        return jsonify({'error': '缺少 material_name'}), 400
-    if not dosage_form:
-        return jsonify({'error': '缺少 dosage_form'}), 400
-    if not brand_name:
-        return jsonify({'error': '缺少 brand_name'}), 400
-    if not supplier:
-        return jsonify({'error': '缺少 supplier'}), 400
-    if not packaging_unit:
-        return jsonify({'error': '缺少 packaging_unit'}), 400
-    if not packaging_volume:
-        return jsonify({'error': '缺少 packaging_volume'}), 400
-    if not date:
-        return jsonify({'error': '缺少 date'}), 400
-    if not purchase_quantity:
-        return jsonify({'error': '缺少 purchase_quantity'}), 400
-    if not usage_quantity:
-        return jsonify({'error': '缺少 usage_quantity'}), 400
-    if not remaining_quantity:
-        return jsonify({'error': '缺少 remaining_quantity'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not material_name:
+    #     return jsonify({'error': '缺少 material_name'}), 400
+    # if not dosage_form:
+    #     return jsonify({'error': '缺少 dosage_form'}), 400
+    # if not brand_name:
+    #     return jsonify({'error': '缺少 brand_name'}), 400
+    # if not supplier:
+    #     return jsonify({'error': '缺少 supplier'}), 400
+    # if not packaging_unit:
+    #     return jsonify({'error': '缺少 packaging_unit'}), 400
+    # if not packaging_volume:
+    #     return jsonify({'error': '缺少 packaging_volume'}), 400
+    # if not date:
+    #     return jsonify({'error': '缺少 date'}), 400
+    # if not purchase_quantity:
+    #     return jsonify({'error': '缺少 purchase_quantity'}), 400
+    # if not usage_quantity:
+    #     return jsonify({'error': '缺少 usage_quantity'}), 400
+    # if not remaining_quantity:
+    #     return jsonify({'error': '缺少 remaining_quantity'}), 400
 
     try:
         new_form = Form11(
@@ -1497,21 +1497,21 @@ def add_form12():
     operator = data.get('operator')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not date_used:
-        return jsonify({'error': '缺少 date_used'}), 400
-    if not field_code:
-        return jsonify({'error': '缺少 field_code'}), 400
-    if not crop:
-        return jsonify({'error': '缺少 crop'}), 400
-    if not material_code_or_name:
-        return jsonify({'error': '缺少 material_code_or_name'}), 400
-    if not usage_amount:
-        return jsonify({'error': '缺少 usage_amount'}), 400
-    if not operator:
-        return jsonify({'error': '缺少 operator'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not date_used:
+    #     return jsonify({'error': '缺少 date_used'}), 400
+    # if not field_code:
+    #     return jsonify({'error': '缺少 field_code'}), 400
+    # if not crop:
+    #     return jsonify({'error': '缺少 crop'}), 400
+    # if not material_code_or_name:
+    #     return jsonify({'error': '缺少 material_code_or_name'}), 400
+    # if not usage_amount:
+    #     return jsonify({'error': '缺少 usage_amount'}), 400
+    # if not operator:
+    #     return jsonify({'error': '缺少 operator'}), 400
     
     try:
         new_form = Form12(
@@ -1599,13 +1599,13 @@ def add_form13():
     other_material_name = data.get('other_material_name')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not other_material_code:
-        return jsonify({'error': '缺少 other_material_code'}), 400
-    if not other_material_name:
-        return jsonify({'error': '缺少 other_material_name'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not other_material_code:
+    #     return jsonify({'error': '缺少 other_material_code'}), 400
+    # if not other_material_name:
+    #     return jsonify({'error': '缺少 other_material_name'}), 400
     
     try:
         new_form = Form13(
@@ -1688,27 +1688,27 @@ def add_form14():
     remaining_quantity = data.get('remaining_quantity')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not material_name:
-        return jsonify({'error': '缺少 material_name'}), 400
-    if not manufacturer:
-        return jsonify({'error': '缺少 manufacturer'}), 400
-    if not supplier:
-        return jsonify({'error': '缺少 supplier'}), 400
-    if not packaging_unit:
-        return jsonify({'error': '缺少 packaging_unit'}), 400
-    if not packaging_volume:
-        return jsonify({'error': '缺少 packaging_volume'}), 400
-    if not date:
-        return jsonify({'error': '缺少 date'}), 400
-    if not purchase_quantity:
-        return jsonify({'error': '缺少 purchase_quantity'}), 400
-    if not usage_quantity:
-        return jsonify({'error': '缺少 usage_quantity'}), 400
-    if not remaining_quantity:
-        return jsonify({'error': '缺少 remaining_quantity'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not material_name:
+    #     return jsonify({'error': '缺少 material_name'}), 400
+    # if not manufacturer:
+    #     return jsonify({'error': '缺少 manufacturer'}), 400
+    # if not supplier:
+    #     return jsonify({'error': '缺少 supplier'}), 400
+    # if not packaging_unit:
+    #     return jsonify({'error': '缺少 packaging_unit'}), 400
+    # if not packaging_volume:
+    #     return jsonify({'error': '缺少 packaging_volume'}), 400
+    # if not date:
+    #     return jsonify({'error': '缺少 date'}), 400
+    # if not purchase_quantity:
+    #     return jsonify({'error': '缺少 purchase_quantity'}), 400
+    # if not usage_quantity:
+    #     return jsonify({'error': '缺少 usage_quantity'}), 400
+    # if not remaining_quantity:
+    #     return jsonify({'error': '缺少 remaining_quantity'}), 400
     
     try:
         new_form = Form14(
@@ -1807,17 +1807,17 @@ def add_form15():
     recorder = data.get('recorder')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not date:
-        return jsonify({'error': '缺少 date'}), 400
-    if not item:
-        return jsonify({'error': '缺少 item'}), 400
-    if not operation:
-        return jsonify({'error': '缺少 operation'}), 400
-    if not recorder:
-        return jsonify({'error': '缺少 recorder'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not date:
+    #     return jsonify({'error': '缺少 date'}), 400
+    # if not item:
+    #     return jsonify({'error': '缺少 item'}), 400
+    # if not operation:
+    #     return jsonify({'error': '缺少 operation'}), 400
+    # if not recorder:
+    #     return jsonify({'error': '缺少 recorder'}), 400
     
     try:
         new_form = Form15(
@@ -1901,17 +1901,17 @@ def add_form16():
     recorder = data.get('recorder')
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not date:
-        return jsonify({'error': '缺少 date'}), 400
-    if not item:
-        return jsonify({'error': '缺少 item'}), 400
-    if not operation:
-        return jsonify({'error': '缺少 operation'}), 400
-    if not recorder:
-        return jsonify({'error': '缺少 recorder'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not date:
+    #     return jsonify({'error': '缺少 date'}), 400
+    # if not item:
+    #     return jsonify({'error': '缺少 item'}), 400
+    # if not operation:
+    #     return jsonify({'error': '缺少 operation'}), 400
+    # if not recorder:
+    #     return jsonify({'error': '缺少 recorder'}), 400
 
     try:
         new_form = Form16(
@@ -2000,27 +2000,27 @@ def add_form17():
     verification_status = data.get('verification_status') 
     notes = data.get('notes')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not harvest_date:
-        return jsonify({'error': '缺少 harvest_date'}), 400
-    if not field_code:
-        return jsonify({'error': '缺少 field_code'}), 400
-    if not crop_name:
-        return jsonify({'error': '缺少 crop_name'}), 400
-    if not batch_or_trace_no:
-        return jsonify({'error': '缺少 batch_or_trace_no'}), 400
-    if not harvest_weight:
-        return jsonify({'error': '缺少 harvest_weight'}), 400
-    if not process_date:
-        return jsonify({'error': '缺少 process_date'}), 400
-    if not post_harvest_treatment:
-        return jsonify({'error': '缺少 post_harvest_treatment'}), 400
-    if not post_treatment_weight:   
-        return jsonify({'error': '缺少 post_treatment_weight'}), 400
-    if not verification_status:
-        return jsonify({'error': '缺少 verification_status'}), 400 
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not harvest_date:
+    #     return jsonify({'error': '缺少 harvest_date'}), 400
+    # if not field_code:
+    #     return jsonify({'error': '缺少 field_code'}), 400
+    # if not crop_name:
+    #     return jsonify({'error': '缺少 crop_name'}), 400
+    # if not batch_or_trace_no:
+    #     return jsonify({'error': '缺少 batch_or_trace_no'}), 400
+    # if not harvest_weight:
+    #     return jsonify({'error': '缺少 harvest_weight'}), 400
+    # if not process_date:
+    #     return jsonify({'error': '缺少 process_date'}), 400
+    # if not post_harvest_treatment:
+    #     return jsonify({'error': '缺少 post_harvest_treatment'}), 400
+    # if not post_treatment_weight:   
+    #     return jsonify({'error': '缺少 post_treatment_weight'}), 400
+    # if not verification_status:
+    #     return jsonify({'error': '缺少 verification_status'}), 400 
 
     try:
         new_form = Form17(
@@ -2313,9 +2313,9 @@ def add_form20():
     jobdate = datetime.strptime(data.get('jobdate'), '%Y-%m-%d')
     operator_name = data.get('temperature')  
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
 
 
     try:
@@ -2396,23 +2396,23 @@ def add_form22():
     processor_name = data.get('processor_name')
     processor_date = datetime.strptime(data.get('processor_date'), '%Y-%m-%d')
 
-    # 檢查必要欄位是否存在
-    if not user_id:
-        return jsonify({'error': '缺少 user_id'}), 400
-    if not date:
-        return jsonify({'error': '缺少 date'}), 400
-    if not customer_name:
-        return jsonify({'error': '缺少 customer_name'}), 400
-    if not customer_phone:
-        return jsonify({'error': '缺少 customer_phone'}), 400
-    if not complaint:
-        return jsonify({'error': '缺少 complaint'}), 400
-    if not resolution:
-        return jsonify({'error': '缺少 resolution'}), 400
-    if not processor_name:
-        return jsonify({'error': '缺少 processor_name'}), 400
-    if not processor_date:
-        return jsonify({'error': '缺少 processor_date'}), 400
+    # # 檢查必要欄位是否存在
+    # if not user_id:
+    #     return jsonify({'error': '缺少 user_id'}), 400
+    # if not date:
+    #     return jsonify({'error': '缺少 date'}), 400
+    # if not customer_name:
+    #     return jsonify({'error': '缺少 customer_name'}), 400
+    # if not customer_phone:
+    #     return jsonify({'error': '缺少 customer_phone'}), 400
+    # if not complaint:
+    #     return jsonify({'error': '缺少 complaint'}), 400
+    # if not resolution:
+    #     return jsonify({'error': '缺少 resolution'}), 400
+    # if not processor_name:
+    #     return jsonify({'error': '缺少 processor_name'}), 400
+    # if not processor_date:
+    #     return jsonify({'error': '缺少 processor_date'}), 400
 
     try:
         new_form = Form22(
