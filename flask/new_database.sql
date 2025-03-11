@@ -39,9 +39,9 @@ CREATE TABLE land_parcels (
     id                 INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id            INT NOT NULL,                    -- 關聯 `users` 表
     -- land_parcels 表中的 user_id 是手動指定的，並且必須是 users 表中已經存在的 id
-    number             VARCHAR(50) NOT NULL,            -- 農地編號
-    land_parcel_number VARCHAR(50) NOT NULL,            -- 農地地籍號碼
-    area               DECIMAL(10,2) NOT NULL,          -- 面積（單位：公頃）
+    number             VARCHAR(50),            -- 農地編號
+    land_parcel_number VARCHAR(50),            -- 農地地籍號碼
+    area               DECIMAL(10,2),          -- 面積（單位：公頃）
     crop               VARCHAR(100),                    -- 種植作物
     notes              TEXT,                            -- 備註
     created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -65,10 +65,10 @@ WHERE u.username = 'farmer1';
 CREATE TABLE form002 (
     id               INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id          INT NOT NULL,                    -- 關聯 `users` 表
-    area_code        VARCHAR(20) NOT NULL,            -- 場區代號
-    area_size        DECIMAL(10,2) NOT NULL,          -- 場區面積（公頃）
-    month            VARCHAR(10) NOT NULL,            -- 月份（1月-12月）
-    crop_info        VARCHAR(255) NOT NULL,           -- 種植作物種類、產期、預估產量（公斤）
+    area_code        VARCHAR(20),            -- 場區代號
+    area_size        DECIMAL(10,2),          -- 場區面積（公頃）
+    month            VARCHAR(10),            -- 月份（1月-12月）
+    crop_info        VARCHAR(255),           -- 種植作物種類、產期、預估產量（公斤）
     notes            TEXT,                            -- 備註
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -91,11 +91,11 @@ WHERE u.username = 'farmer1';
 CREATE TABLE form02 (
     id                   INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id              INT NOT NULL,                    -- 關聯 `users` 表
-    cultivated_crop      VARCHAR(100) NOT NULL,           -- 栽培作物
-    crop_variety         VARCHAR(100) NOT NULL,           -- 栽培品種
-    seed_source          VARCHAR(255) NOT NULL,           -- 種子(苗)來源
-    seedling_purchase_date DATE NOT NULL,                -- 育苗(購入)日期
-    seedling_purchase_type VARCHAR(50) NOT NULL,         -- 育苗(購入)種類
+    cultivated_crop      VARCHAR(100),           -- 栽培作物
+    crop_variety         VARCHAR(100),           -- 栽培品種
+    seed_source          VARCHAR(255),           -- 種子(苗)來源
+    seedling_purchase_date DATE,                -- 育苗(購入)日期
+    seedling_purchase_type VARCHAR(50),         -- 育苗(購入)種類
     notes                TEXT,                            -- 備註
     created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -119,10 +119,10 @@ CREATE TABLE form03 (
     id                   INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id              INT NOT NULL,                    -- 關聯 `users` 表
 
-    operation_date       DATE NOT NULL,                   -- 作業日期
-    field_code           VARCHAR(50) NOT NULL,            -- 田區代號
-    crop                 VARCHAR(100) NOT NULL,           -- 作物
-    crop_content         TEXT NOT NULL,                   -- 作物內容（工作代碼及描述）
+    operation_date       DATE,                   -- 作業日期
+    field_code           VARCHAR(50),            -- 田區代號
+    crop                 VARCHAR(100),           -- 作物
+    crop_content         TEXT,                   -- 作物內容（工作代碼及描述）
     notes                TEXT,                            -- 備註
     created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -148,9 +148,9 @@ WHERE u.username = 'farmer1';
 CREATE TABLE form04 (
     id                   INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id              INT NOT NULL,                    -- 關聯 `users` 表
-    preparation_date     DATE NOT NULL,                   -- 配製日期
-    material_code_or_name VARCHAR(100) NOT NULL,          -- 資材代碼或資材名稱
-    usage_amount         VARCHAR(100) NOT NULL,         -- 使用量(公斤/公升)
+    preparation_date     DATE,                   -- 配製日期
+    material_code_or_name VARCHAR(100),          -- 資材代碼或資材名稱
+    usage_amount         VARCHAR(100),         -- 使用量(公斤/公升)
     preparation_process  TEXT,                            -- 配製流程簡述
     final_ph_value       DECIMAL(5, 2),                   -- 最終 pH 值
     final_ec_value       DECIMAL(5, 2),                   -- 最終 EC 值(mS/cm)
@@ -175,8 +175,8 @@ WHERE u.username = 'farmer1';
 CREATE TABLE form05 (
     id INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id INT NOT NULL,               -- 關聯 `users` 表
-    nutrient_material_code VARCHAR(20) NOT NULL,  -- 養液配製資材代碼
-    nutrient_material_name VARCHAR(100) NOT NULL, -- 養液配製資材名稱
+    nutrient_material_code VARCHAR(20),  -- 養液配製資材代碼
+    nutrient_material_name VARCHAR(100), -- 養液配製資材名稱
     notes TEXT,                         -- 備註
     
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -200,11 +200,11 @@ WHERE nutrient_material_code = 'M000-0000';
 CREATE TABLE form06 (
     id                 INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id            INT NOT NULL,           -- 關聯 `users` 表
-    date_used          DATE NOT NULL,           -- 使用日期
-    field_code         VARCHAR(20) NOT NULL,           -- 田區代號
+    date_used          DATE,           -- 使用日期
+    field_code         VARCHAR(20),           -- 田區代號
     crop               VARCHAR(50),           -- 作物
     fertilizer_type    VARCHAR(100),           -- 施肥別 (基肥, 追肥)
-    material_code_or_name VARCHAR(100) NOT NULL,       -- 資材代碼或資材名稱
+    material_code_or_name VARCHAR(100),       -- 資材代碼或資材名稱
     fertilizer_amount  DECIMAL(10, 2),           -- 肥料使用量 (公斤/公升)
     dilution_factor    DECIMAL(5, 2),           -- 稀釋倍數 (液肥適用)
     operator           VARCHAR(100),           -- 操作人員
@@ -228,8 +228,8 @@ WHERE f.field_code = 'F000-0000';
 CREATE TABLE form07 (
     id INT AUTO_INCREMENT PRIMARY KEY,                    -- 唯一編號
     user_id INT NOT NULL,                                  -- 關聯 `users` 表
-    fertilizer_material_code VARCHAR(20) NOT NULL,          -- 肥料資材代碼
-    fertilizer_material_name VARCHAR(100) NOT NULL,         -- 肥料資材名稱
+    fertilizer_material_code VARCHAR(20),          -- 肥料資材代碼
+    fertilizer_material_name VARCHAR(100),         -- 肥料資材名稱
     notes TEXT,                                            -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
@@ -254,11 +254,11 @@ WHERE f.fertilizer_material_code = 'M000-0000';
 CREATE TABLE form08 (
     id INT AUTO_INCREMENT PRIMARY KEY,                     -- 編號，自動遞增
     user_id              INT NOT NULL,                    -- 關聯 `users` 表
-    material_name VARCHAR(100) NOT NULL,                    -- 資材名稱
+    material_name VARCHAR(100),                    -- 資材名稱
     manufacturer VARCHAR(100),                              -- 廠商
     supplier VARCHAR(100),                                  -- 供應商
-    packaging_unit VARCHAR(100), -- 包裝單位
-    packaging_volume VARCHAR(50),                  -- 包裝容量（如：公克、公斤、毫升、公升等）
+    packaging_unit VARCHAR(100), -- 包裝單位□包 □瓶 □罐 □其他_______
+    packaging_volume VARCHAR(50),                  -- 包裝容量，前面是數字，後面試單位選項（如：公克、公斤、毫升、公升等）
     date DATE,                                     -- 日期
     purchase_quantity DECIMAL(10, 2),              -- 購入量
     usage_quantity DECIMAL(10, 2),                 -- 使用量
@@ -283,18 +283,18 @@ WHERE f.material_name = 'ooxx資材';
 -- form09（有害生物防治或環境消毒資材施用紀錄）
 CREATE TABLE form09 (
     id INT AUTO_INCREMENT PRIMARY KEY,                        -- 編號，自動遞增
-    user_id              INT NOT NULL,                    -- 關聯 `users` 表
-    date_used DATE NOT NULL,                                   -- 使用日期
-    field_code VARCHAR(50) NOT NULL,                            -- 田區代號
-    crop VARCHAR(100) NOT NULL,                                -- 作物名稱
-    pest_target VARCHAR(100) NOT NULL,                         -- 防治對象（如：蟲）
-    material_code_or_name VARCHAR(100) NOT NULL,               -- 資材代碼或名稱
-    water_volume DECIMAL(10, 2) NOT NULL,                      -- 用水量（公升）
-    chemical_usage DECIMAL(10, 2) NOT NULL,                    -- 藥劑使用量（公斤、公升）
-    dilution_factor DECIMAL(10, 2) NOT NULL,                   -- 稀釋倍數
-    safety_harvest_period INT NOT NULL,                        -- 安全採收期（天）
-    operator_method VARCHAR(100) NOT NULL,  -- 操作方式
-    operator VARCHAR(100) NOT NULL,                            -- 操作人員
+    user_id INT,                    -- 關聯 `users` 表
+    date_used DATE,                                   -- 使用日期
+    field_code VARCHAR(50),                            -- 田區代號
+    crop VARCHAR(100),                                -- 作物名稱
+    pest_target VARCHAR(100),                         -- 防治對象（如：蟲）
+    material_code_or_name VARCHAR(100),               -- 資材代碼或名稱
+    water_volume DECIMAL(10, 2),                      -- 用水量（公升）
+    chemical_usage DECIMAL(10, 2),                    -- 藥劑使用量（公斤、公升）
+    dilution_factor DECIMAL(10, 2),                   -- 稀釋倍數
+    safety_harvest_period INT,                        -- 安全採收期（天）
+    operator_method VARCHAR(100),  -- 操作方式
+    operator VARCHAR(100),                            -- 操作人員
     notes TEXT,                                                -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間 
@@ -313,8 +313,8 @@ WHERE crop = '高麗菜' AND pest_target = '蟲';
 CREATE TABLE form10 (
     id INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id INT NOT NULL,               -- 關聯 `users` 表
-    pest_control_material_code VARCHAR(100) NOT NULL,   -- 防治資材代碼
-    pest_control_material_name VARCHAR(100) NOT NULL,   -- 防治資材名稱
+    pest_control_material_code VARCHAR(100),   -- 防治資材代碼
+    pest_control_material_name VARCHAR(100),   -- 防治資材名稱
     notes TEXT,                                              -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,          -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
@@ -336,13 +336,13 @@ WHERE f.pest_control_material_code = 'M000-0000';
 CREATE TABLE form11 (
     id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                             -- 關聯 `users` 表
-    material_name VARCHAR(255) NOT NULL,              -- 資材名稱
+    material_name VARCHAR(255),              -- 資材名稱
     dosage_form VARCHAR(100),                        -- 劑型
     brand_name VARCHAR(100),                         -- 商品名(廠牌)
     supplier VARCHAR(100),                           -- 供應商
-    packaging_unit VARCHAR(100) NOT NULL,             -- 包裝單位
+    packaging_unit VARCHAR(100),             -- 包裝單位
     packaging_volume DECIMAL(10, 2),                  -- 包裝容量
-    date DATE NOT NULL,                              -- 日期
+    date DATE,                              -- 日期
     purchase_quantity DECIMAL(10, 2),                -- 購入量
     usage_quantity DECIMAL(10, 2),                   -- 使用量
     remaining_quantity DECIMAL(10, 2),               -- 剩餘量
@@ -366,12 +366,12 @@ WHERE f.material_name = 'ooxx資材';
 CREATE TABLE form12 (
     id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                             -- 關聯 `users` 表
-    date_used DATE NOT NULL,                          -- 使用日期
-    field_code VARCHAR(100) NOT NULL,                 -- 田區代號
-    crop VARCHAR(100) NOT NULL,                       -- 作物名稱
-    material_code_or_name VARCHAR(255) NOT NULL,      -- 資材代碼或資材名稱
-    usage_amount DECIMAL(10, 2) NOT NULL,             -- 使用量
-    operator VARCHAR(100) NOT NULL,                   -- 操作人員
+    date_used DATE,                          -- 使用日期
+    field_code VARCHAR(100),                 -- 田區代號
+    crop VARCHAR(100),                       -- 作物名稱
+    material_code_or_name VARCHAR(255),      -- 資材代碼或資材名稱
+    usage_amount DECIMAL(10, 2),             -- 使用量
+    operator VARCHAR(100),                   -- 操作人員
     notes TEXT,                                       -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
@@ -394,8 +394,8 @@ WHERE f.crop = '高麗菜';
 CREATE TABLE form13 (
     id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                            -- 關聯 `users` 表
-    other_material_code VARCHAR(50) NOT NULL,         -- 其他資材代碼
-    other_material_name VARCHAR(255) NOT NULL,        -- 其他資材名稱
+    other_material_code VARCHAR(50),         -- 其他資材代碼
+    other_material_name VARCHAR(255),        -- 其他資材名稱
     notes TEXT,                                       -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- 更新時間
@@ -414,15 +414,15 @@ WHERE f.other_material_name = 'ooxx資材';
 CREATE TABLE form14 (
     id VARCHAR(50) PRIMARY KEY,                      -- 編號
     user_id INT NOT NULL,                             -- 關聯 `users` 表
-    material_name VARCHAR(255) NOT NULL,              -- 資材名稱
+    material_name VARCHAR(255),              -- 資材名稱
     manufacturer VARCHAR(255),                        -- 廠商
     supplier VARCHAR(255),                            -- 供應商
-    packaging_unit VARCHAR(100) NOT NULL,             -- 包裝單位
+    packaging_unit VARCHAR(100),             -- 包裝單位
     packaging_volume VARCHAR(50),                     -- 包裝容量 (例如：公克、公斤、毫升、公升、其他)
-    date DATE NOT NULL,                               -- 日期
-    purchase_quantity DECIMAL(10, 2) NOT NULL,        -- 購入量 (例如：10公升)
-    usage_quantity DECIMAL(10, 2) NOT NULL,           -- 使用量 (例如：10公升)
-    remaining_quantity DECIMAL(10, 2) NOT NULL,       -- 剩餘量 (例如：10公升)
+    date DATE,                               -- 日期
+    purchase_quantity DECIMAL(10, 2),        -- 購入量 (例如：10公升)
+    usage_quantity DECIMAL(10, 2),           -- 使用量 (例如：10公升)
+    remaining_quantity DECIMAL(10, 2),       -- 剩餘量 (例如：10公升)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE  -- 外鍵，關聯 `users` 表
@@ -444,10 +444,10 @@ WHERE f.material_name = 'ooxx資材';
 CREATE TABLE form15 (
     id VARCHAR(50) PRIMARY KEY,                      -- 編號
     user_id INT NOT NULL,                             -- 關聯 `users` 表
-    date DATE NOT NULL,                               -- 日期
-    item VARCHAR(100) NOT NULL,                       -- 項目
-    operation VARCHAR(100) NOT NULL,                  -- 作業內容
-    recorder VARCHAR(255) NOT NULL,                   -- 記錄人
+    date DATE,                               -- 日期
+    item VARCHAR(100),                       -- 項目
+    operation VARCHAR(100),                  -- 作業內容
+    recorder VARCHAR(255),                   -- 記錄人
     notes TEXT,                                       -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
@@ -467,10 +467,10 @@ WHERE f.item = '育苗場所';
 CREATE TABLE form16 (
     id VARCHAR(50) PRIMARY KEY,                      -- 編號
     user_id INT NOT NULL,                             -- 關聯 `users` 表
-    date DATE NOT NULL,                               -- 日期
-    item VARCHAR(100) NOT NULL,                       -- 項目
-    operation VARCHAR(100) NOT NULL,                  -- 作業內容
-    recorder VARCHAR(255) NOT NULL,                   -- 記錄人
+    date DATE,                               -- 日期
+    item VARCHAR(100),                       -- 項目
+    operation VARCHAR(100),                  -- 作業內容
+    recorder VARCHAR(255),                   -- 記錄人
     notes TEXT,                                       -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
@@ -491,15 +491,15 @@ WHERE f.item = '噴霧機';
 CREATE TABLE form17 (
     id VARCHAR(50) PRIMARY KEY,                       -- 編號
     user_id INT NOT NULL,                              -- 關聯 `users` 表
-    harvest_date DATE NOT NULL,                        -- 採收日期
-    field_code VARCHAR(50) NOT NULL,                   -- 田區代號
-    crop_name VARCHAR(255) NOT NULL,                   -- 作物名稱
+    harvest_date DATE,                        -- 採收日期
+    field_code VARCHAR(50),                   -- 田區代號
+    crop_name VARCHAR(255),                   -- 作物名稱
     batch_or_trace_no VARCHAR(50),                     -- 批次編號或履歷編號
-    harvest_weight DECIMAL(10, 2) NOT NULL,            -- 採收重量 (處理前)
-    process_date DATE NOT NULL,                        -- 處理日期
-    post_harvest_treatment VARCHAR(100) NOT NULL,      -- 採後處理內容
-    post_treatment_weight DECIMAL(10, 2) NOT NULL,    -- 處理後重量
-    verification_status ENUM('非驗證產品', '驗證產品') NOT NULL, -- 驗證狀態
+    harvest_weight DECIMAL(10, 2),            -- 採收重量 (處理前)
+    process_date DATE,                        -- 處理日期
+    post_harvest_treatment VARCHAR(100),      -- 採後處理內容
+    post_treatment_weight DECIMAL(10, 2),    -- 處理後重量
+    verification_status ENUM('非驗證產品', '驗證產品'), -- 驗證狀態
     verification_organization VARCHAR(255),            -- 驗證機構
     notes TEXT,                                        -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    -- 建立時間
@@ -521,13 +521,13 @@ WHERE f.crop_name = '高麗菜';
 CREATE TABLE form18 (
     id VARCHAR(50) PRIMARY KEY,                     -- 編號
     user_id INT NOT NULL,                            -- 關聯 `users` 表
-    arena VARCHAR(255) NOT NULL,                    -- 處理場所
-    process_date DATE NOT NULL,                     -- 處理日期
-    item VARCHAR(255) NOT NULL,                     -- 品項
-    batch_number VARCHAR(50) NOT NULL,              -- 批次編號
-    fresh_weight DECIMAL(10, 2) NOT NULL,           -- 鮮重 (公斤)
+    arena VARCHAR(255),                    -- 處理場所
+    process_date DATE,                     -- 處理日期
+    item VARCHAR(255),                     -- 品項
+    batch_number VARCHAR(50),              -- 批次編號
+    fresh_weight DECIMAL(10, 2),           -- 鮮重 (公斤)
     operation TEXT,                                 -- 作業內容
-    dry_weight DECIMAL(10, 2) NOT NULL,             -- 乾重 (公斤)
+    dry_weight DECIMAL(10, 2),             -- 乾重 (公斤)
     remarks TEXT,                                   -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
@@ -547,16 +547,16 @@ WHERE f.item = '高麗菜';
 CREATE TABLE form19 (
     id VARCHAR(50) PRIMARY KEY,                     -- 編號
     user_id INT NOT NULL,                            -- 關聯 `users` 表
-    package VARCHAR(255) NOT NULL,                   -- 包裝場所
-    sale_date DATE NOT NULL,                         -- 販售日期
-    product_name VARCHAR(255) NOT NULL,              -- 產品名稱
-    sales_target TEXT NOT NULL,                      -- 銷售對象
-    batch_number VARCHAR(50) NOT NULL,               -- 批次編號
-    shipment_quantity DECIMAL(10, 2) NOT NULL,       -- 出貨量 (公斤)
-    packaging_spec TEXT NOT NULL,                    -- 包裝規格
-    label_usage_quantity INT NOT NULL,               -- 標章使用數量
-    label_void_quantity INT NOT NULL,                -- 標章作廢數量
-    verification_status VARCHAR(255) NOT NULL,       -- 驗證狀態
+    package VARCHAR(255),                   -- 包裝場所
+    sale_date DATE,                         -- 販售日期
+    product_name VARCHAR(255),              -- 產品名稱
+    sales_target TEXT,                      -- 銷售對象
+    batch_number VARCHAR(50),               -- 批次編號
+    shipment_quantity DECIMAL(10, 2),       -- 出貨量 (公斤)
+    packaging_spec TEXT,                    -- 包裝規格
+    label_usage_quantity INT,               -- 標章使用數量
+    label_void_quantity INT,                -- 標章作廢數量
+    verification_status VARCHAR(255),       -- 驗證狀態
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
@@ -575,9 +575,9 @@ WHERE f.product_name = '高麗菜';
 CREATE TABLE form20 (
     id VARCHAR(50) PRIMARY KEY,                     -- 編號
     user_id INT NOT NULL,                            -- 關聯 `users` 表
-    checkitem TEXT NOT NULL,                         -- 檢查項目
-    jobdate DATE NOT NULL,                           -- 作業日期
-    operator_name VARCHAR(255) NOT NULL,             -- 作業人員姓名
+    checkitem TEXT,                         -- 檢查項目
+    jobdate DATE,                           -- 作業日期
+    operator_name VARCHAR(255),             -- 作業人員姓名
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
@@ -595,12 +595,12 @@ JOIN users u ON f.user_id = u.id;
 CREATE TABLE form22 (
     id VARCHAR(50) PRIMARY KEY,                     -- 編號
     user_id INT NOT NULL,                            -- 關聯 `users` 表
-    date DATE NOT NULL,                              -- 日期
-    customer_name VARCHAR(255) NOT NULL,             -- 客戶名稱
-    customer_phone VARCHAR(50) NOT NULL,             -- 客戶電話
-    complaint TEXT NOT NULL,                         -- 客訴內容
-    resolution TEXT NOT NULL,                        -- 處理結果
-    processor VARCHAR(255) NOT NULL,                 -- 處理人簽名/日期
+    date DATE,                              -- 日期
+    customer_name VARCHAR(255),             -- 客戶名稱
+    customer_phone VARCHAR(50),             -- 客戶電話
+    complaint TEXT,                         -- 客訴內容
+    resolution TEXT,                        -- 處理結果
+    processor VARCHAR(255) ,                 -- 處理人簽名/日期
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表

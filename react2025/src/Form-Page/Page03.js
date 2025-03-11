@@ -5,7 +5,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthContext from '../components/auth/AuthContext';
 import FormField from '../components/common/FormField';
-import SelectField from '../components/common/SelectField';
+import MultiSelectField  from '../components/common/MultiSelectField ';
 import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
 import { useNavigate } from 'react-router-dom';
@@ -217,7 +217,7 @@ const Page03 = () => {
           onChange={handleChange}
           label="作物:"
         />
-        <SelectField
+        <MultiSelectField 
           label="作業內容(可填寫代碼)"
           name="crop_content"
           value={formData.crop_content}
