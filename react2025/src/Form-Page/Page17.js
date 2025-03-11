@@ -255,7 +255,7 @@ const Page17 = () => {
           name="post_harvest_treatment"
           value={formData.post_harvest_treatment}
           onChange={handleChange}
-          required
+          
           options={[
             { value: '清洗', label: '清洗' },
             { value: '整修', label: '整修' },
@@ -274,7 +274,7 @@ const Page17 = () => {
             name="post_harvest_treatment_other"
             value={formData.post_harvest_treatment_other}
             onChange={handleChange}
-            required
+            
           />
         )}
 
@@ -290,7 +290,7 @@ const Page17 = () => {
           name="verification_status"
           value={formData.verification_status}
           onChange={handleChange}
-          required
+          
           options={[
             { value: '非驗證產品', label: '非驗證產品' },
             { value: '驗證產品', label: '驗證產品' },
@@ -302,7 +302,7 @@ const Page17 = () => {
             name="verification_status_other"
             value={formData.verification_status_other}
             onChange={handleChange}
-            required
+            
           />
         )}
  

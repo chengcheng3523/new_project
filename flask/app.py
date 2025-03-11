@@ -122,7 +122,7 @@ def create_user_profile():
         existing_user.mobile = data.get('mobile')
         existing_user.address = data.get('address')
         existing_user.email = data.get('email')
-        existing_user.total_area = data.get('total_area')
+        existing_user.total_area = data.get('total_area') if data.get('total_area') != '' else existing_user.total_area
         existing_user.notes = data.get('notes')
 
         db.session.commit()
@@ -220,7 +220,7 @@ def add_land_parcel():
     user_id = data.get('user_id')
     number = data.get('number')
     land_parcel_number = data.get('land_parcel_number')
-    area = data.get('area')
+    area = data.get('area') if data.get('area') != '' else None
     crop = data.get('crop')
     notes = data.get('notes')
 
@@ -249,7 +249,7 @@ def update_land_parcel(id):
 
     land_parcel.number = data.get('number', land_parcel.number)
     land_parcel.land_parcel_number = data.get('land_parcel_number', land_parcel.land_parcel_number)
-    land_parcel.area = data.get('area', land_parcel.area)
+    land_parcel.area = data.get('area') if data.get('area') != '' else land_parcel.area
     land_parcel.crop = data.get('crop', land_parcel.crop)
     land_parcel.notes = data.get('notes', land_parcel.notes)
 
@@ -295,7 +295,7 @@ def get_land_parcels():
 # ----------------------------------------------------------------------------------------
 # 生產計畫
 
-# 新增生產計畫
+#  新增生產計畫
 @app.route('/api/form002', methods=['POST'])
 def add_form002():
     data = request.get_json()
@@ -303,23 +303,13 @@ def add_form002():
         return jsonify({'error': '請提供 JSON 數據'}), 400
 
     user_id = data.get('user_id')
-    area_code = data.get('area_code')
-    area_size = data.get('area_size')
+    area_code = data.get('area_code') 
+    area_size = data.get('area_size') if data.get('area_size') not in [None, ''] else None
     month = data.get('month')
     crop_info = data.get('crop_info')
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not area_code:
-    #     return jsonify({'error': '缺少 場區代號'}), 400
-    # if not area_size:
-    #     return jsonify({'error': '缺少 場區面積(公頃)'}), 400
-    # if not month:
-    #     return jsonify({'error': '缺少 月份'}), 400
-    # if not crop_info:
-    #     return jsonify({'error': '缺少 種植作物種類、產期、預估產量（公斤）'}), 400
+
 
     try:
         new_form = Form002(
@@ -337,7 +327,7 @@ def add_form002():
     except Exception as e:
         print(f"Error occurred while adding form002: {str(e)}")
         return jsonify({'error': str(e)}), 500
-
+    
 # 更新生產計畫
 @app.route('/api/form002/<int:id>', methods=['PUT'])
 def update_form002(id):
@@ -347,7 +337,7 @@ def update_form002(id):
         return jsonify({'error': '生產計畫未找到'}), 404
     
     form.area_code = data.get('area_code', form.area_code)
-    form.area_size = data.get('area_size', form.area_size)
+    form.area_size = data.get('area_size', form.area_size) if data.get('area_size') != '' else None
     form.month = data.get('month', form.month)
     form.crop_info = data.get('crop_info', form.crop_info)
     form.notes = data.get('notes', form.notes)
@@ -382,7 +372,7 @@ def get_user_form002(user_id):
             'id': result.Form002.id,
             'user_id': result.Form002.user_id,
             'area_code': result.Form002.area_code,
-            'area_size': str(result.Form002.area_size),
+            'area_size': str(result.Form002.area_size) if result.Form002.area_size is not None else None,
             'month': result.Form002.month,
             'crop_info': result.Form002.crop_info,
             'notes': result.Form002.notes
@@ -426,24 +416,10 @@ def add_form02():
     cultivated_crop = data.get('cultivated_crop')
     crop_variety = data.get('crop_variety')
     seed_source = data.get('seed_source')
-    seedling_purchase_date = datetime.strptime(data.get('seedling_purchase_date'), '%Y-%m-%d')
+    seedling_purchase_date = datetime.strptime(data['seedling_purchase_date'], '%Y-%m-%d') if data.get('seedling_purchase_date') else None
     seedling_purchase_type = data.get('seedling_purchase_type')
     notes = data.get('notes')
-
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not cultivated_crop:
-    #     return jsonify({'error': '缺少 栽培作物'}), 400
-    # if not crop_variety:
-    #     return jsonify({'error': '缺少 栽培品種'}), 400
-    # if not seed_source:
-    #     return jsonify({'error': '缺少 種子(苗)來源'}), 400
-    # if not seedling_purchase_date:
-    #     return jsonify({'error': '缺少 育苗(購入)日期'}), 400
-    # if not seedling_purchase_type:
-    #     return jsonify({'error': '缺少 育苗(購入)種類'}), 400
-    
+  
     try:
         new_form = Form02(
             user_id=user_id,
@@ -504,7 +480,8 @@ def get_all_form02():
             'cultivated_crop': result.Form02.cultivated_crop,
             'crop_variety': result.Form02.crop_variety,
             'seed_source': result.Form02.seed_source,
-            'seedling_purchase_date': result.Form02.seedling_purchase_date.strftime('%Y-%m-%d'),
+            # 檢查 seedling_purchase_date 是否為 None，如果是，給一個預設值
+            'seedling_purchase_date': result.Form02.seedling_purchase_date.strftime('%Y-%m-%d') if result.Form02.seedling_purchase_date else None ,
             'seedling_purchase_type': result.Form02.seedling_purchase_type,
             'notes': result.Form02.notes
         }
@@ -596,7 +573,7 @@ def get_all_form03():
             "id": result.Form03.id,
             "user_id": result.Form03.user_id,
             "farmer_name": result.farmer_name,
-            "operation_date": result.Form03.operation_date.strftime('%Y-%m-%d'),
+            "operation_date": result.Form03.operation_date.strftime('%Y-%m-%d') if result.Form03.operation_date else None,
             "field_code": result.Form03.field_code,
             "crop": result.Form03.crop,
             "crop_content": result.Form03.crop_content,
@@ -703,7 +680,7 @@ def get_all_form04():
             "id": result.Form04.id,
             "user_id": result.Form04.user_id,
             "farmer_name": result.farmer_name,
-            "preparation_date": result.Form04.preparation_date.strftime('%Y-%m-%d'),
+            "preparation_date": result.Form04.preparation_date.strftime('%Y-%m-%d') if result.Form04.preparation_date else None,
             "material_code_or_name": result.Form04.material_code_or_name,
             "usage_amount": str(result.Form04.usage_amount),
             "preparation_process": result.Form04.preparation_process,
@@ -908,7 +885,7 @@ def get_all_form06():
             "id": result.Form06.id,
             "user_id": result.Form06.user_id,
             "farmer_name": result.farmer_name,
-            "date_used": result.Form06.date_used.strftime('%Y-%m-%d'),
+            "date_used": result.Form06.date_used.strftime('%Y-%m-%d') if result.Form06.date_used else None,
             "field_code": result.Form06.field_code,
             "crop": result.Form06.crop,
             "fertilizer_type": result.Form06.fertilizer_type,
@@ -1120,7 +1097,7 @@ def get_all_form08():
             "supplier": result.Form08.supplier,
             "packaging_unit": result.Form08.packaging_unit,
             "packaging_volume": result.Form08.packaging_volume,
-            "date": result.Form08.date.strftime('%Y-%m-%d'),
+            "date": result.Form08.date.strftime('%Y-%m-%d') if result.Form08.date else None,
             "purchase_quantity": str(result.Form08.purchase_quantity),
             "usage_quantity": str(result.Form08.usage_quantity),
             "remaining_quantity": str(result.Form08.remaining_quantity),
@@ -1249,7 +1226,7 @@ def get_all_form09():
             "id": result.Form09.id,
             "user_id": result.Form09.user_id,
             "farmer_name": result.farmer_name,
-            "date_used": result.Form09.date_used.strftime('%Y-%m-%d'),
+            "date_used": result.Form09.date_used.strftime('%Y-%m-%d') if result.Form09.date_used else None,
             "field_code": result.Form09.field_code,
             "crop": result.Form09.crop,
             "pest_target": result.Form09.pest_target,
@@ -1468,7 +1445,7 @@ def get_all_form11():
             "supplier": result.Form11.supplier,
             "packaging_unit": result.Form11.packaging_unit,
             "packaging_volume": result.Form11.packaging_volume,
-            "date": result.Form11.date.strftime('%Y-%m-%d'),
+            "date": result.Form11.date.strftime('%Y-%m-%d') if result.Form11.date else None,
             "purchase_quantity": str(result.Form11.purchase_quantity),
             "usage_quantity": str(result.Form11.usage_quantity),
             "remaining_quantity": str(result.Form11.remaining_quantity),
@@ -1572,7 +1549,7 @@ def get_all_form12():
             "id": result.Form12.id,
             "user_id": result.Form12.user_id,
             "farmer_name": result.farmer_name,
-            "date_used": result.Form12.date_used.strftime('%Y-%m-%d'),
+            "date_used": result.Form12.date_used.strftime('%Y-%m-%d') if result.Form12.date_used else None,
             "field_code": result.Form12.field_code,
             "crop": result.Form12.crop,
             "material_code_or_name": result.Form12.material_code_or_name,
@@ -1780,7 +1757,7 @@ def get_all_form14():
             "supplier": result.Form14.supplier,
             "packaging_unit": result.Form14.packaging_unit,
             "packaging_volume": result.Form14.packaging_volume,
-            "date": result.Form14.date.strftime('%Y-%m-%d'),
+            "date": result.Form14.date.strftime('%Y-%m-%d') if result.Form14.date else None,
             "purchase_quantity": str(result.Form14.purchase_quantity),
             "usage_quantity": str(result.Form14.usage_quantity),
             "remaining_quantity": str(result.Form14.remaining_quantity),
@@ -1874,7 +1851,7 @@ def get_all_form15():
             "id": result.Form15.id,
             "user_id": result.Form15.user_id,
             "farmer_name": result.farmer_name,
-            "date": result.Form15.date.strftime('%Y-%m-%d'),
+            "date": result.Form15.date.strftime('%Y-%m-%d') if result.Form15.date else None,
             "item": result.Form15.item,
             "operation": result.Form15.operation,
             "recorder": result.Form15.recorder,
@@ -1968,7 +1945,7 @@ def get_all_form16():
             "id": result.Form16.id,
             "user_id": result.Form16.user_id,
             "farmer_name": result.farmer_name,
-            "date": result.Form16.date.strftime('%Y-%m-%d'),
+            "date": result.Form16.date.strftime('%Y-%m-%d') if result.Form16.date else None,
             "item": result.Form16.item,
             "operation": result.Form16.operation,
             "recorder": result.Form16.recorder,
@@ -2087,12 +2064,12 @@ def get_all_form17():
             "id": result.Form17.id,
             "user_id": result.Form17.user_id,
             "farmer_name": result.farmer_name,
-            "harvest_date": result.Form17.harvest_date.strftime('%Y-%m-%d'),
+            "harvest_date": result.Form17.harvest_date.strftime('%Y-%m-%d') if result.Form17.harvest_date else None,
             "field_code": result.Form17.field_code,
             "crop_name": result.Form17.crop_name,
             "batch_or_trace_no": result.Form17.batch_or_trace_no,
             "harvest_weight": str(result.Form17.harvest_weight),
-            "process_date": result.Form17.process_date.strftime('%Y-%m-%d'),
+            "process_date": result.Form17.process_date.strftime('%Y-%m-%d') if result.Form17.process_date else None,
             "post_harvest_treatment": result.Form17.post_harvest_treatment,
             "post_treatment_weight": str(result.Form17.post_treatment_weight),
             "verification_status": result.Form17.verification_status, 
@@ -2184,7 +2161,7 @@ def get_all_form18():
             "user_id": result.Form18.user_id,
             "farmer_name": result.farmer_name,
             "arena": result.Form18.arena,
-            "process_date": result.Form18.process_date.strftime('%Y-%m-%d'),
+            "process_date": result.Form18.process_date.strftime('%Y-%m-%d') if result.Form18.process_date else None,
             "item": result.Form18.item,
             "batch_number": result.Form18.batch_number,
             "fresh_weight": str(result.Form18.fresh_weight),
@@ -2284,7 +2261,7 @@ def get_all_form19():
             "user_id": result.Form19.user_id,
             "farmer_name": result.farmer_name,
             "package": result.Form19.package,
-            "sale_date": result.Form19.sale_date.strftime('%Y-%m-%d'),
+            "sale_date": result.Form19.sale_date.strftime('%Y-%m-%d') if result.Form19.sale_date else None,
             "product_name": result.Form19.product_name,
             "sales_target": str(result.Form19.sales_target),
             "batch_number": result.Form19.batch_number,
@@ -2370,7 +2347,7 @@ def get_all_form20():
             "user_id": result.Form20.user_id,
             "farmer_name": result.farmer_name,
             "checkitem": result.Form20.checkitem,
-            "jobdate": result.Form20.jobdate.strftime('%Y-%m-%d'),
+            "jobdate": result.Form20.jobdate.strftime('%Y-%m-%d') if result.Form20.jobdate else None,
             "operator_name": result.Form20.operator_name
         }
         for result in results
@@ -2472,13 +2449,13 @@ def get_all_form22():
             "id": result.Form22.id,
             "user_id": result.Form22.user_id,
             "farmer_name": result.farmer_name,
-            "date": result.Form22.date.strftime('%Y-%m-%d'),
+            "date": result.Form22.date.strftime('%Y-%m-%d') if result.Form22.date else None,
             "customer_name": result.Form22.customer_name,
             "customer_phone": result.Form22.customer_phone,
             "complaint": result.Form22.complaint,
             "resolution": result.Form22.resolution,
             "processor_name": result.Form22.processor_name,
-            "processor_date": result.Form22.processor_date.strftime('%Y-%m-%d')
+            "processor_date": result.Form22.processor_date.strftime('%Y-%m-%d') if result.Form22.processor_date else None
         }
         for result in results
     ]

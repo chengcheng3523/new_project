@@ -73,15 +73,7 @@ const Page07 = () => {
     e.preventDefault();
     setLoading(true);
 
-  // 檢查必要欄位是否填寫
-  const requiredFields = ['fertilizer_material_code', 'fertilizer_material_name'];
-  for (const field of requiredFields) {
-    if (!formData[field]) {
-      alert(`請填寫 ${field} 欄位！`);
-      setLoading(false);
-      return;
-    }
-  }
+
 
   try {
     let response;

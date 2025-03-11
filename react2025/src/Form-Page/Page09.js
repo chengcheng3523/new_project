@@ -9,7 +9,7 @@ import SelectField from '../components/common/SelectField';
 import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
 import { useNavigate } from 'react-router-dom';
-import moment from 'moment';
+
 
 const Page09 = () => {
   const { role, userId } = useContext(AuthContext);
@@ -93,15 +93,7 @@ const Page09 = () => {
     e.preventDefault();
     setLoading(true);
 
-  // 檢查必要欄位是否填寫
-  const requiredFields = ['date_used', 'field_code', 'crop', 'pest_target', 'material_code_or_name', 'water_volume', 'chemical_usage', 'dilution_factor', 'safety_harvest_period', 'operator_method', 'operator'];
-    for (const field of requiredFields) {
-    if (!formData[field]) {
-      alert(`請填寫 ${field} 欄位！`);
-      setLoading(false);
-      return;
-    }
-  }
+
 
   try {
     let response;
@@ -212,70 +204,70 @@ const Page09 = () => {
         value={formData.date_used}
         onChange={handleChange}
         type="date"
-        required
+        
       />
       <FormField
         label="田區代號"
         name="field_code"
         value={formData.field_code}
         onChange={handleChange}
-        required
+        
       />
       <FormField
         label="作物"
         name="crop"
         value={formData.crop}
         onChange={handleChange}
-        required
+        
       />
       <FormField
         label="防治對象"
         name="pest_target"
         value={formData.pest_target}
         onChange={handleChange}
-        required
+        
       />
       <FormField
         label="資材代碼或名稱"
         name="material_code_or_name"
         value={formData.material_code_or_name}
         onChange={handleChange}
-        required
+        
       />
       <FormField
         label="用水量(公升)"
         name="water_volume"
         value={formData.water_volume}
         onChange={handleChange}
-        required
+        
       />
       <FormField
         label="藥劑使用量(公斤.公升)"
         name="chemical_usage"
         value={formData.chemical_usage}
         onChange={handleChange}
-        required
+        
       />
       <FormField
         label="稀釋倍數"
         name="dilution_factor"
         value={formData.dilution_factor}
         onChange={handleChange}
-        required
+        
       />
       <FormField
         label="安全採收期(天)"
         name="safety_harvest_period"
         value={formData.safety_harvest_period}
         onChange={handleChange}
-        required
+        
       />
       <SelectField
         label="操作方式"
         name="operator_method"
         value={formData.operator_method}
         onChange={handleChange}
-        required
+        
         options={[
           { value: '噴灑', label: '噴灑' },
           { value: '撒施', label: '撒施' },
@@ -288,7 +280,7 @@ const Page09 = () => {
         name="operator"
         value={formData.operator}
         onChange={handleChange}
-        required
+        
       />
  
         <FormField

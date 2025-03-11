@@ -283,7 +283,7 @@ WHERE f.material_name = 'ooxx資材';
 -- form09（有害生物防治或環境消毒資材施用紀錄）
 CREATE TABLE form09 (
     id INT AUTO_INCREMENT PRIMARY KEY,                        -- 編號，自動遞增
-    user_id INT,                    -- 關聯 `users` 表
+    user_id INT NOT NULL,                    -- 關聯 `users` 表
     date_used DATE,                                   -- 使用日期
     field_code VARCHAR(50),                            -- 田區代號
     crop VARCHAR(100),                                -- 作物名稱

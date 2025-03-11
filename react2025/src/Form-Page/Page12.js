@@ -84,15 +84,7 @@ const Page12 = () => {
     setLoading(true);
 
 
-  // // 檢查必要欄位是否填寫
-  // const requiredFields = ['date_used', 'field_code', 'crop', 'material_code_or_name', 'usage_amount', 'operator'];
-  // for (const field of requiredFields) {
-  //   if (!formData[field]) {
-  //     alert(`請填寫 ${field} 欄位！`);
-  //     setLoading(false);
-  //     return;
-  //   }
-  // }
+
 
   try {
     let response;

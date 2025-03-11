@@ -81,15 +81,7 @@ const Page16 = () => {
     e.preventDefault();
     setLoading(true);
 
-  // 檢查必要欄位是否填寫
-  const requiredFields = ['date', 'item', 'operation', 'recorder'];
-  for (const field of requiredFields) {
-    if (!formData[field]) {
-      alert(`請填寫 ${field} 欄位！`);
-      setLoading(false);
-      return;
-    }
-  }
+
   // 合併 項目 & 作業內容
   const operation = formData.operation === '其他' ? formData.operation_other : formData.operation;
   const item = formData.item === '其他' ? formData.item_other : formData.item;
@@ -210,7 +202,7 @@ const Page16 = () => {
           name="item"
           value={formData.item}
           onChange={handleChange}
-          required
+          
           options={[
             { value: '噴霧機', label: '噴霧機' },
             { value: '割草機', label: '割草機' },
@@ -231,7 +223,7 @@ const Page16 = () => {
             name="item_other"
             value={formData.item_other}
             onChange={handleChange}
-            required
+            
           />
         )}
 
@@ -240,7 +232,7 @@ const Page16 = () => {
           name="operation"
           value={formData.operation}
           onChange={handleChange}
-          required
+          
           options={[
             { value: '清潔', label: '清潔' },
             { value: '維修', label: '維修' },
@@ -255,7 +247,7 @@ const Page16 = () => {
             name="operation_other"
             value={formData.operation_other}
             onChange={handleChange}
-            required
+            
           />
         )}
 
@@ -264,7 +256,7 @@ const Page16 = () => {
           name="recorder"
           value={formData.recorder}
           onChange={handleChange}
-          required
+          
         />
         <FormField
           label="備註"

@@ -77,15 +77,7 @@ const Page002 = () => {
     e.preventDefault();
     setLoading(true);
 
-  // 檢查必要欄位是否填寫
-  const requiredFields = ['area_code', 'area_size', 'month', 'crop_info', 'notes'];
-  for (const field of requiredFields) {
-    if (!formData[field]) {
-      alert(`請填寫 ${field} 欄位！`);
-      setLoading(false);
-      return;
-    }
-  }
+
 
   try {
     let response;
@@ -171,7 +163,6 @@ const Page002 = () => {
           name="area_code"
           value={formData.area_code}
           onChange={handleChange}
-          required
           disabled={loading}
         />
         <FormField

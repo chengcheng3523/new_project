@@ -100,15 +100,7 @@ const Page14 = () => {
       e.preventDefault();
       setLoading(true);
   
-  // 檢查必要欄位是否填寫
-  const requiredFields = ['material_name', 'manufacturer', 'supplier', 'date', 'packaging_unit' , 'purchase_quantity', 'usage_quantity', 'remaining_quantity'];
-  for (const field of requiredFields) {
-    if (!formData[field]) {
-      alert(`請填寫 ${field} 欄位！`);
-      setLoading(false);
-      return;
-    }
-  }
+
   // 驗證使用量和剩餘量不超過購入量
   const purchase = parseFloat(formData.purchase_quantity);
   const usage = parseFloat(formData.usage_quantity) || 0;
@@ -261,7 +253,7 @@ const Page14 = () => {
           name="packaging_unit"
           value={formData.packaging_unit}
           onChange={handleChange}
-          required
+          
           options={[
             { label: '包', value: '包' },
             { label: '瓶', value: '瓶' },
@@ -276,7 +268,7 @@ const Page14 = () => {
             name="packaging_unit_other"
             value={formData.packaging_unit_other}
             onChange={handleChange}
-            required
+            
           />
         )}
         <FormField
@@ -285,14 +277,14 @@ const Page14 = () => {
           type="number"
           value={formData.volumeValue}
           onChange={handleChange}
-          required
+          
         />
         <SelectField
           label="包裝容量 (單位)"
           name="volumeUnit"
           value={formData.volumeUnit}
           onChange={handleChange}
-          required
+          
           options={[
             { label: '公克', value: '公克' },
             { label: '公斤', value: '公斤' },
@@ -307,7 +299,7 @@ const Page14 = () => {
           name="volumeUnit_other"
           value={formData.volumeUnit_other}
           onChange={handleChange}
-          required
+          
         />
       )}
         <FormField

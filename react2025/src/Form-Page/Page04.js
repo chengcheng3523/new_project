@@ -83,15 +83,7 @@ const Page04 = () => {
     e.preventDefault();
     setLoading(true);
 
-  // 檢查必要欄位是否填寫
-  const requiredFields = ['preparation_date', 'material_code_or_name', 'usage_amount', 'preparation_process', 'final_ph_value', 'final_ec_value', 'preparer_name'];
-  for (const field of requiredFields) {
-    if (!formData[field]) {
-      alert(`請填寫 ${field} 欄位！`);
-      setLoading(false);
-      return;
-    }
-  }
+
 
   try {
     let response;

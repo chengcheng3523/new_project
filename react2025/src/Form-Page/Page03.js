@@ -82,15 +82,7 @@ const Page03 = () => {
     setLoading(true);
 
 
-  // 檢查必要欄位是否填寫
-  const requiredFields = ['operation_date', 'field_code', 'crop', 'crop_content' ];
-  for (const field of requiredFields) {
-    if (!formData[field]) {
-      alert(`請填寫 ${field} 欄位！`);
-      setLoading(false);
-      return;
-    }
-  }
+
 
   // 合併 
   const crop_content = formData.crop_content === '其他' ? formData.crop_content_other : formData.crop_content;
@@ -222,7 +214,7 @@ const Page03 = () => {
           name="crop_content"
           value={formData.crop_content}
           onChange={handleChange}
-          required
+          
           options={[
             { value: '(1-1) 整地', label: '(1-1) 整地' },
             { value: '(1-2) 作畦', label: '(1-2) 作畦' },
@@ -272,7 +264,7 @@ const Page03 = () => {
               name="crop_content_other"
               value={formData.crop_content_other}
               onChange={handleChange}
-              required
+              
             />
           )}
 

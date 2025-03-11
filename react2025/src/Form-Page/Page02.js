@@ -82,15 +82,7 @@ const Page02 = () => {
     e.preventDefault();
     setLoading(true);
 
-  // 檢查必要欄位是否填寫
-  const requiredFields = ['cultivated_crop', 'crop_variety', 'seed_source', 'seedling_purchase_type' ];
-  for (const field of requiredFields) {
-    if (!formData[field]) {
-      alert(`請填寫 ${field} 欄位！`);
-      setLoading(false);
-      return;
-    }
-  }
+
   // 合併「育苗(購入)種類」和「育苗(購入)種類 (購買來源)」
   const seedling_purchase_type = formData.seedling_purchase_type === '購買來源' ? formData.seedling_purchase_type_other : formData.seedling_purchase_type;
  
@@ -219,7 +211,7 @@ const Page02 = () => {
           name="seedling_purchase_type"
           value={formData.seedling_purchase_type}
           onChange={handleChange}
-          required
+          
           options={[
             { value: '自行育苗', label: '自行育苗' },
             { value: '購買來源', label: '購買來源' },
@@ -231,7 +223,7 @@ const Page02 = () => {
             name="seedling_purchase_type_other"
             value={formData.seedling_purchase_type_other}
             onChange={handleChange}
-            required
+            
           />
         )}
 
