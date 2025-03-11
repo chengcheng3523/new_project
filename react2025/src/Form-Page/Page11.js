@@ -1,4 +1,4 @@
-// 肥料入出庫
+// 有害生物防治或環境消毒資材入出庫
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Clearfix from "../components/common/Clearfix";
 import axios from 'axios';
@@ -12,14 +12,15 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
 
-const Page08 = () => {
+const Page11 = () => {
   const { role, userId } = useContext(AuthContext);
   const isAdmin = role === 'admin'; 
   const [formData, setFormData] = useState({
     id: null,
     user_id: userId, 
-    material_name: '',
-    manufacturer: '',
+    material_name: '', 
+    dosage_form: '', // 新增：劑型
+    brand_name: '', // 新增：商品名(廠牌)
     supplier : '',
     date: '',
     packaging_unit : '',
@@ -40,18 +41,19 @@ const Page08 = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:5000/api/form08');
+      const response = await axios.get('http://127.0.0.1:5000/api/form11');
       console.log('原始數據:', response.data); // 打印原始數據確認結構
       if (Array.isArray(response.data)) {
         const transformedData = response.data.map(item => ({
           id: item.id, // 使用 land_parcel_number 作为唯一标识符
           user_id: item.user_id,
           material_name: item.material_name,
-          manufacturer: item.manufacturer,
+          dosage_form: item.dosage_form,
+          brand_name: item.brand_name,
           supplier: item.supplier,
-          date: item.date,
           packaging_unit: item.packaging_unit,
           packaging_volume: item.packaging_volume,
+          date: item.date,
           purchase_quantity: item.purchase_quantity,
           usage_quantity: item.usage_quantity,
           remaining_quantity: item.remaining_quantity,
@@ -101,7 +103,7 @@ const Page08 = () => {
       setLoading(true);
   
   // 檢查必要欄位是否填寫
-  const requiredFields = ['material_name', 'manufacturer', 'supplier', 'date', 'packaging_unit' , 'purchase_quantity', 'usage_quantity', 'remaining_quantity'];
+  const requiredFields = ['material_name', 'dosage_form', 'brand_name', 'supplier', 'date', 'packaging_unit', 'purchase_quantity', 'usage_quantity', 'remaining_quantity'];
   for (const field of requiredFields) {
     if (!formData[field]) {
       alert(`請填寫 ${field} 欄位！`);
@@ -124,8 +126,7 @@ const Page08 = () => {
     return;
   }
 
-  // 合併包裝容量
-  // const packaging_volume = `${formData.volumeValue} ${formData.volumeUnit}`;
+  // 合併包裝容量 (volumeValue + volumeUnit)
   const packaging_unit = formData.packaging_unit === '其他' ? formData.packaging_unit_other : formData.packaging_unit;
   const packaging_volume = `${formData.volumeValue} ${formData.volumeUnit === '其他' ? formData.volumeUnit_other : formData.volumeUnit}`;
 
@@ -133,7 +134,7 @@ const Page08 = () => {
     let response;
     if (formData.id) {
       if (isAdmin) {
-        response = await axios.put(`http://127.0.0.1:5000/api/form08/${formData.id}`, {
+        response = await axios.put(`http://127.0.0.1:5000/api/form11/${formData.id}`, {
           ...formData,
           packaging_volume,
           packaging_unit,
@@ -145,10 +146,11 @@ const Page08 = () => {
       }
       } else {
         // 新增資料
-        response = await axios.post('http://127.0.0.1:5000/api/form08', {
+        response = await axios.post('http://127.0.0.1:5000/api/form11', {
           user_id: userId,
           material_name: formData.material_name,
-          manufacturer: formData.manufacturer,
+          dosage_form: formData.dosage_form,
+          brand_name: formData.brand_name,
           supplier: formData.supplier,
           date: formData.date,
           packaging_unit,
@@ -164,7 +166,8 @@ const Page08 = () => {
         id: null,
         user_id: userId,
         material_name: '',
-        manufacturer: '',
+        dosage_form: '',
+        brand_name: '',
         supplier: '',
         date: '',
         packaging_unit: '',
@@ -196,7 +199,7 @@ const Page08 = () => {
       return;
     }
     try {
-      const response = await axios.delete(`http://127.0.0.1:5000/api/form08/${id}`);
+      const response = await axios.delete(`http://127.0.0.1:5000/api/form11/${id}`);
       console.log('删除成功:', response.data);
       fetchData(); // 刷新数据
       alert('成功刪除資料！');
@@ -218,7 +221,8 @@ const Page08 = () => {
       id: record.id,
       user_id: record.user_id,
       material_name: record.material_name || '',
-      manufacturer: record.manufacturer || '',
+      dosage_form: record.dosage_form || '',
+      brand_name: record.brand_name || '',
       supplier: record.supplier || '',
       date: record.date || '',
       packaging_unit: isOtherPackagingUnit ? '其他' : record.packaging_unit || '',
@@ -237,7 +241,7 @@ const Page08 = () => {
     <div className="container">
       <Clearfix height="100px" />
       <Form onSubmit={handleSubmit}>
-        <h4>表 8.肥料入出庫紀錄</h4>
+        <h4>表 11.有害生物防治或環境消毒資材入出庫紀錄</h4>
         <FormField
           label="資材名稱"
           name="material_name"
@@ -245,9 +249,15 @@ const Page08 = () => {
           onChange={handleChange}
         />
         <FormField
-          label="廠商"
-          name="manufacturer"
-          value={formData.manufacturer}
+          label="劑型"
+          name="dosage_form"
+          value={formData.dosage_form}
+          onChange={handleChange}
+        />
+        <FormField
+          label="商品名(廠牌)"
+          name="brand_name"
+          value={formData.brand_name}
           onChange={handleChange}
         />
         <FormField
@@ -351,12 +361,13 @@ const Page08 = () => {
       <Clearfix height="50px" />
       {/* 表格顯示 */}
       <table className="table table-bordered table-hover table-responsive table caption-top">
-        <caption>表 8.肥料入出庫紀錄</caption>
+        <caption>表 11.有害生物防治或環境消毒資材入出庫紀錄</caption>
         <thead class="table-light">
           <tr>
           <th>id</th>
           <th>資材名稱</th>
-          <th>廠商</th>
+          <th>劑型</th>
+          <th>商品名(廠牌)</th>
           <th>供應商</th>
           <th>包裝單位</th>
           <th>包裝容量</th>
@@ -373,7 +384,8 @@ const Page08 = () => {
             <tr key={record.id || record.FieldCode}>
               <td>{record.id}</td>
               <td>{record.material_name}</td>
-              <td>{record.manufacturer || '-'}</td>
+              <td>{record.dosage_form || '-'}</td>
+              <td>{record.brand_name || '-'}</td>
               <td>{record.supplier || '-'}</td>
               <td>{record.packaging_unit || '-'}</td>
               <td>{record.packaging_volume || '-'}</td>
@@ -402,11 +414,5 @@ const Page08 = () => {
   );
 };
 
-export default Page08;
+export default Page11;
 
-
-// 表單問題一，【包裝容量】在資料庫可填入的是 數字 ，後面需要加上 單位 作法，包裝容量分離數字和單位，並且單位有選項是【其他】，需要填入 (單位) 字串 
-// 表單問題二，使用量和剩餘量的數字應該是要小於購入量，如何設定?
-// 表單問題三，自動計算剩餘量，如何設定?
-// 表單問題四，修改時，選項並未返回表單，這是錯誤的，如何修正?
-// 表單問題五，需要確認【包裝單位】在資料庫可選【其他】需填入 (單位) 字串?並且在修改時需要可返回選項和輸入框與其他相同，需要調整

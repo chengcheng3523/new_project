@@ -253,6 +253,7 @@ const Page04 = () => {
             <th>最終EC值(mS/cm)</th>
             <th>配製人員名稱</th>
             <th>備註</th>
+            {isAdmin && <th>操作</th>}
             </tr>
         </thead>
         <tbody>

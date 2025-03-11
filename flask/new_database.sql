@@ -341,7 +341,7 @@ CREATE TABLE form11 (
     brand_name VARCHAR(100),                         -- 商品名(廠牌)
     supplier VARCHAR(100),                           -- 供應商
     packaging_unit VARCHAR(100),             -- 包裝單位
-    packaging_volume DECIMAL(10, 2),                  -- 包裝容量
+    packaging_volume VARCHAR(100),                  -- 包裝容量
     date DATE,                              -- 日期
     purchase_quantity DECIMAL(10, 2),                -- 購入量
     usage_quantity DECIMAL(10, 2),                   -- 使用量

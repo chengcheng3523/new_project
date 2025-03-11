@@ -299,6 +299,7 @@ const Page03 = () => {
             <th>作物</th>
             <th>作業內容</th>
             <th>備註</th>
+            {isAdmin && <th>操作</th>}
           </tr>
         </thead>
         <tbody>

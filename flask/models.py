@@ -207,6 +207,7 @@ class Form11(db.Model):
     purchase_quantity = db.Column(db.Numeric(10, 2), nullable=True)  # 購入量
     usage_quantity = db.Column(db.Numeric(10, 2), nullable=True)  # 使用量
     remaining_quantity = db.Column(db.Numeric(10, 2), nullable=True)  # 剩餘量
+    notes = db.Column(db.Text, nullable=True)  # 備註
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 建立時間
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 更新時間
 

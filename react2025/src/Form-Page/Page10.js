@@ -193,6 +193,7 @@ const Page10 = () => {
             <th>資材代碼</th>
             <th>資材名稱</th>
             <th>備註</th>
+            {isAdmin && <th>操作</th>}
           </tr>
         </thead>
         <tbody>

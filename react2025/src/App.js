@@ -27,6 +27,17 @@ import Page08 from './Form-Page/Page08'; // 表8
 import Page09 from './Form-Page/Page09'; // 表9
 import Page10 from './Form-Page/Page10'; // 表10
 
+import Page11 from './Form-Page/Page11'; // 表11
+import Page12 from './Form-Page/Page12'; // 表12
+import Page13 from './Form-Page/Page13'; // 表13
+import Page14 from './Form-Page/Page14'; // 表14
+import Page15 from './Form-Page/Page15'; // 表15
+import Page16 from './Form-Page/Page16'; // 表16
+import Page17 from './Form-Page/Page17'; // 表17
+import Page18 from './Form-Page/Page18'; // 表18
+import Page19 from './Form-Page/Page19'; // 表19
+import Page20 from './Form-Page/Page20'; // 表20
+import Page22 from './Form-Page/Page22'; // 表22
 
 
 const App = () => {
@@ -57,6 +68,19 @@ const App = () => {
           <Route path="/Page08" element={< Page08 />} />
           <Route path="/Page09" element={< Page09 />} />
           <Route path="/Page10" element={< Page10 />} />
+
+          <Route path="/Page11" element={< Page11 />} />
+          <Route path="/Page12" element={< Page12 />} />
+          <Route path="/Page13" element={< Page13 />} />
+          <Route path="/Page14" element={< Page14 />} />
+          <Route path="/Page15" element={< Page15 />} />
+          <Route path="/Page16" element={< Page16 />} />
+          <Route path="/Page17" element={< Page17 />} />
+          <Route path="/Page18" element={< Page18 />} />
+          <Route path="/Page19" element={< Page19 />} />
+          <Route path="/Page20" element={< Page20 />} />
+          
+          <Route path="/Page22" element={< Page22 />} />
 
 
         </Routes>

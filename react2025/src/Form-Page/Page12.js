@@ -1,4 +1,4 @@
-// 肥料施用
+// 其他資材使用
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Clearfix from "../components/common/Clearfix";
 import axios from 'axios';
@@ -10,7 +10,7 @@ import { Button, DeleteButton, EditButton } from '../components/common/Button';
 import { useNavigate } from 'react-router-dom';
 
 
-const Page06 = () => {
+const Page12 = () => {
   const { role, userId } = useContext(AuthContext);
   const isAdmin = role === 'admin'; 
   const [formData, setFormData] = useState({
@@ -18,13 +18,10 @@ const Page06 = () => {
     user_id: userId, 
     date_used: '',
     field_code: '',
-    crop: '',
-    fertilizer_type: '',
+    crop: '', 
     material_code_or_name: '',
-    fertilizer_amount: '',
-    dilution_factor: '',
-    operator: '',
-    process: '',
+    usage_amount: '', 
+    operator: '', 
     notes: '',
   });
   
@@ -34,7 +31,7 @@ const Page06 = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:5000/api/form06');
+      const response = await axios.get('http://127.0.0.1:5000/api/form12');
       console.log('原始數據:', response.data); // 打印原始數據確認結構
       if (Array.isArray(response.data)) {
         const transformedData = response.data.map(item => ({
@@ -42,13 +39,10 @@ const Page06 = () => {
           user_id: item.user_id,
           date_used: item.date_used,
           field_code: item.field_code,
-          crop: item.crop,
-          fertilizer_type: item.fertilizer_type,
+          crop: item.crop, 
           material_code_or_name: item.material_code_or_name,
-          fertilizer_amount: item.fertilizer_amount,
-          dilution_factor: item.dilution_factor,
-          operator: item.operator,
-          process: item.process,
+          usage_amount: item.usage_amount, 
+          operator: item.operator, 
           notes: item.notes,
         }));
 
@@ -90,22 +84,22 @@ const Page06 = () => {
     setLoading(true);
 
 
-  // 檢查必要欄位是否填寫
-  const requiredFields = ['date_used', 'field_code', 'crop', 'fertilizer_type', 'material_code_or_name', 'fertilizer_amount', 'dilution_factor', 'operator', 'process'];
-  for (const field of requiredFields) {
-    if (!formData[field]) {
-      alert(`請填寫 ${field} 欄位！`);
-      setLoading(false);
-      return;
-    }
-  }
+  // // 檢查必要欄位是否填寫
+  // const requiredFields = ['date_used', 'field_code', 'crop', 'material_code_or_name', 'usage_amount', 'operator'];
+  // for (const field of requiredFields) {
+  //   if (!formData[field]) {
+  //     alert(`請填寫 ${field} 欄位！`);
+  //     setLoading(false);
+  //     return;
+  //   }
+  // }
 
   try {
     let response;
     if (formData.id) {
       // 更新現有資料，使用 PUT 請求
       if (isAdmin) {
-        response = await axios.put(`http://127.0.0.1:5000/api/form06/${formData.id}`, formData);
+        response = await axios.put(`http://127.0.0.1:5000/api/form12/${formData.id}`, formData);
       } else {
         alert('您沒有權限更新資料！');
         setLoading(false);
@@ -113,17 +107,14 @@ const Page06 = () => {
       }
       } else {
         // 新增資料
-        response = await axios.post('http://127.0.0.1:5000/api/form06', {
+        response = await axios.post('http://127.0.0.1:5000/api/form12', {
           user_id: userId,
           date_used: formData.date_used,
           field_code: formData.field_code,
-          crop: formData.crop,
-          fertilizer_type: formData.fertilizer_type,
+          crop: formData.crop, 
           material_code_or_name: formData.material_code_or_name,
-          fertilizer_amount: formData.fertilizer_amount,
-          dilution_factor: formData.dilution_factor,
-          operator: formData.operator,
-          process: formData.process,
+          usage_amount: formData.usage_amount, 
+          operator: formData.operator, 
           notes: formData.notes,
         });
       }
@@ -133,13 +124,10 @@ const Page06 = () => {
         user_id: userId,
         date_used: '',
         field_code: '',
-        crop: '',
-        fertilizer_type: '',
+        crop: '', 
         material_code_or_name: '',
-        fertilizer_amount: '',
-        dilution_factor: '',
-        operator: '',
-        process: '',
+        usage_amount: '', 
+        operator: '', 
         notes: '',
       });
       alert('成功儲存資料！');
@@ -160,7 +148,7 @@ const Page06 = () => {
       return;
     }
     try {
-      const response = await axios.delete(`http://127.0.0.1:5000/api/form06/${id}`);
+      const response = await axios.delete(`http://127.0.0.1:5000/api/form12/${id}`);
       console.log('删除成功:', response.data);
       fetchData(); // 刷新数据
       alert('成功刪除資料！');
@@ -177,13 +165,10 @@ const Page06 = () => {
       id: record.id,
       date_used: record.date_used,
       field_code: record.field_code,
-      crop: record.crop,
-      fertilizer_type: record.fertilizer_type,
+      crop: record.crop, 
       material_code_or_name: record.material_code_or_name,
-      fertilizer_amount: record.fertilizer_amount,
-      dilution_factor: record.dilution_factor,
-      operator: record.operator,
-      process: record.process,
+      usage_amount: record.usage_amount, 
+      operator: record.operator, 
       notes: record.notes,
     });
   };
@@ -191,7 +176,7 @@ const Page06 = () => {
     <div className="container">
       <Clearfix height="100px" />
       <Form onSubmit={handleSubmit}>
-        <h4>表 6.肥料施用紀錄</h4>
+        <h4>表 12.其他資材使用紀錄</h4>
         <FormField
           label="使用日期"
           id="date_used"
@@ -216,13 +201,6 @@ const Page06 = () => {
           disabled={loading}
         />
         <FormField
-          label="施肥別 (基肥, 追肥)"
-          name="fertilizer_type"
-          value={formData.fertilizer_type}
-          onChange={handleChange}
-          disabled={loading}
-        />
-        <FormField
           label="資材代碼或資材名稱"
           name="material_code_or_name"
           value={formData.material_code_or_name}
@@ -230,16 +208,9 @@ const Page06 = () => {
           disabled={loading}
         />
         <FormField
-          label="肥料使用量 (公斤/公升)"
-          name="fertilizer_amount"
-          value={formData.fertilizer_amount}
-          onChange={handleChange}
-          disabled={loading}
-        />
-        <FormField
-          label="稀釋倍數"
-          name="dilution_factor"
-          value={formData.dilution_factor}
+          label="使用量"
+          name="usage_amount"
+          value={formData.usage_amount}
           onChange={handleChange}
           disabled={loading}
         />
@@ -251,14 +222,7 @@ const Page06 = () => {
           disabled={loading}
         />
         <FormField
-          label="製作流程"
-          name="process"
-          value={formData.process}
-          onChange={handleChange}
-          disabled={loading}
-        />
-        <FormField
-          label="備註"
+          label="備註(例：用途、使用方法等)"
           name="notes"
           value={formData.notes}
           onChange={handleChange}
@@ -271,19 +235,16 @@ const Page06 = () => {
       <Clearfix height="50px" />
       {/* 表格顯示 */}
       <table className="table table-bordered table-hover table-responsive table caption-top">
-        <caption>肥料施用紀錄</caption>
+        <caption>其他資材使用紀錄</caption>
         <thead class="table-light">
           <tr>
             <th>id</th>
             <th>使用日期</th>
             <th>田區代號</th>
-            <th>作物</th>
-            <th>施肥別 (基肥, 追肥)</th>
+            <th>作物</th> 
             <th>資材代碼或資材名稱</th>
-            <th>肥料使用量 (公斤/公升)</th>
-            <th>稀釋倍數</th>
-            <th>操作人員</th>
-            <th>製作流程</th>
+            <th>使用量</th> 
+            <th>操作人員</th> 
             <th>備註</th>
             {isAdmin && <th>操作</th>}
           </tr>
@@ -294,13 +255,10 @@ const Page06 = () => {
               <td>{record.id}</td>
               <td>{record.date_used}</td>
               <td>{record.field_code}</td>
-              <td>{record.crop}</td>
-              <td>{record.fertilizer_type}</td>
+              <td>{record.crop}</td> 
               <td>{record.material_code_or_name}</td>
-              <td>{record.fertilizer_amount}</td>
-              <td>{record.dilution_factor}</td>
-              <td>{record.operator}</td>
-              <td>{record.process}</td>
+              <td>{record.usage_amount}</td> 
+              <td>{record.operator}</td> 
               <td>{record.notes}</td>
               {isAdmin && (
                 <td>
@@ -322,4 +280,4 @@ const Page06 = () => {
   );
 };
 
-export default Page06;
+export default Page12;

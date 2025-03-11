@@ -2112,23 +2112,277 @@ def get_all_form17():
 # form18（乾燥作業紀錄）
 
 # 新增乾燥作業紀錄
+@app.route('/api/form18', methods=['POST'])
+def add_form18():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    user_id = data.get('user_id') 
+    arena = data.get('arena')
+    process_date = datetime.strptime(data.get('process_date'), '%Y-%m-%d')
+    item = data.get('item')
+    batch_number = data.get('batch_number')
+    fresh_weight = data.get('fresh_weight')
+    operation = data.get('operation')
+    dry_weight = data.get('dry_weight')
+    remarks = data.get('remarks')
+
+    try:
+        new_form = Form18(
+            user_id=user_id,
+            arena=arena,
+            process_date=process_date,
+            item=item,
+            batch_number=batch_number,
+            fresh_weight=fresh_weight,
+            operation=operation,
+            dry_weight=dry_weight,
+            remarks=remarks
+        )
+
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '乾燥作業紀錄新增成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form18: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    
 # 更新乾燥作業紀錄
+@app.route('/api/form18/<int:id>', methods=['PUT'])
+def update_form18(id):
+    data = request.get_json()
+    form = Form18.query.get(id)
+    if not form:
+        return jsonify({'error': '乾燥作業紀錄未找到'}), 404
+    
+    form.arena = data['arena']
+    form.process_date = datetime.strptime(data['process_date'], '%Y-%m-%d')
+    form.item = data['item']
+    form.batch_number = data['batch_number']
+    form.fresh_weight = data['fresh_weight']
+    form.operation = data['operation']
+    form.dry_weight = data['dry_weight']
+    form.remarks = data.get('remarks')
+    db.session.commit()
+    return jsonify({'message': '乾燥作業紀錄更新成功'})
+
 # 刪除乾燥作業紀錄
+@app.route('/api/form18/<int:id>', methods=['DELETE'])
+def delete_form18(id):
+    record = Form18.query.get(id)
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'message': 'Record deleted successfully'})
+
 # 查詢所有使用者的乾燥作業紀錄
+@app.route('/api/form18', methods=['GET'])
+def get_all_form18():
+    results = db.session.query(Form18, users.farmer_name).\
+        join(users, users.id == Form18.user_id).all()
+    
+    forms = [
+        {
+            "id": result.Form18.id,
+            "user_id": result.Form18.user_id,
+            "farmer_name": result.farmer_name,
+            "arena": result.Form18.arena,
+            "process_date": result.Form18.process_date.strftime('%Y-%m-%d'),
+            "item": result.Form18.item,
+            "batch_number": result.Form18.batch_number,
+            "fresh_weight": str(result.Form18.fresh_weight),
+            "operation": result.Form18.operation,
+            "dry_weight": str(result.Form18.dry_weight),
+            "remarks": result.Form18.remarks
+        }
+        for result in results
+    ]
+    return jsonify(forms)
+
 # ----------------------------------------------------------------------------------------------
 # form19（包裝及出貨紀錄）
 
 # 新增包裝及出貨紀錄
+@app.route('/api/form19', methods=['POST'])
+def add_form19():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+        
+    user_id = data.get('user_id')
+    package = data.get('package')
+    sale_date = datetime.strptime(data.get('sale_date'), '%Y-%m-%d')
+    product_name = data.get('product_name')
+    sales_target = data.get('sales_target')
+    batch_number = data.get('batch_number')
+    shipment_quantity = data.get('shipment_quantity')
+    packaging_spec = data.get('packaging_spec')
+    label_usage_quantity = data.get('label_usage_quantity')
+    label_void_quantity = data.get('label_void_quantity')
+    verification_status = data.get('verification_status')
+
+    try:
+        new_form = Form19(
+            user_id=user_id,
+            package=package,
+            sale_date=sale_date,
+            product_name=product_name,
+            sales_target=sales_target,
+            batch_number=batch_number,
+            shipment_quantity=shipment_quantity,
+            packaging_spec=packaging_spec,
+            label_usage_quantity=label_usage_quantity,
+            label_void_quantity=label_void_quantity,
+            verification_status=verification_status
+        )
+
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '包裝及出貨紀錄新增成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form19: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 # 更新包裝及出貨紀錄
+@app.route('/api/form19/<int:id>', methods=['PUT'])
+def update_form19(id):
+    data = request.get_json()
+    form = Form19.query.get(id)
+    if not form:
+        return jsonify({'error': '包裝及出貨紀錄未找到'}), 404
+    
+    form.package = data['package']
+    form.sale_date = datetime.strptime(data['sale_date'], '%Y-%m-%d')
+    form.product_name = data['product_name']
+    form.sales_target = data['sales_target']
+    form.batch_number = data['batch_number']
+    form.shipment_quantity = data['shipment_quantity']
+    form.packaging_spec = data['packaging_spec']
+    form.label_usage_quantity = data['label_usage_quantity']
+    form.label_void_quantity = data['label_void_quantity']
+    form.verification_status = data['verification_status']
+    db.session.commit()
+    return jsonify({'message': '包裝及出貨紀錄更新成功'})
+
 # 刪除包裝及出貨紀錄
+@app.route('/api/form19/<int:id>', methods=['DELETE'])
+def delete_form19(id):
+    record = Form19.query.get(id)
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'message': 'Record deleted successfully'})
+
 # 查詢所有使用者的包裝及出貨紀錄
+@app.route('/api/form19', methods=['GET'])
+def get_all_form19():
+    results = db.session.query(Form19, users.farmer_name).\
+        join(users, users.id == Form19.user_id).all()
+    
+    forms = [
+        {
+            "id": result.Form19.id,
+            "user_id": result.Form19.user_id,
+            "farmer_name": result.farmer_name,
+            "package": result.Form19.package,
+            "sale_date": result.Form19.sale_date.strftime('%Y-%m-%d'),
+            "product_name": result.Form19.product_name,
+            "sales_target": str(result.Form19.sales_target),
+            "batch_number": result.Form19.batch_number,
+            "shipment_quantity": str(result.Form19.shipment_quantity),
+            "packaging_spec": result.Form19.packaging_spec,
+            "label_usage_quantity": str(result.Form19.label_usage_quantity),
+            "label_void_quantity": str(result.Form19.label_void_quantity),
+            "verification_status": result.Form19.verification_status
+        }
+        for result in results
+    ]
+    return jsonify(forms)
+
 # ----------------------------------------------------------------------------------------------
 # form20（作業人員衛生及健康狀態檢查紀錄）
 
 # 新增作業人員衛生及健康狀態檢查紀錄
+@app.route('/api/form20', methods=['POST'])
+def add_form20():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    user_id = data.get('user_id')
+    checkitem = data.get('checkitem')
+    jobdate = datetime.strptime(data.get('jobdate'), '%Y-%m-%d')
+    operator_name = data.get('temperature')  
+
+    # 檢查必要欄位是否存在
+    if not user_id:
+        return jsonify({'error': '缺少 user_id'}), 400
+
+
+    try:
+        new_form = Form20(
+            user_id=user_id,
+            checkitem=checkitem,
+            jobdate=jobdate,
+            operator_name=operator_name
+        )
+
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '作業人員衛生及健康狀態檢查紀錄新增成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form20: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    
 # 更新作業人員衛生及健康狀態檢查紀錄
+@app.route('/api/form20/<int:id>', methods=['PUT'])
+def update_form20(id):
+    data = request.get_json()
+    form = Form20.query.get(id)
+    if not form:
+        return jsonify({'error': '作業人員衛生及健康狀態檢查紀錄未找到'}), 404
+    
+    form.checkitem = data['checkitem']
+    form.jobdate = datetime.strptime(data['jobdate'], '%Y-%m-%d')
+    form.operator_name = data['operator_name']
+    db.session.commit()
+    return jsonify({'message': '作業人員衛生及健康狀態檢查紀錄更新成功'})
+
 # 刪除作業人員衛生及健康狀態檢查紀錄
+@app.route('/api/form20/<int:id>', methods=['DELETE'])
+def delete_form20(id):
+    record = Form20.query.get(id)
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    db.session.delete(record)
+    db.session.commit() 
+    return jsonify({'message': 'Record deleted successfully'})
+
 # 查詢所有使用者的作業人員衛生及健康狀態檢查紀錄
+@app.route('/api/form20', methods=['GET'])
+def get_all_form20():
+    results = db.session.query(Form20, users.farmer_name).\
+        join(users, users.id == Form20.user_id).all()
+    
+    forms = [
+        {
+            "id": result.Form20.id,
+            "user_id": result.Form20.user_id,
+            "farmer_name": result.farmer_name,
+            "checkitem": result.Form20.checkitem,
+            "jobdate": result.Form20.jobdate.strftime('%Y-%m-%d'),
+            "operator_name": result.Form20.operator_name
+        }
+        for result in results
+    ]
+    return jsonify(forms)
+
 # ----------------------------------------------------------------------------------------------
 # form22（客戶抱怨/回饋紀錄）
 
@@ -2237,7 +2491,6 @@ def get_all_form22():
 
 
 # ----------------------------------------------------------------------------------------------
-
 
 # 在應用程式啟動時測試資料庫連線
 if __name__ == '__main__':
