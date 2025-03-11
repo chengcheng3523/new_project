@@ -239,7 +239,7 @@ class Form13(db.Model):
     
 # 其他資材入出庫紀錄
 class Form14(db.Model):
-    id = db.Column(db.String(50), primary_key=True)  # 編號
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 編號
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
     material_name = db.Column(db.String(255), nullable=False)  # 資材名稱
     manufacturer = db.Column(db.String(255), nullable=True)  # 廠商
@@ -250,12 +250,13 @@ class Form14(db.Model):
     purchase_quantity = db.Column(db.Numeric(10, 2), nullable=False)  # 購入量
     usage_quantity = db.Column(db.Numeric(10, 2), nullable=False)  # 使用量
     remaining_quantity = db.Column(db.Numeric(10, 2), nullable=False)  # 剩餘量 
+    notes = db.Column(db.Text, nullable=True)  # 備註
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 建立時間
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 更新時間
  
 # 場地設施之保養、維修及清潔管理紀錄
 class Form15(db.Model):
-    id = db.Column(db.String(50), primary_key=True)  # 編號
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 編號
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
     date = db.Column(db.Date, nullable=False)  # 日期
     item = db.Column(db.String(100), nullable=False)  # 項目
@@ -267,7 +268,7 @@ class Form15(db.Model):
 
 # 器具/機械/設備之保養、維修、校正及清潔管理紀錄
 class Form16(db.Model):
-    id = db.Column(db.String(50), primary_key=True)  # 編號
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 編號
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
     date = db.Column(db.Date, nullable=False)  # 日期
     item = db.Column(db.String(100), nullable=False)  # 項目
@@ -279,7 +280,7 @@ class Form16(db.Model):
 
 # 採收及採後處理紀錄
 class Form17(db.Model):
-    id = db.Column(db.String(50), primary_key=True)  # 編號
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 編號
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
     harvest_date = db.Column(db.Date, nullable=False)  # 採收日期
     field_code = db.Column(db.String(50), nullable=False)  # 田區代號
@@ -289,15 +290,14 @@ class Form17(db.Model):
     process_date = db.Column(db.Date, nullable=False)  # 處理日期
     post_harvest_treatment = db.Column(db.String(100), nullable=False)  # 採後處理內容
     post_treatment_weight = db.Column(db.Numeric(10, 2), nullable=False)  # 處理後重量
-    verification_status = db.Column(db.Enum('非驗證產品', '驗證產品'), nullable=False)  # 驗證狀態
-    verification_organization = db.Column(db.String(255), nullable=True)  # 驗證機構
+    verification_status = db.Column(db.String(255), nullable=False)  # 驗證狀態 
     notes = db.Column(db.Text, nullable=True)  # 備註
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 建立時間
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 更新時間
 
 # 乾燥作業紀錄
 class Form18(db.Model):
-    id = db.Column(db.String(50), primary_key=True)  # 編號
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 編號
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
     arena = db.Column(db.String(255), nullable=False)  # 處理場所
     process_date = db.Column(db.Date, nullable=False)  # 處理日期
@@ -310,7 +310,7 @@ class Form18(db.Model):
     
 # 包裝及出貨紀錄
 class Form19(db.Model):
-    id = db.Column(db.String(50), primary_key=True)  # 編號
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 編號
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
     package = db.Column(db.String(255), nullable=False)  # 包裝場所
     sale_date = db.Column(db.Date, nullable=False)  # 販售日期
@@ -327,7 +327,7 @@ class Form19(db.Model):
 
 # 作業人員衛生及健康狀態檢查紀錄
 class Form20(db.Model):
-    id = db.Column(db.String(50), primary_key=True)  # 編號
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 編號
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
     checkitem = db.Column(db.Text, nullable=False)  # 檢查項目
     jobdate = db.Column(db.Date, nullable=False)  # 作業日期
@@ -337,14 +337,15 @@ class Form20(db.Model):
 
 # 客戶抱怨/回饋紀錄
 class Form22(db.Model):
-
-    id = db.Column(db.String(50), primary_key=True)  # 編號
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 編號
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
     date = db.Column(db.Date, nullable=False)  # 日期
     customer_name = db.Column(db.String(255), nullable=False)  # 客戶名稱
     customer_phone = db.Column(db.String(50), nullable=False)  # 客戶電話
     complaint = db.Column(db.Text, nullable=False)  # 客訴內容
     resolution = db.Column(db.Text, nullable=False)  # 處理結果
-    processor = db.Column(db.String(255), nullable=False)  # 處理人簽名/日期
+    processor_name  = db.Column(db.String(50), nullable=False)  # 處理人員
+    processor_date = db.Column(db.Date, nullable=False)            # 處理日期
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 建立時間
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 更新時間

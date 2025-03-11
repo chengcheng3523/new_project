@@ -26,9 +26,9 @@ import Page14 from '../Form-Page/Page14';
 import Page15 from '../Form-Page/Page15';
 import Page16 from '../Form-Page/Page16';
 import Page17 from '../Form-Page/Page17';
-import Page18 from '../Form-Page/Page18';
-import Page19 from '../Form-Page/Page19';
-import Page20 from '../Form-Page/Page20';
+// import Page18 from '../Form-Page/Page18';
+// import Page19 from '../Form-Page/Page19';
+// import Page20 from '../Form-Page/Page20';
 
 import Page22 from '../Form-Page/Page22';
 
@@ -104,12 +104,12 @@ const HomePage =()=> {
       setSelectedForm(isAuthenticated ? <Page16 /> : <div>資料: Page16</div>);
     } else if (title === 'Page17') {
       setSelectedForm(isAuthenticated ? <Page17 /> : <div>資料: Page17</div>);
-    } else if (title === 'Page18') {
-      setSelectedForm(isAuthenticated ? <Page18 /> : <div>資料: Page18</div>);
-    } else if (title === 'Page19') {
-      setSelectedForm(isAuthenticated ? <Page19 /> : <div>資料: Page19</div>);
-    } else if (title === 'Page20') {
-      setSelectedForm(isAuthenticated ? <Page20 /> : <div>資料: Page20</div>);
+    // } else if (title === 'Page18') {
+    //   setSelectedForm(isAuthenticated ? <Page18 /> : <div>資料: Page18</div>);
+    // } else if (title === 'Page19') {
+    //   setSelectedForm(isAuthenticated ? <Page19 /> : <div>資料: Page19</div>);
+    // } else if (title === 'Page20') {
+    //   setSelectedForm(isAuthenticated ? <Page20 /> : <div>資料: Page20</div>);
 
     } else if (title === 'Page22') {
       setSelectedForm(isAuthenticated ? <Page22 /> : <div>資料: Page22</div>);
@@ -186,15 +186,15 @@ const HomePage =()=> {
         <ProductContainer onClick={() => handleCardClick('Page17')}>
           <TitleCard title="採收及採後處理" />
         </ProductContainer>
-        <ProductContainer onClick={() => handleCardClick('Page18')}>
-          <TitleCard title="乾燥作業" />
+        {/* <ProductContainer onClick={() => handleCardClick('Page18')}>
+          <TitleCard title="暫時不可用" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page19')}>
-          <TitleCard title="包裝及出貨" />
+          <TitleCard title="暫時不可用" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page20')}>
-          <TitleCard title="作業人員衛生及健康狀態檢查" />
-        </ProductContainer>
+          <TitleCard title="暫時不可用" />
+        </ProductContainer> */}
 
         <ProductContainer onClick={() => handleCardClick('Page22')}>
           <TitleCard title="客戶抱怨/回饋" />

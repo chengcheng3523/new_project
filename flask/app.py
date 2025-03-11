@@ -1997,8 +1997,7 @@ def add_form17():
     process_date = datetime.strptime(data.get('process_date'), '%Y-%m-%d')
     post_harvest_treatment = data.get('post_harvest_treatment')
     post_treatment_weight = data.get('post_treatment_weight')
-    verification_status = data.get('verification_status')
-    verification_organization = data.get('verification_organization')
+    verification_status = data.get('verification_status') 
     notes = data.get('notes')
 
     # 檢查必要欄位是否存在
@@ -2021,9 +2020,7 @@ def add_form17():
     if not post_treatment_weight:   
         return jsonify({'error': '缺少 post_treatment_weight'}), 400
     if not verification_status:
-        return jsonify({'error': '缺少 verification_status'}), 400
-    if not verification_organization:
-        return jsonify({'error': '缺少 verification_organization'}), 400
+        return jsonify({'error': '缺少 verification_status'}), 400 
 
     try:
         new_form = Form17(
@@ -2036,8 +2033,7 @@ def add_form17():
             process_date=process_date,
             post_harvest_treatment=post_harvest_treatment,
             post_treatment_weight=post_treatment_weight,
-            verification_status=verification_status,
-            verification_organization=verification_organization,
+            verification_status=verification_status, 
             notes=notes
         )
 
@@ -2064,8 +2060,7 @@ def update_form17(id):
     form.process_date = datetime.strptime(data['process_date'], '%Y-%m-%d')
     form.post_harvest_treatment = data['post_harvest_treatment']
     form.post_treatment_weight = data['post_treatment_weight']
-    form.verification_status = data['verification_status']
-    form.verification_organization = data['verification_organization']
+    form.verification_status = data['verification_status'] 
     form.notes = data.get('notes')
     db.session.commit()
     return jsonify({'message': '採收及採後處理紀錄更新成功'})
@@ -2100,8 +2095,7 @@ def get_all_form17():
             "process_date": result.Form17.process_date.strftime('%Y-%m-%d'),
             "post_harvest_treatment": result.Form17.post_harvest_treatment,
             "post_treatment_weight": str(result.Form17.post_treatment_weight),
-            "verification_status": result.Form17.verification_status,
-            "verification_organization": result.Form17.verification_organization,
+            "verification_status": result.Form17.verification_status, 
             "notes": result.Form17.notes
         }
         for result in results
@@ -2398,6 +2392,7 @@ def add_form22():
     customer_name = data.get('customer_name')
     customer_phone = data.get('customer_phone')
     complaint = data.get('complaint')
+    resolution = data.get('resolution')
     processor_name = data.get('processor_name')
     processor_date = datetime.strptime(data.get('processor_date'), '%Y-%m-%d')
 
@@ -2412,6 +2407,8 @@ def add_form22():
         return jsonify({'error': '缺少 customer_phone'}), 400
     if not complaint:
         return jsonify({'error': '缺少 complaint'}), 400
+    if not resolution:
+        return jsonify({'error': '缺少 resolution'}), 400
     if not processor_name:
         return jsonify({'error': '缺少 processor_name'}), 400
     if not processor_date:
@@ -2424,6 +2421,7 @@ def add_form22():
             customer_name=customer_name,
             customer_phone=customer_phone,
             complaint=complaint,
+            resolution=resolution,
             processor_name=processor_name,
             processor_date=processor_date
         )
@@ -2446,6 +2444,7 @@ def update_form22(id):
     form.customer_name = data['customer_name']
     form.customer_phone = data['customer_phone']
     form.complaint = data['complaint']
+    form.resolution = data['resolution']
     form.processor_name = data['processor_name']
     form.processor_date = datetime.strptime(data['processor_date'], '%Y-%m-%d')
     db.session.commit()
@@ -2477,6 +2476,7 @@ def get_all_form22():
             "customer_name": result.Form22.customer_name,
             "customer_phone": result.Form22.customer_phone,
             "complaint": result.Form22.complaint,
+            "resolution": result.Form22.resolution,
             "processor_name": result.Form22.processor_name,
             "processor_date": result.Form22.processor_date.strftime('%Y-%m-%d')
         }

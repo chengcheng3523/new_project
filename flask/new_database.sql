@@ -303,7 +303,7 @@ CREATE TABLE form09 (
 -- 資料示例 form09（有害生物防治或環境消毒資材施用紀錄）
 INSERT INTO form09 (user_id, date_used, field_code, crop, pest_target, material_code_or_name, water_volume, chemical_usage, dilution_factor, safety_harvest_period, operator_method, operator, notes)
 VALUES 
-    (1, '2025/02/05', 'F000-0000', '高麗菜', '蟲', 'M000-0000', 10.00, 0.5, 2.4, 14, '噴灑', '王小明', '無');
+    (1, '2025-02-05', 'F000-0000', '高麗菜', '蟲', 'M000-0000', 10.00, 0.5, 2.4, 14, '噴灑', '王小明', '無');
 -- 查詢有害生物防治或環境消毒資材施用紀錄
 SELECT f.id, f.date_used, f.field_code, f.crop, f.pest_target, f.material_code_or_name, f.water_volume, f.chemical_usage, f.dilution_factor, f.safety_harvest_period, f.operator_method, f.operator, f.notes
 FROM form09
@@ -414,7 +414,7 @@ WHERE f.other_material_name = 'ooxx資材';
 
 -- form14（其他資材入出庫紀錄）
 CREATE TABLE form14 (
-    id VARCHAR(50) PRIMARY KEY,                      -- 編號
+    id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                             -- 關聯 `users` 表
     material_name VARCHAR(255),              -- 資材名稱
     manufacturer VARCHAR(255),                        -- 廠商
@@ -432,10 +432,10 @@ CREATE TABLE form14 (
 );
 
 -- 資料示例
-INSERT INTO form14 (id, user_id, material_name, manufacturer, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
+INSERT INTO form14 (user_id, material_name, manufacturer, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
 VALUES 
-    ('0000-0000', 1, 'ooxx資材', '廠商', '供應商', '包', '10公斤', '2025/02/05', 10.00, 5.00, 5.00, '無');
-
+    (1, 'ooxx資材', '廠商', '供應商', '包', '10公斤', '2025-02-05', 10.00, 5.00, 5.00, '無');
+ 
 -- 查詢與 `users` 表關聯的其他資材入出庫紀錄
 SELECT f.id, f.material_name, f.manufacturer, f.supplier, f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, u.username, u.farmer_name, f.notes
 FROM form14 f
@@ -443,9 +443,13 @@ JOIN users u ON f.user_id = u.id
 WHERE f.material_name = 'ooxx資材';
 
 
+
+
+
+
 -- form15（場地設施之保養、維修及清潔管理紀錄）
 CREATE TABLE form15 (
-    id VARCHAR(50) PRIMARY KEY,                      -- 編號
+    id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                             -- 關聯 `users` 表
     date DATE,                               -- 日期
     item VARCHAR(100),                       -- 項目
@@ -457,9 +461,9 @@ CREATE TABLE form15 (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
 );
 -- 資料示例
-INSERT INTO form15 (id, user_id, date, item, operation, recorder, notes)
+INSERT INTO form15 (user_id, date, item, operation, recorder, notes)
 VALUES 
-    ('0000-0000', 1, '2025/02/05', '育苗場所', '清潔', '王小明', '清理育苗場所的灰塵及雜物');
+    (1,  '2025-02-05', '育苗場所', '清潔', '王小明', '清理育苗場所的灰塵及雜物');
 -- 查詢與 `users` 表關聯的作業記錄
 SELECT f.id, f.date, f.item, f.operation, f.recorder, f.notes, u.username, u.farmer_name
 FROM form15 f
@@ -468,7 +472,7 @@ WHERE f.item = '育苗場所';
 
 -- form16（器具/機械/設備之保養、維修、校正及清潔管理紀錄）
 CREATE TABLE form16 (
-    id VARCHAR(50) PRIMARY KEY,                      -- 編號
+    id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                             -- 關聯 `users` 表
     date DATE,                               -- 日期
     item VARCHAR(100),                       -- 項目
@@ -480,9 +484,10 @@ CREATE TABLE form16 (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
 );
 -- 資料示例
-INSERT INTO form16 (id, user_id, date, item, operation, recorder, notes)
+INSERT INTO form16 (user_id, date, item, operation, recorder, notes)
 VALUES 
-    ('0000-0000', 1, '2025/02/05', '噴霧機', '保養', '王小明', '更換噴嘴，清洗濾網');
+    (1, '2025-02-05', '噴霧機', '保養', '王小明', '更換噴嘴，清洗濾網');
+
 -- 查詢與 `users` 表關聯的作業記錄
 SELECT f.id, f.date, f.item, f.operation, f.recorder, f.notes, u.username, u.farmer_name
 FROM form16 f
@@ -492,7 +497,7 @@ WHERE f.item = '噴霧機';
 
 -- form17（採收及採後處理紀錄）
 CREATE TABLE form17 (
-    id VARCHAR(50) PRIMARY KEY,             -- 編號
+    id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                   -- 關聯 `users` 表
     harvest_date DATE,                      -- 採收日期
     field_code VARCHAR(50),                 -- 田區代號
@@ -501,18 +506,18 @@ CREATE TABLE form17 (
     harvest_weight DECIMAL(10, 2),          -- 採收重量 (處理前)
     process_date DATE,                      -- 處理日期
     post_harvest_treatment VARCHAR(100),    -- 採後處理內容
-    post_treatment_weight DECIMAL(10, 2),   -- 處理後重量
-    verification_status VARCHAR(100),       -- 驗證狀態
-    verification_organization VARCHAR(255), -- 驗證機構
+    post_treatment_weight DECIMAL(10, 2),   -- 處理後重量(公斤)
+
+    verification_status VARCHAR(100),       -- 驗證狀態 
     notes TEXT,                             -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE    -- 外鍵，關聯 `users` 表
 );
 -- 資料示例
-INSERT INTO form17 (id, user_id, harvest_date, field_code, crop_name, batch_or_trace_no, harvest_weight, process_date, post_harvest_treatment, post_treatment_weight, verification_status, verification_organization, notes)
+INSERT INTO form17 (user_id, harvest_date, field_code, crop_name, batch_or_trace_no, harvest_weight, process_date, post_harvest_treatment, post_treatment_weight, verification_status, notes)
 VALUES 
-    ('0000-0000', 1, '2025/02/05', 'F000-0000', '高麗菜', 'ABCD-EFHG-IJKL', 10.00, '2025/02/06', '清洗', 9.50, '非驗證產品', NULL, '間作及敷蓋稻草');
+    (1,  '2025-02-05', 'F000-0000', '高麗菜', 'ABCD-EFHG-IJKL', 10.00, '2025-02-06', '清洗', 9.50, '非驗證產品', '間作及敷蓋稻草');
 -- 查詢與 `users` 表關聯的採收與處理記錄
 SELECT f.id, f.harvest_date, f.crop_name, f.post_harvest_treatment, f.post_treatment_weight, f.verification_status, f.notes, u.username, u.farmer_name
 FROM form17 f
@@ -522,7 +527,7 @@ WHERE f.crop_name = '高麗菜';
 
 -- form18（乾燥作業紀錄）
 CREATE TABLE form18 (
-    id VARCHAR(50) PRIMARY KEY,                     -- 編號
+    id INT AUTO_INCREMENT PRIMARY KEY,                     -- 編號
     user_id INT NOT NULL,                            -- 關聯 `users` 表
     arena VARCHAR(255),                    -- 處理場所
     process_date DATE,                     -- 處理日期
@@ -537,8 +542,8 @@ CREATE TABLE form18 (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
 );
 -- 插入資料範例
-INSERT INTO form18 (id, user_id, arena, process_date, item, batch_number, fresh_weight, operation, dry_weight, remarks)
-VALUES ('0000-0000', 1, '高麗菜', '2025-02-05', '高麗菜', 'ABCD-EFHG-IJKL', 10.00, '金針浸泡___溶液:濃度__%__小時，金針漂水___分鐘，日曬___小時，乾燥___度C___小時', 9.00, '我是備註區');
+INSERT INTO form18 (user_id, arena, process_date, item, batch_number, fresh_weight, operation, dry_weight, remarks)
+VALUES (1,  '高麗菜', '2025-02-05', '高麗菜', 'ABCD-EFHG-IJKL', 10.00, '金針浸泡___溶液:濃度__%__小時，金針漂水___分鐘，日曬___小時，乾燥___度C___小時', 9.00, '我是備註區');
 
 -- 查詢與 `users` 表關聯的乾燥作業紀錄
 SELECT f.id, f.process_date, f.item, f.dry_weight, f.remarks, u.username, u.farmer_name
@@ -548,7 +553,7 @@ WHERE f.item = '高麗菜';
 
 -- form19（包裝及出貨紀錄）
 CREATE TABLE form19 (
-    id VARCHAR(50) PRIMARY KEY,                     -- 編號
+    id INT AUTO_INCREMENT PRIMARY KEY,                     -- 編號
     user_id INT NOT NULL,                            -- 關聯 `users` 表
     package VARCHAR(255),                   -- 包裝場所
     sale_date DATE,                         -- 販售日期
@@ -565,8 +570,8 @@ CREATE TABLE form19 (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
 );
 -- 插入資料範例
-INSERT INTO form19 (id, user_id, package, sale_date, product_name, sales_target, batch_number, shipment_quantity, packaging_spec, label_usage_quantity, label_void_quantity, verification_status)
-VALUES ('0000-0000', 1, 'F000-0000', '2025-02-05', '高麗菜', '零售 (地點: ABC市場)', 'ABCD-EFHG-IJKL', 10.00, '包裝規格描述', 10, 0, '非驗證產品');
+INSERT INTO form19 (user_id, package, sale_date, product_name, sales_target, batch_number, shipment_quantity, packaging_spec, label_usage_quantity, label_void_quantity, verification_status)
+VALUES (1,  'F000-0000', '2025-02-05', '高麗菜', '零售 (地點: ABC市場)', 'ABCD-EFHG-IJKL', 10.00, '包裝規格描述', 10, 0, '非驗證產品');
 
 -- 查詢與 `users` 表關聯的包裝及出貨紀錄
 SELECT f.id, f.sale_date, f.product_name, f.shipment_quantity, f.verification_status, u.username, u.farmer_name
@@ -576,7 +581,7 @@ WHERE f.product_name = '高麗菜';
 
 -- form20（作業人員衛生及健康狀態檢查紀錄）
 CREATE TABLE form20 (
-    id VARCHAR(50) PRIMARY KEY,                     -- 編號
+    id INT AUTO_INCREMENT PRIMARY KEY,                     -- 編號
     user_id INT NOT NULL,                            -- 關聯 `users` 表
     checkitem TEXT,                         -- 檢查項目
     jobdate DATE,                           -- 作業日期
@@ -586,8 +591,8 @@ CREATE TABLE form20 (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
 );
 -- 插入資料範例
-INSERT INTO form20 (id, user_id, checkitem, jobdate, operator_name)
-VALUES ('0000-0000', 1, '共5項', '2025-02-05', '王小明');
+INSERT INTO form20 (user_id, checkitem, jobdate, operator_name)
+VALUES (1,  '共5項', '2025-02-05', '王小明');
 
 -- 查詢與 `users` 表關聯的衛生及健康狀態檢查紀錄
 SELECT f.id, f.jobdate, f.operator_name, f.checkitem, u.username, u.farmer_name
@@ -596,14 +601,14 @@ JOIN users u ON f.user_id = u.id;
 
 -- form22（客戶抱怨/回饋紀錄）
 CREATE TABLE form22 (
-    id VARCHAR(50) PRIMARY KEY,                     -- 編號
+    id INT AUTO_INCREMENT PRIMARY KEY,                     -- 編號
     user_id INT NOT NULL,                            -- 關聯 `users` 表
     date DATE,                              -- 日期
     customer_name VARCHAR(255),             -- 客戶名稱
     customer_phone VARCHAR(50),             -- 客戶電話
     complaint TEXT,                         -- 客訴內容
     resolution TEXT,                        -- 處理結果
-    processor_name VARCHAR(255) ,                 -- 處理人簽名
+    processor_name VARCHAR(255) ,           -- 處理人簽名
     processor_date DATE,                    -- 處理日期
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
@@ -611,8 +616,8 @@ CREATE TABLE form22 (
 );
 
 -- 插入資料範例
-INSERT INTO form22 (id, user_id, date, customer_name, customer_phone, complaint, resolution,  processor_name, processor_date)
-VALUES ('0000-0000', 1, '2025-02-05', '王小明', '0988-888-888', '我是客訴內容區', '我是處理結果區', '王小明 (處理人)', '2025-02-06');
+INSERT INTO form22 (user_id, date, customer_name, customer_phone, complaint, resolution,  processor_name, processor_date)
+VALUES (1,  '2025-02-05', '王小明', '0988-888-888', '我是客訴內容區', '我是處理結果區', '王小明 (處理人)', '2025-02-06');
 
 -- 查詢與 `users` 表關聯的客戶抱怨/回饋紀錄
 SELECT f.id, f.date, f.customer_name, f.complaint, f.resolution, u.username, u.farmer_name, f.processor_name, f.processor_date
