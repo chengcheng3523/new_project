@@ -5,7 +5,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthContext from '../components/auth/AuthContext';
 import FormField from '../components/common/FormField';
-import MultiSelectField  from '../components/common/MultiSelectField ';
+import MultiSelectField  from '../components/common/MultiSelectField';
 import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
 import { useNavigate } from 'react-router-dom';
@@ -268,7 +268,7 @@ const Page03 = () => {
           />
           {formData.crop_content === '其他' && (
             <FormField
-              label="8. 其他(若非上述內容，請填寫其他並註明工作內容)"
+              label="其他"
               name="crop_content_other"
               value={formData.crop_content_other}
               onChange={handleChange}

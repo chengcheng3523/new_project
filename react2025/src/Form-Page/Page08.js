@@ -26,6 +26,7 @@ const Page08 = () => {
     packaging_unit_other: '', // 新增：當選擇「其他」時的單位輸入
     volumeValue: '',          // 新增：包裝容量的數字部分
     volumeUnit: '',           // 新增：包裝容量的單位部分
+    volumeUnit_other: '',     // 新增：當選擇「其他」時的單位輸入
     packaging_volume : '',
     purchase_quantity : '',
     usage_quantity : '',
@@ -124,8 +125,9 @@ const Page08 = () => {
   }
 
   // 合併包裝容量
-  const packaging_volume = `${formData.volumeValue} ${formData.volumeUnit}`;
+  // const packaging_volume = `${formData.volumeValue} ${formData.volumeUnit}`;
   const packaging_unit = formData.packaging_unit === '其他' ? formData.packaging_unit_other : formData.packaging_unit;
+  const packaging_volume = `${formData.volumeValue} ${formData.volumeUnit === '其他' ? formData.volumeUnit_other : formData.volumeUnit}`;
 
   try {
     let response;
@@ -169,6 +171,7 @@ const Page08 = () => {
         packaging_unit_other: '',
         volumeValue: '',
         volumeUnit: '',
+        volumeUnit_other: '',
         purchase_quantity: '',
         usage_quantity: '',
         remaining_quantity: '',
@@ -208,7 +211,9 @@ const Page08 = () => {
     
     // 分解 packaging_volume 為數字和單位
     const [volumeValue, volumeUnit] = record.packaging_volume ? record.packaging_volume.split(' ') : ['', ''];
-    const isOtherUnit = !['包', '瓶', '罐'].includes(record.packaging_unit);
+    const isOtherPackagingUnit = !['包', '瓶', '罐'].includes(record.packaging_unit);
+    const isOtherVolumeUnit = !['公克', '公斤', '毫升', '公升'].includes(volumeUnit);
+  
     setFormData({
       id: record.id,
       user_id: record.user_id,
@@ -216,10 +221,11 @@ const Page08 = () => {
       manufacturer: record.manufacturer || '',
       supplier: record.supplier || '',
       date: record.date || '',
-      packaging_unit: isOtherUnit ? '其他' : record.packaging_unit || '',
-      packaging_unit_other: isOtherUnit ? record.packaging_unit : '',
+      packaging_unit: isOtherPackagingUnit ? '其他' : record.packaging_unit || '',
+      packaging_unit_other: isOtherPackagingUnit ? record.packaging_unit : '',
       volumeValue: volumeValue || '',
-      volumeUnit: volumeUnit || '',
+      volumeUnit: isOtherVolumeUnit ? '其他' : volumeUnit || '',
+      volumeUnit_other: isOtherVolumeUnit ? volumeUnit : '',
       purchase_quantity: record.purchase_quantity || '',
       usage_quantity: record.usage_quantity || '',
       remaining_quantity: record.remaining_quantity || '',
@@ -292,8 +298,18 @@ const Page08 = () => {
             { label: '公斤', value: '公斤' },
             { label: '毫升', value: '毫升' },
             { label: '公升', value: '公升' },
+            { label: '其他', value: '其他' },
           ]}
         />
+        {formData.volumeUnit === '其他' && (
+          <FormField
+          label="包裝容量 (其他)"
+          name="volumeUnit_other"
+          value={formData.volumeUnit_other}
+          onChange={handleChange}
+          required
+        />
+      )}
         <FormField
           id="date"
           name="date"

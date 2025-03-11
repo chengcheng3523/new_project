@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Label from './Label';
 import styled from "styled-components";
 
@@ -31,19 +31,7 @@ const Select = styled.select`
   }
 `;
 
-const MultiSelectField = ({ id, name, value = [], onChange, label, required, options }) => {
-  const [selectedValues, setSelectedValues] = useState(value);
-
-  useEffect(() => {
-    setSelectedValues(value);
-  }, [value]);
-
-  const handleSelectChange = (e) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-    setSelectedValues(selectedOptions);
-    onChange({ target: { name, value: selectedOptions } });
-  };
-
+const MultiSelectField = ({ id, name, value, onChange, label, required, options }) => {
   return (
     <Container>
       <StyledLabel htmlFor={id}>
@@ -52,10 +40,9 @@ const MultiSelectField = ({ id, name, value = [], onChange, label, required, opt
       <Select
         id={id}
         name={name}
-        value={selectedValues}
+        value={value}
         required={required}
-        onChange={handleSelectChange}
-        multiple
+        onChange={onChange}
       >
         {options && options.map((option) => (
           <option key={option.value} value={option.value}>

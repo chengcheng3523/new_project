@@ -1,14 +1,20 @@
+``` 
 cd flask
-pip install -r requirements.txt  # 如果有 requirements.txt 檔案
 flask run
-
+``` 
+``` 
+pip install -r requirements.txt  # 如果有 requirements.txt 檔案
+``` 
+``` 
 cd react2025
-npm install
 npm start
-
-
+``` 
+``` 
+npm install
+``` 
+``` 
 python app.py
-
+``` 
 ## Page
 * Homepage  /mall
 * ProductCollectionpage /mall/xxx
