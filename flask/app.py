@@ -63,7 +63,6 @@ def register_user():
         password = data.get('password')
         plain_password = data.get('plain_password')  # 取得原始密碼
         
-
         if not username or not password or not plain_password:
             return jsonify({'error': '帳號、密碼或原始密碼不能為空'}), 400
 
@@ -84,7 +83,6 @@ def register_user():
             username=username,
             password=password_hash,
             plain_password=plain_password  # 存入原始密碼
-        
         )
 
         db.session.add(new_user)
@@ -173,7 +171,6 @@ def update_users(id):
         return jsonify({'status': '使用者資料更新成功'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 # 刪除users
 @app.route('/api/users/<int:id>', methods=['DELETE'])
@@ -272,7 +269,6 @@ def delete_land_parcel(id):
     db.session.commit()
     return jsonify({'status': '農地資訊已删除'}), 200
 
-
 # 查詢所有農地資訊 API
 @app.route('/api/land_parcels', methods=['GET'])
 def get_land_parcels():
@@ -294,7 +290,6 @@ def get_land_parcels():
         }
         for result in results
     ]
-
     return jsonify(land_parcels)
 
 # ----------------------------------------------------------------------------------------
@@ -415,7 +410,6 @@ def get_all_form002():
         }
         for result in results
     ]
-
     return jsonify(forms)
 
 # ----------------------------------------------------------------------------------------------
@@ -516,13 +510,12 @@ def get_all_form02():
         }
         for result in results
     ]
-
     return jsonify(forms)
 
 # ----------------------------------------------------------------------------------------------
-# 栽培工作紀錄
+# 栽培工作
 
-# 新增栽培工作紀錄
+# 新增栽培工作
 @app.route('/api/form03', methods=['POST'])
 def add_form03():
     data = request.get_json()
@@ -565,13 +558,13 @@ def add_form03():
         print(f"Error occurred while adding form03: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# 更新栽培工作紀錄
+# 更新栽培工作
 @app.route('/api/form03/<int:id>', methods=['PUT'])
 def update_form03(id):
     data = request.get_json()
     form = Form03.query.get(id)
     if not form:
-        return jsonify({'error': '栽培工作紀錄 not found未找到'}), 404
+        return jsonify({'error': '栽培工作 not found未找到'}), 404
     
     form.operation_date = datetime.strptime(data['operation_date'], '%Y-%m-%d')
     form.field_code = data['field_code']
@@ -579,9 +572,9 @@ def update_form03(id):
     form.crop_content = data['crop_content']
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '栽培工作紀錄更新成功'})
+    return jsonify({'message': '栽培工作更新成功'})
 
-# 刪除栽培工作紀錄
+# 刪除栽培工作
 @app.route('/api/form03/<int:id>', methods=['DELETE'])
 def delete_form03(id):
     record = Form03.query.get(id)
@@ -592,7 +585,7 @@ def delete_form03(id):
     db.session.commit()
     return jsonify({'message': 'Record deleted successfully'})
 
-# 查詢所有使用者的栽培紀錄
+# 查詢所有使用者的栽培
 @app.route('/api/form03', methods=['GET'])
 def get_all_form03(): 
     results = db.session.query(Form03, users.farmer_name).\
@@ -614,57 +607,9 @@ def get_all_form03():
 
     return jsonify(forms)
 # ----------------------------------------------------------------------------------------------
+# 養液配製
 
-
-
-
-
-
-
-# 未測試資料
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# 養液配製紀錄
-
-# 新增養液配製紀錄
+# 新增養液配製
 @app.route('/api/form04', methods=['POST'])
 def add_form04():
     data = request.get_json()
@@ -712,18 +657,18 @@ def add_form04():
 
         db.session.add(new_form)
         db.session.commit()
-        return jsonify({'status': '養液配製紀錄新增成功', 'form_id': new_form.id}), 201
+        return jsonify({'status': '養液配製新增成功', 'form_id': new_form.id}), 201
     except Exception as e:
         print(f"Error occurred while adding form04: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# 更新養液配製紀錄
+# 更新養液配製
 @app.route('/api/form04/<int:id>', methods=['PUT'])
 def update_form04(id):
     data = request.get_json()
     form = Form04.query.get(id)
     if not form:
-        return jsonify({'error': '養液配製紀錄 未找到'}), 404
+        return jsonify({'error': '養液配製 未找到'}), 404
     
     form.preparation_date = datetime.strptime(data['preparation_date'], '%Y-%m-%d')
     form.material_code_or_name = data['material_code_or_name']
@@ -734,9 +679,9 @@ def update_form04(id):
     form.preparer_name = data['preparer_name']
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '養液配製紀錄更新成功'})
+    return jsonify({'message': '養液配製更新成功'})
 
-# 刪除養液配製紀錄
+# 刪除養液配製
 @app.route('/api/form04/<int:id>', methods=['DELETE'])
 def delete_form04(id):
     record = Form04.query.get(id)
@@ -747,7 +692,7 @@ def delete_form04(id):
     db.session.commit()
     return jsonify({'message': 'Record deleted successfully'})
 
-# 查詢所有使用者的養液配製紀錄
+# 查詢所有使用者的養液配製
 @app.route('/api/form04', methods=['GET'])
 def get_all_form04(): 
     results = db.session.query(Form04, users.farmer_name).\
@@ -769,7 +714,6 @@ def get_all_form04():
         }
         for result in results
     ]
-
     return jsonify(forms)
 
 # ----------------------------------------------------------------------------------------------
@@ -853,13 +797,12 @@ def get_all_form05():
         }
         for result in results
     ]
-
     return jsonify(forms)
 
 # ----------------------------------------------------------------------------------------------
-# 肥料施用紀錄
+# 肥料施用
 
-# 新增肥料施用紀錄
+# 新增肥料施用
 @app.route('/api/form06', methods=['POST'])
 def add_form06():
     data = request.get_json()
@@ -917,18 +860,18 @@ def add_form06():
 
         db.session.add(new_form)
         db.session.commit()
-        return jsonify({'status': '肥料施用紀錄新增成功', 'form_id': new_form.id}), 201
+        return jsonify({'status': '肥料施用新增成功', 'form_id': new_form.id}), 201
     except Exception as e:
         print(f"Error occurred while adding form06: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# 更新肥料施用紀錄
+# 更新肥料施用
 @app.route('/api/form06/<int:id>', methods=['PUT'])
 def update_form06(id):
     data = request.get_json()
     form = Form06.query.get(id)
     if not form:
-        return jsonify({'error': '肥料施用紀錄未找到'}), 404
+        return jsonify({'error': '肥料施用未找到'}), 404
     
     form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d')
     form.field_code = data['field_code']
@@ -941,9 +884,9 @@ def update_form06(id):
     form.process = data['process']
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '肥料施用紀錄更新成功'}),200
+    return jsonify({'message': '肥料施用更新成功'}),200
 
-# 刪除肥料施用紀錄
+# 刪除肥料施用
 @app.route('/api/form06/<int:id>', methods=['DELETE'])
 def delete_form06(id):
     record = Form06.query.get(id)
@@ -954,7 +897,7 @@ def delete_form06(id):
     db.session.commit()
     return jsonify({'message': 'Record deleted successfully'})
 
-# 查詢所有使用者的肥料施用紀錄
+# 查詢所有使用者的肥料施用
 @app.route('/api/form06', methods=['GET'])
 def get_all_form06():
     results = db.session.query(Form06, users.farmer_name).\
@@ -978,14 +921,13 @@ def get_all_form06():
         }
         for result in results
     ]
-
     return jsonify(forms)
 
 # ----------------------------------------------------------------------------------------------
 
-# form07（肥料資材與代碼對照表）
+# form07（肥料資材與代碼）
 
-# 新增肥料資材與代碼對照表
+# 新增肥料資材與代碼
 @app.route('/api/form07', methods=['POST'])
 def add_form07():
     data = request.get_json()
@@ -1015,26 +957,26 @@ def add_form07():
 
         db.session.add(new_form)
         db.session.commit()
-        return jsonify({'status': '肥料資材與代碼對照表新增成功', 'form_id': new_form.id}), 201
+        return jsonify({'status': '肥料資材與代碼新增成功', 'form_id': new_form.id}), 201
     except Exception as e:
         print(f"Error occurred while adding form07: {str(e)}")
         return jsonify({'error': str(e)}), 500
     
-# 更新肥料資材與代碼對照表
+# 更新肥料資材與代碼
 @app.route('/api/form07/<int:id>', methods=['PUT'])
 def update_form07(id):
     data = request.get_json()
     form = Form07.query.get(id)
     if not form:
-        return jsonify({'error': '肥料資材與代碼對照表未找到'}), 404
+        return jsonify({'error': '肥料資材與代碼未找到'}), 404
     
     form.fertilizer_material_code = data['fertilizer_material_code']
     form.fertilizer_material_name = data['fertilizer_material_name']
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '肥料資材與代碼對照表更新成功'})
+    return jsonify({'message': '肥料資材與代碼更新成功'})
 
-# 刪除肥料資材與代碼對照表
+# 刪除肥料資材與代碼
 @app.route('/api/form07/<int:id>', methods=['DELETE'])
 def delete_form07(id):
     record = Form07.query.get(id)
@@ -1045,7 +987,7 @@ def delete_form07(id):
     db.session.commit()
     return jsonify({'message': 'Record deleted successfully'})
 
-# 查詢所有使用者的肥料資材與代碼對照表
+# 查詢所有使用者的肥料資材與代碼
 @app.route('/api/form07', methods=['GET'])
 def get_all_form07(): 
     results = db.session.query(Form07, users.farmer_name).\
@@ -1062,13 +1004,12 @@ def get_all_form07():
         }
         for result in results
     ]
-
     return jsonify(forms)
 
 # ----------------------------------------------------------------------------------------------
-# form08（肥料入出庫紀錄）
+# form08（肥料入出庫）
 
-# 新增肥料入出庫紀錄
+# 新增肥料入出庫
 @app.route('/api/form08', methods=['POST'])
 def add_form08():
     data = request.get_json()
@@ -1109,7 +1050,6 @@ def add_form08():
     if not remaining_quantity:
         return jsonify({'error': '缺少 remaining_quantity'}), 400
     
-
     try:
         new_form = Form08(
             user_id=user_id,
@@ -1127,18 +1067,18 @@ def add_form08():
 
         db.session.add(new_form)
         db.session.commit()
-        return jsonify({'status': '肥料入出庫紀錄新增成功', 'form_id': new_form.id}), 201
+        return jsonify({'status': '肥料入出庫新增成功', 'form_id': new_form.id}), 201
     except Exception as e:
         print(f"Error occurred while adding form08: {str(e)}")
         return jsonify({'error': str(e)}), 500
-    
-# 更新肥料入出庫紀錄
+
+# 更新肥料入出庫
 @app.route('/api/form08/<int:id>', methods=['PUT'])
 def update_form08(id):
     data = request.get_json()
     form = Form08.query.get(id)
     if not form:
-        return jsonify({'error': '肥料入出庫紀錄未找到'}), 404
+        return jsonify({'error': '肥料入出庫未找到'}), 404
     
     form.material_name = data['material_name']
     form.manufacturer = data['manufacturer']
@@ -1151,9 +1091,9 @@ def update_form08(id):
     form.remaining_quantity = data['remaining_quantity']
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '肥料入出庫紀錄更新成功'})
+    return jsonify({'message': '肥料入出庫更新成功'})
 
-# 刪除肥料入出庫紀錄
+# 刪除肥料入出庫
 @app.route('/api/form08/<int:id>', methods=['DELETE'])
 def delete_form08(id):
     record = Form08.query.get(id)
@@ -1164,7 +1104,7 @@ def delete_form08(id):
     db.session.commit()
     return jsonify({'message': 'Record deleted successfully'})
 
-# 查詢所有使用者的肥料入出庫紀錄
+# 查詢所有使用者的肥料入出庫
 @app.route('/api/form08', methods=['GET'])
 def get_all_form08(): 
     results = db.session.query(Form08, users.farmer_name).\
@@ -1188,13 +1128,12 @@ def get_all_form08():
         }
         for result in results
     ]
-
     return jsonify(forms)
 
 # ----------------------------------------------------------------------------------------------
-# form09（有害生物防治或環境消毒資材施用紀錄）
+# form09（有害生物防治或環境消毒資材施用）
 
-# 新增有害生物防治或環境消毒資材施用紀錄
+# 新增有害生物防治或環境消毒資材施用
 @app.route('/api/form09', methods=['POST'])
 def add_form09():
     data = request.get_json()
@@ -1260,18 +1199,18 @@ def add_form09():
 
         db.session.add(new_form)
         db.session.commit()
-        return jsonify({'status': '有害生物防治或環境消毒資材施用紀錄新增成功', 'form_id': new_form.id}), 201
+        return jsonify({'status': '有害生物防治或環境消毒資材施用新增成功', 'form_id': new_form.id}), 201
     except Exception as e:
         print(f"Error occurred while adding form09: {str(e)}")
         return jsonify({'error': str(e)}), 500
     
-# 更新有害生物防治或環境消毒資材施用紀錄
+# 更新有害生物防治或環境消毒資材施用
 @app.route('/api/form09/<int:id>', methods=['PUT'])
 def update_form09(id):
     data = request.get_json()
     form = Form09.query.get(id)
     if not form:
-        return jsonify({'error': '有害生物防治或環境消毒資材施用紀錄未找到'}), 404
+        return jsonify({'error': '有害生物防治或環境消毒資材施用未找到'}), 404
     
     form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d')
     form.field_code = data['field_code']
@@ -1286,9 +1225,9 @@ def update_form09(id):
     form.operator = data['operator']
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '有害生物防治或環境消毒資材施用紀錄更新成功'})
+    return jsonify({'message': '有害生物防治或環境消毒資材施用更新成功'})
 
-# 刪除有害生物防治或環境消毒資材施用紀錄
+# 刪除有害生物防治或環境消毒資材施用
 @app.route('/api/form09/<int:id>', methods=['DELETE'])
 def delete_form09(id):
     record = Form09.query.get(id)
@@ -1299,7 +1238,7 @@ def delete_form09(id):
     db.session.commit()
     return jsonify({'message': 'Record deleted successfully'})
 
-# 查詢所有使用者的有害生物防治或環境消毒資材施用紀錄
+# 查詢所有使用者的有害生物防治或環境消毒資材施用
 @app.route('/api/form09', methods=['GET'])
 def get_all_form09():
     results = db.session.query(Form09, users.farmer_name).\
@@ -1325,13 +1264,12 @@ def get_all_form09():
         }
         for result in results
     ]
-
     return jsonify(forms)
 
 # ----------------------------------------------------------------------------------------------
-# form10（防治資材與代碼對照表）
+# form10（防治資材與代碼）
 
-# 新增防治資材與代碼對照表
+# 新增防治資材與代碼
 @app.route('/api/form10', methods=['POST'])
 def add_form10():
     data = request.get_json()
@@ -1361,26 +1299,26 @@ def add_form10():
 
         db.session.add(new_form)
         db.session.commit()
-        return jsonify({'status': '防治資材與代碼對照表新增成功', 'form_id': new_form.id}), 201
+        return jsonify({'status': '防治資材與代碼新增成功', 'form_id': new_form.id}), 201
     except Exception as e:
         print(f"Error occurred while adding form10: {str(e)}")
         return jsonify({'error': str(e)}), 500
     
-# 更新防治資材與代碼對照表
+# 更新防治資材與代碼
 @app.route('/api/form10/<int:id>', methods=['PUT'])
 def update_form10(id):
     data = request.get_json()
     form = Form10.query.get(id)
     if not form:
-        return jsonify({'error': '防治資材與代碼對照表未找到'}), 404
+        return jsonify({'error': '防治資材與代碼未找到'}), 404
     
     form.pest_control_material_code = data['pest_control_material_code']
     form.pest_control_material_name = data['pest_control_material_name']
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '防治資材與代碼對照表更新成功'})
+    return jsonify({'message': '防治資材與代碼更新成功'})
 
-# 刪除防治資材與代碼對照表
+# 刪除防治資材與代碼
 @app.route('/api/form10/<int:id>', methods=['DELETE'])
 def delete_form10(id):
     record = Form10.query.get(id)
@@ -1391,7 +1329,7 @@ def delete_form10(id):
     db.session.commit()
     return jsonify({'message': 'Record deleted successfully'})
 
-# 查詢所有使用者的防治資材與代碼對照表
+# 查詢所有使用者的防治資材與代碼
 @app.route('/api/form10', methods=['GET'])
 def get_all_form10(): 
     results = db.session.query(Form10, users.farmer_name).\
@@ -1408,7 +1346,888 @@ def get_all_form10():
         }
         for result in results
     ]
+    return jsonify(forms)
 
+# ----------------------------------------------------------------------------------------------
+# form11（有害生物防治或環境消毒資材入出庫）
+
+# 新增有害生物防治或環境消毒資材入出庫
+@app.route('/api/form11', methods=['POST'])
+def add_form11():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    user_id = data.get('user_id')
+    material_name = data.get('material_name')
+    dosage_form = data.get('dosage_form')
+    brand_name  = data.get('brand_name')
+    supplier = data.get('supplier')
+    packaging_unit = data.get('packaging_unit')
+    packaging_volume = data.get('packaging_volume')
+    date = datetime.strptime(data.get('date'), '%Y-%m-%d')
+    purchase_quantity = data.get('purchase_quantity')
+    usage_quantity = data.get('usage_quantity')
+    remaining_quantity = data.get('remaining_quantity')
+    notes = data.get('notes')
+
+    # 檢查必要欄位是否存在
+    if not user_id:
+        return jsonify({'error': '缺少 user_id'}), 400
+    if not material_name:
+        return jsonify({'error': '缺少 material_name'}), 400
+    if not dosage_form:
+        return jsonify({'error': '缺少 dosage_form'}), 400
+    if not brand_name:
+        return jsonify({'error': '缺少 brand_name'}), 400
+    if not supplier:
+        return jsonify({'error': '缺少 supplier'}), 400
+    if not packaging_unit:
+        return jsonify({'error': '缺少 packaging_unit'}), 400
+    if not packaging_volume:
+        return jsonify({'error': '缺少 packaging_volume'}), 400
+    if not date:
+        return jsonify({'error': '缺少 date'}), 400
+    if not purchase_quantity:
+        return jsonify({'error': '缺少 purchase_quantity'}), 400
+    if not usage_quantity:
+        return jsonify({'error': '缺少 usage_quantity'}), 400
+    if not remaining_quantity:
+        return jsonify({'error': '缺少 remaining_quantity'}), 400
+
+    try:
+        new_form = Form11(
+            user_id=user_id,
+            material_name=material_name,
+            dosage_form=dosage_form,
+            brand_name=brand_name,
+            supplier=supplier,
+            packaging_unit=packaging_unit,
+            packaging_volume=packaging_volume,
+            date=date,
+            purchase_quantity=purchase_quantity,
+            usage_quantity=usage_quantity,
+            remaining_quantity=remaining_quantity,
+            notes=notes
+        )
+
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '有害生物防治或環境消毒資材入出庫新增成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form11: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    
+# 更新有害生物防治或環境消毒資材入出庫
+@app.route('/api/form11/<int:id>', methods=['PUT'])
+def update_form11(id):
+    data = request.get_json()
+    form = Form11.query.get(id)
+    if not form:
+        return jsonify({'error': '有害生物防治或環境消毒資材入出庫未找到'}), 404
+    
+    form.material_name = data['material_name']
+    form.dosage_form = data['dosage_form']
+    form.brand_name = data['brand_name']
+    form.supplier = data['supplier']
+    form.packaging_unit = data['packaging_unit']
+    form.packaging_volume = data['packaging_volume']
+    form.date = datetime.strptime(data['date'], '%Y-%m-%d')
+    form.purchase_quantity = data['purchase_quantity']
+    form.usage_quantity = data['usage_quantity']
+    form.remaining_quantity = data['remaining_quantity']
+    form.notes = data.get('notes')
+    db.session.commit()
+    return jsonify({'message': '有害生物防治或環境消毒資材入出庫更新成功'})
+
+# 刪除有害生物防治或環境消毒資材入出庫
+@app.route('/api/form11/<int:id>', methods=['DELETE'])
+def delete_form11(id):
+    record = Form11.query.get(id)
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'message': 'Record deleted successfully'})
+
+# 查詢所有使用者的有害生物防治或環境消毒資材入出庫
+@app.route('/api/form11', methods=['GET'])
+def get_all_form11():
+    results = db.session.query(Form11, users.farmer_name).\
+        join(users, users.id == Form11.user_id).all()
+    
+    forms = [
+        {
+            "id": result.Form11.id,
+            "user_id": result.Form11.user_id,
+            "farmer_name": result.farmer_name,
+            "material_name": result.Form11.material_name,
+            "dosage_form": result.Form11.dosage_form,
+            "brand_name": result.Form11.brand_name,
+            "supplier": result.Form11.supplier,
+            "packaging_unit": result.Form11.packaging_unit,
+            "packaging_volume": result.Form11.packaging_volume,
+            "date": result.Form11.date.strftime('%Y-%m-%d'),
+            "purchase_quantity": str(result.Form11.purchase_quantity),
+            "usage_quantity": str(result.Form11.usage_quantity),
+            "remaining_quantity": str(result.Form11.remaining_quantity),
+            "notes": result.Form11.notes
+        }
+        for result in results
+    ]
+    return jsonify(forms)
+
+# ----------------------------------------------------------------------------------------------
+# form12（其他資材使用紀錄）
+
+# 新增其他資材使用紀錄
+@app.route('/api/form12', methods=['POST'])
+def add_form12():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    user_id = data.get('user_id')
+    date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d')
+    field_code = data.get('field_code')
+    crop = data.get('crop')
+    material_code_or_name = data.get('material_code_or_name')
+    usage_amount = data.get('usage_amount')
+    operator = data.get('operator')
+    notes = data.get('notes')
+
+    # 檢查必要欄位是否存在
+    if not user_id:
+        return jsonify({'error': '缺少 user_id'}), 400
+    if not date_used:
+        return jsonify({'error': '缺少 date_used'}), 400
+    if not field_code:
+        return jsonify({'error': '缺少 field_code'}), 400
+    if not crop:
+        return jsonify({'error': '缺少 crop'}), 400
+    if not material_code_or_name:
+        return jsonify({'error': '缺少 material_code_or_name'}), 400
+    if not usage_amount:
+        return jsonify({'error': '缺少 usage_amount'}), 400
+    if not operator:
+        return jsonify({'error': '缺少 operator'}), 400
+    
+    try:
+        new_form = Form12(
+            user_id=user_id,
+            date_used=date_used,
+            field_code=field_code,
+            crop=crop,
+            material_code_or_name=material_code_or_name,
+            usage_amount=usage_amount,
+            operator=operator,
+            notes=notes
+        )
+
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '其他資材使用紀錄新增成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form12: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    
+# 更新其他資材使用紀錄
+@app.route('/api/form12/<int:id>', methods=['PUT'])
+def update_form12(id):
+    data = request.get_json()
+    form = Form12.query.get(id)
+    if not form:
+        return jsonify({'error': '其他資材使用紀錄未找到'}), 404
+    
+    form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d')
+    form.field_code = data['field_code']
+    form.crop = data['crop']
+    form.material_code_or_name = data['material_code_or_name']
+    form.usage_amount = data['usage_amount']
+    form.operator = data['operator']
+    form.notes = data.get('notes')
+    db.session.commit()
+    return jsonify({'message': '其他資材使用紀錄更新成功'})
+
+# 刪除其他資材使用紀錄
+@app.route('/api/form12/<int:id>', methods=['DELETE'])
+def delete_form12(id):
+    record = Form12.query.get(id)
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'message': 'Record deleted successfully'})
+
+# 查詢所有使用者的其他資材使用紀錄
+@app.route('/api/form12', methods=['GET'])
+def get_all_form12():
+    results = db.session.query(Form12, users.farmer_name).\
+        join(users, users.id == Form12.user_id).all()
+    
+    forms = [
+        {
+            "id": result.Form12.id,
+            "user_id": result.Form12.user_id,
+            "farmer_name": result.farmer_name,
+            "date_used": result.Form12.date_used.strftime('%Y-%m-%d'),
+            "field_code": result.Form12.field_code,
+            "crop": result.Form12.crop,
+            "material_code_or_name": result.Form12.material_code_or_name,
+            "usage_amount": str(result.Form12.usage_amount),
+            "operator": result.Form12.operator,
+            "notes": result.Form12.notes
+        }
+        for result in results
+    ]
+    return jsonify(forms)
+
+# ----------------------------------------------------------------------------------------------
+# form13（其他資材與代碼）
+
+# 新增其他資材與代碼
+@app.route('/api/form13', methods=['POST'])
+def add_form13():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    user_id = data.get('user_id')
+    other_material_code = data.get('other_material_code')
+    other_material_name = data.get('other_material_name')
+    notes = data.get('notes')
+
+    # 檢查必要欄位是否存在
+    if not user_id:
+        return jsonify({'error': '缺少 user_id'}), 400
+    if not other_material_code:
+        return jsonify({'error': '缺少 other_material_code'}), 400
+    if not other_material_name:
+        return jsonify({'error': '缺少 other_material_name'}), 400
+    
+    try:
+        new_form = Form13(
+            user_id=user_id,
+            other_material_code=other_material_code,
+            other_material_name=other_material_name,
+            notes=notes
+        )
+
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '其他資材與代碼新增成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form13: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# 更新其他資材與代碼
+@app.route('/api/form13/<int:id>', methods=['PUT'])
+def update_form13(id):
+    data = request.get_json()
+    form = Form13.query.get(id)
+    if not form:
+        return jsonify({'error': '其他資材與代碼未找到'}), 404
+    
+    form.other_material_code = data['other_material_code']
+    form.other_material_name = data['other_material_name']
+    form.notes = data.get('notes')
+    db.session.commit()
+    return jsonify({'message': '其他資材與代碼更新成功'})
+
+# 刪除其他資材與代碼
+@app.route('/api/form13/<int:id>', methods=['DELETE'])
+def delete_form13(id):
+    record = Form13.query.get(id)
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'message': 'Record deleted successfully'})
+
+# 查詢所有使用者的其他資材與代碼
+@app.route('/api/form13', methods=['GET'])
+def get_all_form13(): 
+    results = db.session.query(Form13, users.farmer_name).\
+        join(users, users.id == Form13.user_id).all()
+    
+    forms = [
+        {
+            "id": result.Form13.id,
+            "user_id": result.Form13.user_id,
+            "farmer_name": result.farmer_name,
+            "other_material_code": result.Form13.other_material_code,
+            "other_material_name": result.Form13.other_material_name,
+            "notes": result.Form13.notes
+        }
+        for result in results
+    ]
+    return jsonify(forms)
+
+# ----------------------------------------------------------------------------------------------
+# form14（其他資材入出庫紀錄）
+
+# 新增其他資材入出庫紀錄
+@app.route('/api/form14', methods=['POST'])
+def add_form14():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    user_id = data.get('user_id')
+    material_name = data.get('material_name')
+    manufacturer = data.get('manufacturer')
+    supplier = data.get('supplier')
+    packaging_unit = data.get('packaging_unit')
+    packaging_volume = data.get('packaging_volume')
+    date = datetime.strptime(data.get('date'), '%Y-%m-%d')
+    purchase_quantity = data.get('purchase_quantity')
+    usage_quantity = data.get('usage_quantity')
+    remaining_quantity = data.get('remaining_quantity')
+    notes = data.get('notes')
+
+    # 檢查必要欄位是否存在
+    if not user_id:
+        return jsonify({'error': '缺少 user_id'}), 400
+    if not material_name:
+        return jsonify({'error': '缺少 material_name'}), 400
+    if not manufacturer:
+        return jsonify({'error': '缺少 manufacturer'}), 400
+    if not supplier:
+        return jsonify({'error': '缺少 supplier'}), 400
+    if not packaging_unit:
+        return jsonify({'error': '缺少 packaging_unit'}), 400
+    if not packaging_volume:
+        return jsonify({'error': '缺少 packaging_volume'}), 400
+    if not date:
+        return jsonify({'error': '缺少 date'}), 400
+    if not purchase_quantity:
+        return jsonify({'error': '缺少 purchase_quantity'}), 400
+    if not usage_quantity:
+        return jsonify({'error': '缺少 usage_quantity'}), 400
+    if not remaining_quantity:
+        return jsonify({'error': '缺少 remaining_quantity'}), 400
+    
+    try:
+        new_form = Form14(
+            user_id=user_id,
+            material_name=material_name,
+            manufacturer=manufacturer,
+            supplier=supplier,
+            packaging_unit=packaging_unit,
+            packaging_volume=packaging_volume,
+            date=date,
+            purchase_quantity=purchase_quantity,
+            usage_quantity=usage_quantity,
+            remaining_quantity=remaining_quantity,
+            notes=notes
+        )
+
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '其他資材入出庫紀錄新增成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form14: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    
+# 更新其他資材入出庫紀錄
+@app.route('/api/form14/<int:id>', methods=['PUT'])
+def update_form14(id):
+    data = request.get_json()
+    form = Form14.query.get(id)
+    if not form:
+        return jsonify({'error': '其他資材入出庫紀錄未找到'}), 404
+    
+    form.material_name = data['material_name']
+    form.manufacturer = data['manufacturer']
+    form.supplier = data['supplier']
+    form.packaging_unit = data['packaging_unit']
+    form.packaging_volume = data['packaging_volume']
+    form.date = datetime.strptime(data['date'], '%Y-%m-%d')
+    form.purchase_quantity = data['purchase_quantity']
+    form.usage_quantity = data['usage_quantity']
+    form.remaining_quantity = data['remaining_quantity']
+    form.notes = data.get('notes')
+    db.session.commit()
+    return jsonify({'message': '其他資材入出庫紀錄更新成功'})
+
+# 刪除其他資材入出庫紀錄
+@app.route('/api/form14/<int:id>', methods=['DELETE'])
+def delete_form14(id):
+    record = Form14.query.get(id)
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'message': 'Record deleted successfully'})
+
+# 查詢所有使用者的其他資材入出庫紀錄
+@app.route('/api/form14', methods=['GET'])
+def get_all_form14():
+    results = db.session.query(Form14, users.farmer_name).\
+        join(users, users.id == Form14.user_id).all()
+    
+    forms = [
+        {
+            "id": result.Form14.id,
+            "user_id": result.Form14.user_id,
+            "farmer_name": result.farmer_name,
+            "material_name": result.Form14.material_name,
+            "manufacturer": result.Form14.manufacturer,
+            "supplier": result.Form14.supplier,
+            "packaging_unit": result.Form14.packaging_unit,
+            "packaging_volume": result.Form14.packaging_volume,
+            "date": result.Form14.date.strftime('%Y-%m-%d'),
+            "purchase_quantity": str(result.Form14.purchase_quantity),
+            "usage_quantity": str(result.Form14.usage_quantity),
+            "remaining_quantity": str(result.Form14.remaining_quantity),
+            "notes": result.Form14.notes
+        }
+        for result in results
+    ]
+    return jsonify(forms)
+
+# ----------------------------------------------------------------------------------------------
+# form15（場地設施之保養、維修及清潔管理紀錄）
+
+# 新增場地設施之保養、維修及清潔管理紀錄
+@app.route('/api/form15', methods=['POST'])
+def add_form15():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    user_id = data.get('user_id')
+    date = datetime.strptime(data.get('date'), '%Y-%m-%d')
+    item = data.get('item')
+    operation = data.get('operation')
+    recorder = data.get('recorder')
+    notes = data.get('notes')
+
+    # 檢查必要欄位是否存在
+    if not user_id:
+        return jsonify({'error': '缺少 user_id'}), 400
+    if not date:
+        return jsonify({'error': '缺少 date'}), 400
+    if not item:
+        return jsonify({'error': '缺少 item'}), 400
+    if not operation:
+        return jsonify({'error': '缺少 operation'}), 400
+    if not recorder:
+        return jsonify({'error': '缺少 recorder'}), 400
+    
+    try:
+        new_form = Form15(
+            user_id=user_id,
+            date=date,
+            item=item,
+            operation=operation,
+            recorder=recorder,
+            notes=notes
+        )
+
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '場地設施之保養、維修及清潔管理紀錄新增成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form15: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    
+# 更新場地設施之保養、維修及清潔管理紀錄
+@app.route('/api/form15/<int:id>', methods=['PUT'])
+def update_form15(id):
+    data = request.get_json()
+    form = Form15.query.get(id)
+    if not form:
+        return jsonify({'error': '場地設施之保養、維修及清潔管理紀錄未找到'}), 404
+    
+    form.date = datetime.strptime(data['date'], '%Y-%m-%d')
+    form.item = data['item']
+    form.operation = data['operation']
+    form.recorder = data['recorder']
+    form.notes = data.get('notes')
+    db.session.commit()
+    return jsonify({'message': '場地設施之保養、維修及清潔管理紀錄更新成功'})
+
+# 刪除場地設施之保養、維修及清潔管理紀錄
+@app.route('/api/form15/<int:id>', methods=['DELETE'])
+def delete_form15(id):
+    record = Form15.query.get(id)
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'message': 'Record deleted successfully'})
+
+# 查詢所有使用者的場地設施之保養、維修及清潔管理紀錄
+@app.route('/api/form15', methods=['GET'])
+def get_all_form15():
+    results = db.session.query(Form15, users.farmer_name).\
+        join(users, users.id == Form15.user_id).all()
+    
+    forms = [
+        {
+            "id": result.Form15.id,
+            "user_id": result.Form15.user_id,
+            "farmer_name": result.farmer_name,
+            "date": result.Form15.date.strftime('%Y-%m-%d'),
+            "item": result.Form15.item,
+            "operation": result.Form15.operation,
+            "recorder": result.Form15.recorder,
+            "notes": result.Form15.notes
+        }
+        for result in results
+    ]
+    return jsonify(forms)
+
+# ----------------------------------------------------------------------------------------------
+# form16（器具/機械/設備之保養、維修、校正及清潔管理紀錄）
+
+# 新增器具/機械/設備之保養、維修、校正及清潔管理紀錄
+@app.route('/api/form16', methods=['POST'])
+def add_form16():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    user_id = data.get('user_id')
+    date = datetime.strptime(data.get('date'), '%Y-%m-%d')
+    item = data.get('item')
+    operation = data.get('operation')
+    recorder = data.get('recorder')
+    notes = data.get('notes')
+
+    # 檢查必要欄位是否存在
+    if not user_id:
+        return jsonify({'error': '缺少 user_id'}), 400
+    if not date:
+        return jsonify({'error': '缺少 date'}), 400
+    if not item:
+        return jsonify({'error': '缺少 item'}), 400
+    if not operation:
+        return jsonify({'error': '缺少 operation'}), 400
+    if not recorder:
+        return jsonify({'error': '缺少 recorder'}), 400
+
+    try:
+        new_form = Form16(
+            user_id=user_id,
+            date=date,
+            item=item,
+            operation=operation,
+            recorder=recorder,
+            notes=notes
+        )
+
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '器具/機械/設備之保養、維修、校正及清潔管理紀錄新增成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form16: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# 更新器具/機械/設備之保養、維修、校正及清潔管理紀錄
+@app.route('/api/form16/<int:id>', methods=['PUT'])
+def update_form16(id):
+    data = request.get_json()
+    form = Form16.query.get(id)
+    if not form:
+        return jsonify({'error': '器具/機械/設備之保養、維修、校正及清潔管理紀錄未找到'}), 404
+    
+    form.date = datetime.strptime(data['date'], '%Y-%m-%d')
+    form.item = data['item']
+    form.operation = data['operation']
+    form.recorder = data['recorder']
+    form.notes = data.get('notes')
+    db.session.commit()
+    return jsonify({'message': '器具/機械/設備之保養、維修、校正及清潔管理紀錄更新成功'})
+
+# 刪除器具/機械/設備之保養、維修、校正及清潔管理紀錄
+@app.route('/api/form16/<int:id>', methods=['DELETE'])
+def delete_form16(id):
+    record = Form16.query.get(id)
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'message': 'Record deleted successfully'})
+
+# 查詢所有使用者的器具/機械/設備之保養、維修、校正及清潔管理紀錄
+@app.route('/api/form16', methods=['GET'])
+def get_all_form16():
+    results = db.session.query(Form16, users.farmer_name).\
+        join(users, users.id == Form16.user_id).all()
+    
+    forms = [
+        {
+            "id": result.Form16.id,
+            "user_id": result.Form16.user_id,
+            "farmer_name": result.farmer_name,
+            "date": result.Form16.date.strftime('%Y-%m-%d'),
+            "item": result.Form16.item,
+            "operation": result.Form16.operation,
+            "recorder": result.Form16.recorder,
+            "notes": result.Form16.notes
+        }
+        for result in results
+    ]
+    return jsonify(forms)
+
+# ----------------------------------------------------------------------------------------------
+# form17（採收及採後處理紀錄）
+
+# 新增採收及採後處理紀錄
+@app.route('/api/form17', methods=['POST'])
+def add_form17():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    user_id = data.get('user_id')
+    harvest_date = datetime.strptime(data.get('harvest_date'), '%Y-%m-%d')
+    field_code = data.get('field_code')
+    crop_name = data.get('crop_name')
+    batch_or_trace_no = data.get('batch_or_trace_no')
+    harvest_weight = data.get('harvest_weight')
+    process_date = datetime.strptime(data.get('process_date'), '%Y-%m-%d')
+    post_harvest_treatment = data.get('post_harvest_treatment')
+    post_treatment_weight = data.get('post_treatment_weight')
+    verification_status = data.get('verification_status')
+    verification_organization = data.get('verification_organization')
+    notes = data.get('notes')
+
+    # 檢查必要欄位是否存在
+    if not user_id:
+        return jsonify({'error': '缺少 user_id'}), 400
+    if not harvest_date:
+        return jsonify({'error': '缺少 harvest_date'}), 400
+    if not field_code:
+        return jsonify({'error': '缺少 field_code'}), 400
+    if not crop_name:
+        return jsonify({'error': '缺少 crop_name'}), 400
+    if not batch_or_trace_no:
+        return jsonify({'error': '缺少 batch_or_trace_no'}), 400
+    if not harvest_weight:
+        return jsonify({'error': '缺少 harvest_weight'}), 400
+    if not process_date:
+        return jsonify({'error': '缺少 process_date'}), 400
+    if not post_harvest_treatment:
+        return jsonify({'error': '缺少 post_harvest_treatment'}), 400
+    if not post_treatment_weight:   
+        return jsonify({'error': '缺少 post_treatment_weight'}), 400
+    if not verification_status:
+        return jsonify({'error': '缺少 verification_status'}), 400
+    if not verification_organization:
+        return jsonify({'error': '缺少 verification_organization'}), 400
+
+    try:
+        new_form = Form17(
+            user_id=user_id,
+            harvest_date=harvest_date,
+            field_code=field_code,
+            crop_name=crop_name,
+            batch_or_trace_no=batch_or_trace_no,
+            harvest_weight=harvest_weight,
+            process_date=process_date,
+            post_harvest_treatment=post_harvest_treatment,
+            post_treatment_weight=post_treatment_weight,
+            verification_status=verification_status,
+            verification_organization=verification_organization,
+            notes=notes
+        )
+
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '採收及採後處理紀錄新增成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form17: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# 更新採收及採後處理紀錄
+@app.route('/api/form17/<int:id>', methods=['PUT'])
+def update_form17(id):
+    data = request.get_json()
+    form = Form17.query.get(id)
+    if not form:
+        return jsonify({'error': '採收及採後處理紀錄未找到'}), 404
+    
+    form.harvest_date = datetime.strptime(data['harvest_date'], '%Y-%m-%d')
+    form.field_code = data['field_code']
+    form.crop_name = data['crop_name']
+    form.batch_or_trace_no = data['batch_or_trace_no']
+    form.harvest_weight = data['harvest_weight']
+    form.process_date = datetime.strptime(data['process_date'], '%Y-%m-%d')
+    form.post_harvest_treatment = data['post_harvest_treatment']
+    form.post_treatment_weight = data['post_treatment_weight']
+    form.verification_status = data['verification_status']
+    form.verification_organization = data['verification_organization']
+    form.notes = data.get('notes')
+    db.session.commit()
+    return jsonify({'message': '採收及採後處理紀錄更新成功'})
+
+# 刪除採收及採後處理紀錄
+@app.route('/api/form17/<int:id>', methods=['DELETE'])
+def delete_form17(id):
+    record = Form17.query.get(id)
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'message': 'Record deleted successfully'})
+
+# 查詢所有使用者的採收及採後處理紀錄
+@app.route('/api/form17', methods=['GET'])
+def get_all_form17():
+    results = db.session.query(Form17, users.farmer_name).\
+        join(users, users.id == Form17.user_id).all()
+    
+    forms = [
+        {
+            "id": result.Form17.id,
+            "user_id": result.Form17.user_id,
+            "farmer_name": result.farmer_name,
+            "harvest_date": result.Form17.harvest_date.strftime('%Y-%m-%d'),
+            "field_code": result.Form17.field_code,
+            "crop_name": result.Form17.crop_name,
+            "batch_or_trace_no": result.Form17.batch_or_trace_no,
+            "harvest_weight": str(result.Form17.harvest_weight),
+            "process_date": result.Form17.process_date.strftime('%Y-%m-%d'),
+            "post_harvest_treatment": result.Form17.post_harvest_treatment,
+            "post_treatment_weight": str(result.Form17.post_treatment_weight),
+            "verification_status": result.Form17.verification_status,
+            "verification_organization": result.Form17.verification_organization,
+            "notes": result.Form17.notes
+        }
+        for result in results
+    ]
+    return jsonify(forms)
+
+# ----------------------------------------------------------------------------------------------
+# form18（乾燥作業紀錄）
+
+# 新增乾燥作業紀錄
+# 更新乾燥作業紀錄
+# 刪除乾燥作業紀錄
+# 查詢所有使用者的乾燥作業紀錄
+# ----------------------------------------------------------------------------------------------
+# form19（包裝及出貨紀錄）
+
+# 新增包裝及出貨紀錄
+# 更新包裝及出貨紀錄
+# 刪除包裝及出貨紀錄
+# 查詢所有使用者的包裝及出貨紀錄
+# ----------------------------------------------------------------------------------------------
+# form20（作業人員衛生及健康狀態檢查紀錄）
+
+# 新增作業人員衛生及健康狀態檢查紀錄
+# 更新作業人員衛生及健康狀態檢查紀錄
+# 刪除作業人員衛生及健康狀態檢查紀錄
+# 查詢所有使用者的作業人員衛生及健康狀態檢查紀錄
+# ----------------------------------------------------------------------------------------------
+# form22（客戶抱怨/回饋紀錄）
+
+# 新增客戶抱怨/回饋紀錄
+@app.route('/api/form22', methods=['POST'])
+def add_form22():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    user_id = data.get('user_id')
+    date = datetime.strptime(data.get('date'), '%Y-%m-%d')
+    customer_name = data.get('customer_name')
+    customer_phone = data.get('customer_phone')
+    complaint = data.get('complaint')
+    processor_name = data.get('processor_name')
+    processor_date = datetime.strptime(data.get('processor_date'), '%Y-%m-%d')
+
+    # 檢查必要欄位是否存在
+    if not user_id:
+        return jsonify({'error': '缺少 user_id'}), 400
+    if not date:
+        return jsonify({'error': '缺少 date'}), 400
+    if not customer_name:
+        return jsonify({'error': '缺少 customer_name'}), 400
+    if not customer_phone:
+        return jsonify({'error': '缺少 customer_phone'}), 400
+    if not complaint:
+        return jsonify({'error': '缺少 complaint'}), 400
+    if not processor_name:
+        return jsonify({'error': '缺少 processor_name'}), 400
+    if not processor_date:
+        return jsonify({'error': '缺少 processor_date'}), 400
+
+    try:
+        new_form = Form22(
+            user_id=user_id,
+            date=date,
+            customer_name=customer_name,
+            customer_phone=customer_phone,
+            complaint=complaint,
+            processor_name=processor_name,
+            processor_date=processor_date
+        )
+        db.session.add(new_form)
+        db.session.commit()
+        return jsonify({'status': '客戶抱怨/回饋紀錄新增成功', 'form_id': new_form.id}), 201
+    except Exception as e:
+        print(f"Error occurred while adding form22: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# 更新客戶抱怨/回饋紀錄
+@app.route('/api/form22/<int:id>', methods=['PUT'])
+def update_form22(id):
+    data = request.get_json()
+    form = Form22.query.get(id)
+    if not form:
+        return jsonify({'error': '客戶抱怨/回饋紀錄未找到'}), 404
+
+    form.date = datetime.strptime(data['date'], '%Y-%m-%d')
+    form.customer_name = data['customer_name']
+    form.customer_phone = data['customer_phone']
+    form.complaint = data['complaint']
+    form.processor_name = data['processor_name']
+    form.processor_date = datetime.strptime(data['processor_date'], '%Y-%m-%d')
+    db.session.commit()
+    return jsonify({'message': '客戶抱怨/回饋紀錄更新成功'})
+
+# 刪除客戶抱怨/回饋紀錄
+@app.route('/api/form22/<int:id>', methods=['DELETE'])
+def delete_form22(id):
+    record = Form22.query.get(id)
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'message': 'Record deleted successfully'})
+
+# 查詢所有使用者的客戶抱怨/回饋紀錄
+@app.route('/api/form22', methods=['GET'])
+def get_all_form22():
+    results = db.session.query(Form22, users.farmer_name).\
+        join(users, users.id == Form22.user_id).all()
+
+    forms = [
+        {
+            "id": result.Form22.id,
+            "user_id": result.Form22.user_id,
+            "farmer_name": result.farmer_name,
+            "date": result.Form22.date.strftime('%Y-%m-%d'),
+            "customer_name": result.Form22.customer_name,
+            "customer_phone": result.Form22.customer_phone,
+            "complaint": result.Form22.complaint,
+            "processor_name": result.Form22.processor_name,
+            "processor_date": result.Form22.processor_date.strftime('%Y-%m-%d')
+        }
+        for result in results
+    ]
     return jsonify(forms)
 
 # ----------------------------------------------------------------------------------------------
@@ -1417,176 +2236,7 @@ def get_all_form10():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # ----------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # 在應用程式啟動時測試資料庫連線

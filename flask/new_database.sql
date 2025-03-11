@@ -346,18 +346,20 @@ CREATE TABLE form11 (
     purchase_quantity DECIMAL(10, 2),                -- 購入量
     usage_quantity DECIMAL(10, 2),                   -- 使用量
     remaining_quantity DECIMAL(10, 2),               -- 剩餘量
+    notes TEXT,                                              -- 備註
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE  -- 外鍵，關聯 `users` 表
 );
 -- 資料示例form11（有害生物防治或環境消毒資材入出庫紀錄）
-INSERT INTO form11 (user_id, material_name, dosage_form, brand_name, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity)
+INSERT INTO form11 (user_id, material_name, dosage_form, brand_name, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
 VALUES 
-    (1, 'ooxx資材', '顆粒型', '某某廠', '供應商A', '包', 10.0, '2025-02-05', 20.0, 10.0, 10.0);
+    (1, 'ooxx資材', '顆粒型', '某某廠', '供應商A', '包', 10.0, '2025-02-05', 20.0, 10.0, 10.0, '無');
 -- 查詢有害生物防治或環境消毒資材入出庫紀錄
 SELECT f.id, f.material_name, f.dosage_form, f.brand_name, f.supplier, f.packaging_unit, 
        f.packaging_volume, f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, 
-       u.username, u.farmer_name
+       u.username, u.farmer_name, f.notes
 FROM form11 f
 JOIN users u ON f.user_id = u.id
 WHERE f.material_name = 'ooxx資材';
@@ -423,18 +425,19 @@ CREATE TABLE form14 (
     purchase_quantity DECIMAL(10, 2),        -- 購入量 (例如：10公升)
     usage_quantity DECIMAL(10, 2),           -- 使用量 (例如：10公升)
     remaining_quantity DECIMAL(10, 2),       -- 剩餘量 (例如：10公升)
+    notes TEXT,                                       -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE  -- 外鍵，關聯 `users` 表
 );
 
 -- 資料示例
-INSERT INTO form14 (id, user_id, material_name, manufacturer, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity)
+INSERT INTO form14 (id, user_id, material_name, manufacturer, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
 VALUES 
-    ('0000-0000', 1, 'ooxx資材', '廠商', '供應商', '包', '10公斤', '2025/02/05', 10.00, 5.00, 5.00);
+    ('0000-0000', 1, 'ooxx資材', '廠商', '供應商', '包', '10公斤', '2025/02/05', 10.00, 5.00, 5.00, '無');
 
 -- 查詢與 `users` 表關聯的其他資材入出庫紀錄
-SELECT f.id, f.material_name, f.manufacturer, f.supplier, f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, u.username, u.farmer_name
+SELECT f.id, f.material_name, f.manufacturer, f.supplier, f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, u.username, u.farmer_name, f.notes
 FROM form14 f
 JOIN users u ON f.user_id = u.id
 WHERE f.material_name = 'ooxx資材';
@@ -489,22 +492,22 @@ WHERE f.item = '噴霧機';
 
 -- form17（採收及採後處理紀錄）
 CREATE TABLE form17 (
-    id VARCHAR(50) PRIMARY KEY,                       -- 編號
-    user_id INT NOT NULL,                              -- 關聯 `users` 表
-    harvest_date DATE,                        -- 採收日期
-    field_code VARCHAR(50),                   -- 田區代號
-    crop_name VARCHAR(255),                   -- 作物名稱
-    batch_or_trace_no VARCHAR(50),                     -- 批次編號或履歷編號
-    harvest_weight DECIMAL(10, 2),            -- 採收重量 (處理前)
-    process_date DATE,                        -- 處理日期
-    post_harvest_treatment VARCHAR(100),      -- 採後處理內容
-    post_treatment_weight DECIMAL(10, 2),    -- 處理後重量
-    verification_status ENUM('非驗證產品', '驗證產品'), -- 驗證狀態
-    verification_organization VARCHAR(255),            -- 驗證機構
-    notes TEXT,                                        -- 備註
+    id VARCHAR(50) PRIMARY KEY,             -- 編號
+    user_id INT NOT NULL,                   -- 關聯 `users` 表
+    harvest_date DATE,                      -- 採收日期
+    field_code VARCHAR(50),                 -- 田區代號
+    crop_name VARCHAR(255),                 -- 作物名稱
+    batch_or_trace_no VARCHAR(50),          -- 批次編號或履歷編號
+    harvest_weight DECIMAL(10, 2),          -- 採收重量 (處理前)
+    process_date DATE,                      -- 處理日期
+    post_harvest_treatment VARCHAR(100),    -- 採後處理內容
+    post_treatment_weight DECIMAL(10, 2),   -- 處理後重量
+    verification_status VARCHAR(100),       -- 驗證狀態
+    verification_organization VARCHAR(255), -- 驗證機構
+    notes TEXT,                             -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE    -- 外鍵，關聯 `users` 表
 );
 -- 資料示例
 INSERT INTO form17 (id, user_id, harvest_date, field_code, crop_name, batch_or_trace_no, harvest_weight, process_date, post_harvest_treatment, post_treatment_weight, verification_status, verification_organization, notes)
@@ -600,18 +603,19 @@ CREATE TABLE form22 (
     customer_phone VARCHAR(50),             -- 客戶電話
     complaint TEXT,                         -- 客訴內容
     resolution TEXT,                        -- 處理結果
-    processor VARCHAR(255) ,                 -- 處理人簽名/日期
+    processor_name VARCHAR(255) ,                 -- 處理人簽名
+    processor_date DATE,                    -- 處理日期
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
 );
 
 -- 插入資料範例
-INSERT INTO form22 (id, user_id, date, customer_name, customer_phone, complaint, resolution, processor)
-VALUES ('0000-0000', 1, '2025-02-05', '王小明', '0988-888-888', '我是客訴內容區', '我是處理結果區', '王小明/2025-02-05');
+INSERT INTO form22 (id, user_id, date, customer_name, customer_phone, complaint, resolution,  processor_name, processor_date)
+VALUES ('0000-0000', 1, '2025-02-05', '王小明', '0988-888-888', '我是客訴內容區', '我是處理結果區', '王小明 (處理人)', '2025-02-06');
 
 -- 查詢與 `users` 表關聯的客戶抱怨/回饋紀錄
-SELECT f.id, f.date, f.customer_name, f.complaint, f.resolution, u.username, u.farmer_name
+SELECT f.id, f.date, f.customer_name, f.complaint, f.resolution, u.username, u.farmer_name, f.processor_name, f.processor_date
 FROM form22 f
 JOIN users u ON f.user_id = u.id;
 
