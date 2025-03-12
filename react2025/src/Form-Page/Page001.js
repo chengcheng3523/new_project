@@ -39,19 +39,18 @@ const Page001 = () => {
       console.log('原始數據:', response.data); // 打印原始數據確認結構
       if (Array.isArray(response.data)) {
         const transformedData = response.data.map(item => ({
-          id: item[0],  
-          user_id: item[1], 
-          password: item[2], 
-          unit_name: item[4],  
-          farmer_name: item[5],
-          phone: item[6],
-          fax: item[7],
-          mobile: item[8],
-          address: item[9],
-          email: item[10],
-          total_area: item[11],
-          notes: item[12],
-          land_parcel_id: item[13],
+          id: item.id,  // 使用对象字段而非数组索引
+          user_id: item.username,  // 假设 'username' 对应于 user_id
+          unit_name: item.unit_name,
+          farmer_name: item.farmer_name,
+          phone: item.phone,
+          fax: item.fax,
+          mobile: item.mobile,
+          address: item.address,
+          email: item.email,
+          total_area: item.total_area,
+          notes: item.notes,
+          land_parcel_id: item.land_parcel_id,  // 需要确认该字段是否在数据中
         }));
  
         setData( transformedData ); // 設置數據狀態

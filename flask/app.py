@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from flask_mysqldb import MySQL
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
 from datetime import datetime
@@ -19,19 +18,14 @@ app.config['SECRET_KEY'] = 'your_secret_key'  # 設置 Flask 密鑰
 jwt = JWTManager(app)  # 初始化 JWTManager 並與 Flask 應用程式關聯
 CORS(app)
 
-#Database connection settings
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'       #MYSQL 使用者
-app.config['MYSQL_PASSWORD'] = 'root'   #MYSQL 密碼
-app.config['MYSQL_DB'] = 'new_database' #MYSQL 名稱
-mysql = MySQL(app)
+# 初始化 SQLAlchemy
+# db = SQLAlchemy(app)
 
 # 檢查 MySQL 資料庫連線是否正常。
 def test_db_connection():
     try:
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT 1")
-        cur.close()
+        with db.engine.connect() as connection:
+            connection.execute("SELECT 1")
         print("Database connection successful.")
     except Exception as e:
         print(f"Database connection failed: {str(e)}")
@@ -132,20 +126,33 @@ def create_user_profile():
         print(f"Error occurred while updating profile: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-# 查詢users-all
+# 查詢所有使用者
 @app.route('/api/users/get', methods=['GET'])
 def get_users():
     try:
-        cur = mysql.connection.cursor()
-        cur.execute("SHOW TABLES LIKE 'users'")  # 先检查表是否存在
-        if not cur.fetchone():
-            return jsonify({'error': '資料表 users 不存在'}), 500
-
-        cur.execute("SELECT * FROM users")
-        users = cur.fetchall()
-        cur.close()
-        return jsonify(users)
+        users_data = users.query.all()  # 使用 SQLAlchemy ORM 获取所有用户
+        print(f"Fetched users data: {users_data}")  # 调试输出
+        # 构造返回的用户列表
+        users_list = [
+            {
+                'id': user.id,
+                'username': user.username,
+                'unit_name': user.unit_name,
+                'farmer_name': user.farmer_name,
+                'phone': user.phone,
+                'fax': user.fax,
+                'mobile': user.mobile,
+                'address': user.address,
+                'email': user.email,
+                'total_area': str(user.total_area),
+                'notes': user.notes,
+                'land_parcel_id': user.land_parcel_id
+            }
+            for user in users_data
+        ]
+        return jsonify(users_list), 200
     except Exception as e:
+        print(f"Error occurred while fetching users: {str(e)}")
         return jsonify({'error': str(e)}), 500
     
 # 修改使用者資料
