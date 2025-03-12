@@ -319,8 +319,6 @@ def add_form002():
     crop_info = data.get('crop_info')
     notes = data.get('notes')
 
-
-
     try:
         new_form = Form002(
             user_id=user_id,
@@ -515,8 +513,6 @@ def add_form03():
     crop = data.get('crop')
     crop_content = data.get('crop_content')
     notes = data.get('notes')
-
-
     
     try:
         new_form = Form03(
@@ -603,7 +599,6 @@ def add_form04():
     preparer_name = data.get('preparer_name')
     notes = data.get('notes')
 
-    
     try:
         new_form = Form04(
             user_id=user_id,
@@ -694,8 +689,6 @@ def add_form05():
     nutrient_material_name = data.get('nutrient_material_name')
     notes = data.get('notes')
 
-
-    
     try:
         new_form = Form05(
             user_id=user_id,
@@ -776,8 +769,6 @@ def add_form06():
     operator = data.get('operator')
     process = data.get('process')
     notes = data.get('notes')
-
-
 
     try:
         new_form = Form06(
@@ -874,8 +865,6 @@ def add_form07():
     fertilizer_material_code = data.get('fertilizer_material_code')
     fertilizer_material_name = data.get('fertilizer_material_name')
     notes = data.get('notes')
-
-
     
     try:
         new_form = Form07(
@@ -1061,8 +1050,6 @@ def add_form09():
     operator_method = data.get('operator_method')
     operator = data.get('operator')
     notes = data.get('notes')
-
-
     
     try:
         new_form = Form09(
@@ -1165,8 +1152,6 @@ def add_form10():
     pest_control_material_name = data.get('pest_control_material_name')
     notes = data.get('notes')
 
- 
-    
     try:
         new_form = Form10(
             user_id=user_id,
@@ -1248,8 +1233,6 @@ def add_form11():
     usage_quantity = data.get('usage_quantity') if data.get('usage_quantity') not in ['', 'None', None] else None
     remaining_quantity = data.get('remaining_quantity') if data.get('remaining_quantity') not in ['', 'None', None] else None
     notes = data.get('notes')
-
-
 
     try:
         new_form = Form11(
@@ -1353,8 +1336,6 @@ def add_form12():
     operator = data.get('operator')
     notes = data.get('notes')
 
-
-    
     try:
         new_form = Form12(
             user_id=user_id,
@@ -1441,7 +1422,6 @@ def add_form13():
     other_material_name = data.get('other_material_name')
     notes = data.get('notes')
 
-
     try:
         new_form = Form13(
             user_id=user_id,
@@ -1523,8 +1503,6 @@ def add_form14():
     remaining_quantity = data.get('remaining_quantity') if data.get('remaining_quantity') not in ['', 'None', None] else None
     notes = data.get('notes')
 
-
-    
     try:
         new_form = Form14(
             user_id=user_id,
@@ -1622,8 +1600,6 @@ def add_form15():
     recorder = data.get('recorder')
     notes = data.get('notes')
 
-
-    
     try:
         new_form = Form15(
             user_id=user_id,
@@ -2084,11 +2060,6 @@ def add_form20():
     jobdate = datetime.strptime(data.get('jobdate'), '%Y-%m-%d') if data.get('jobdate') not in ['', 'None', None] else None
     operator_name = data.get('temperature')  
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-
-
     try:
         new_form = Form20(
             user_id=user_id,
@@ -2167,8 +2138,6 @@ def add_form22():
     processor_name = data.get('processor_name')
     processor_date = datetime.strptime(data.get('processor_date'), '%Y-%m-%d') if data.get('processor_date') not in ['', 'None', None] else None
 
-
-
     try:
         new_form = Form22(
             user_id=user_id,
@@ -2241,15 +2210,8 @@ def get_all_form22():
 
 # ----------------------------------------------------------------------------------------------
 
-
-
-
-
-# ----------------------------------------------------------------------------------------------
-
 # 在應用程式啟動時測試資料庫連線
 if __name__ == '__main__':
     test_db_connection()
     app.run(debug=True)
 
-# users
