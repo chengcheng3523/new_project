@@ -116,7 +116,7 @@ def create_user_profile():
         existing_user.mobile = data.get('mobile')
         existing_user.address = data.get('address')
         existing_user.email = data.get('email')
-        existing_user.total_area = data.get('total_area') if data.get('total_area') != '' else existing_user.total_area
+        existing_user.total_area = None if data.get('total_area') in ['', 'None', None] else data.get('total_area')
         existing_user.notes = data.get('notes')
 
         db.session.commit()
@@ -172,7 +172,10 @@ def update_users(id):
         for field in ['unit_name', 'farmer_name', 'phone', 'fax', 'mobile', 
                       'address', 'email', 'total_area', 'notes', 'land_parcel_id']:
             if field in data:
-                setattr(user, field, data[field])
+                if field == 'total_area' and (data[field] == '' or data[field] == 'None'):
+                    setattr(user, field, None)  # 如果是空字符串或字符串 'None'，將total_area設為None
+                else:
+                    setattr(user, field, data[field])
 
         db.session.commit()
         return jsonify({'status': '使用者資料更新成功'}), 200
@@ -227,7 +230,7 @@ def add_land_parcel():
     user_id = data.get('user_id')
     number = data.get('number')
     land_parcel_number = data.get('land_parcel_number')
-    area = data.get('area') if data.get('area') != '' else None
+    area = data.get('area') if data.get('area') not in ['', 'None', None] else None
     crop = data.get('crop')
     notes = data.get('notes')
 
@@ -256,7 +259,7 @@ def update_land_parcel(id):
 
     land_parcel.number = data.get('number', land_parcel.number)
     land_parcel.land_parcel_number = data.get('land_parcel_number', land_parcel.land_parcel_number)
-    land_parcel.area = data.get('area') if data.get('area') != '' else land_parcel.area
+    land_parcel.area = data.get('area') if data.get('area') not in ['', 'None', None] else None
     land_parcel.crop = data.get('crop', land_parcel.crop)
     land_parcel.notes = data.get('notes', land_parcel.notes)
 
@@ -311,7 +314,7 @@ def add_form002():
 
     user_id = data.get('user_id')
     area_code = data.get('area_code') 
-    area_size = data.get('area_size') if data.get('area_size') not in [None, ''] else None
+    area_size = data.get('area_size') if data.get('area_size') not in ['', 'None', None] else None
     month = data.get('month')
     crop_info = data.get('crop_info')
     notes = data.get('notes')
@@ -344,7 +347,7 @@ def update_form002(id):
         return jsonify({'error': '生產計畫未找到'}), 404
     
     form.area_code = data.get('area_code', form.area_code)
-    form.area_size = data.get('area_size', form.area_size) if data.get('area_size') != '' else None
+    form.area_size = data.get('area_size', form.area_size) if data.get('area_size') not in ['', 'None', None] else None
     form.month = data.get('month', form.month)
     form.crop_info = data.get('crop_info', form.crop_info)
     form.notes = data.get('notes', form.notes)
@@ -379,7 +382,7 @@ def get_user_form002(user_id):
             'id': result.Form002.id,
             'user_id': result.Form002.user_id,
             'area_code': result.Form002.area_code,
-            'area_size': str(result.Form002.area_size) if result.Form002.area_size is not None else None,
+            'area_size': str(result.Form002.area_size),
             'month': result.Form002.month,
             'crop_info': result.Form002.crop_info,
             'notes': result.Form002.notes
@@ -456,7 +459,7 @@ def update_form02(id):
     form.cultivated_crop = data['cultivated_crop']
     form.crop_variety = data['crop_variety']
     form.seed_source = data['seed_source']
-    form.seedling_purchase_date = datetime.strptime(data['seedling_purchase_date'], '%Y-%m-%d')
+    form.seedling_purchase_date = datetime.strptime(data['seedling_purchase_date'], '%Y-%m-%d') if data.get('seedling_purchase_date') not in ['', 'None', None] else None
     form.seedling_purchase_type = data['seedling_purchase_type']
     form.notes = data.get('notes') 
     db.session.commit()
@@ -507,23 +510,13 @@ def add_form03():
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
     user_id = data.get('user_id')
-    operation_date =  datetime.strptime(data.get('operation_date'), '%Y-%m-%d')
+    operation_date =  datetime.strptime(data.get('operation_date'), '%Y-%m-%d') if data.get('operation_date') not in ['', 'None', None] else None
     field_code = data.get('field_code')
     crop = data.get('crop')
     crop_content = data.get('crop_content')
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not operation_date:
-    #     return jsonify({'error': '缺少 作業日期'}), 400
-    # if not field_code:
-    #     return jsonify({'error': '缺少 田區代號'}), 400
-    # if not crop:
-    #     return jsonify({'error': '缺少 crop'}), 400
-    # if not crop_content:
-    #     return jsonify({'error': '缺少 crop_content'}), 400
+
     
     try:
         new_form = Form03(
@@ -550,7 +543,7 @@ def update_form03(id):
     if not form:
         return jsonify({'error': '栽培工作 not found未找到'}), 404
     
-    form.operation_date = datetime.strptime(data['operation_date'], '%Y-%m-%d')
+    form.operation_date = datetime.strptime(data['operation_date'], '%Y-%m-%d') if data.get('operation_date') not in ['', 'None', None] else None
     form.field_code = data['field_code']
     form.crop = data['crop']
     form.crop_content = data['crop_content']
@@ -580,7 +573,7 @@ def get_all_form03():
             "id": result.Form03.id,
             "user_id": result.Form03.user_id,
             "farmer_name": result.farmer_name,
-            "operation_date": result.Form03.operation_date.strftime('%Y-%m-%d') if result.Form03.operation_date else None,
+            "operation_date": result.Form03.operation_date.strftime('%Y-%m-%d') ,
             "field_code": result.Form03.field_code,
             "crop": result.Form03.crop,
             "crop_content": result.Form03.crop_content,
@@ -601,30 +594,15 @@ def add_form04():
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
     user_id = data.get('user_id')
-    preparation_date =  datetime.strptime(data.get('preparation_date'), '%Y-%m-%d')
+    preparation_date =  datetime.strptime(data.get('preparation_date'), '%Y-%m-%d') if data.get('preparation_date') not in ['', 'None', None] else None
     material_code_or_name = data.get('material_code_or_name')
-    usage_amount = data.get('usage_amount')
+    usage_amount = data.get('usage_amount') if data.get('usage_amount') not in ['', 'None', None] else None
     preparation_process = data.get('preparation_process')
-    final_ph_value = data.get('final_ph_value')
-    final_ec_value = data.get('final_ec_value')
+    final_ph_value = data.get('final_ph_value') if data.get('final_ph_value') not in ['', 'None', None] else None
+    final_ec_value = data.get('final_ec_value') if data.get('final_ec_value') not in ['', 'None', None] else None
     preparer_name = data.get('preparer_name')
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not preparation_date:
-    #     return jsonify({'error': '缺少 preparation_date'}), 400
-    # if not usage_amount:
-    #     return jsonify({'error': '缺少 usage_amount'}), 400
-    # if not preparation_process:
-    #     return jsonify({'error': '缺少 preparation_process'}), 400
-    # if not final_ph_value:
-    #     return jsonify({'error': '缺少 final_ph_value'}), 400
-    # if not final_ec_value:
-    #     return jsonify({'error': '缺少 final_ec_value'}), 400
-    # if not preparer_name:
-    #     return jsonify({'error': '缺少 preparer_name'}), 400
     
     try:
         new_form = Form04(
@@ -654,12 +632,12 @@ def update_form04(id):
     if not form:
         return jsonify({'error': '養液配製 未找到'}), 404
     
-    form.preparation_date = datetime.strptime(data['preparation_date'], '%Y-%m-%d')
+    form.preparation_date = datetime.strptime(data['preparation_date'], '%Y-%m-%d') if data.get('preparation_date') not in ['', 'None', None] else None
     form.material_code_or_name = data['material_code_or_name']
-    form.usage_amount = data['usage_amount']
+    form.usage_amount = data['usage_amount'] if data['usage_amount'] not in ['', 'None', None] else None
     form.preparation_process = data['preparation_process']
-    form.final_ph_value = data['final_ph_value']
-    form.final_ec_value = data['final_ec_value']
+    form.final_ph_value = data['final_ph_value'] if data['final_ec_value'] not in ['', 'None', None] else None
+    form.final_ec_value = data['final_ec_value'] if data['final_ec_value'] not in ['', 'None', None] else None
     form.preparer_name = data['preparer_name']
     form.notes = data.get('notes')
     db.session.commit()
@@ -716,13 +694,7 @@ def add_form05():
     nutrient_material_name = data.get('nutrient_material_name')
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not nutrient_material_code:
-    #     return jsonify({'error': '缺少 nutrient_material_code'}), 400
-    # if not nutrient_material_name:
-    #     return jsonify({'error': '缺少 nutrient_material_name'}), 400
+
     
     try:
         new_form = Form05(
@@ -794,38 +766,18 @@ def add_form06():
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
     user_id = data.get('user_id')
-    date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d')
+    date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
     field_code = data.get('field_code')
     crop = data.get('crop')
     fertilizer_type = data.get('fertilizer_type')
     material_code_or_name = data.get('material_code_or_name')
-    fertilizer_amount = data.get('fertilizer_amount')
-    dilution_factor = data.get('dilution_factor')
+    fertilizer_amount = data.get('fertilizer_amount') if data.get('fertilizer_amount') not in ['', 'None', None] else None
+    dilution_factor = data.get('dilution_factor') if data.get('dilution_factor') not in ['', 'None', None] else None
     operator = data.get('operator')
     process = data.get('process')
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not date_used:
-    #     return jsonify({'error': '缺少 date_used'}), 400
-    # if not field_code:
-    #     return jsonify({'error': '缺少 field_code'}), 400
-    # if not crop:
-    #     return jsonify({'error': '缺少 crop'}), 400
-    # if not fertilizer_type:
-    #     return jsonify({'error': '缺少 fertilizer_type'}), 400
-    # if not material_code_or_name:
-    #     return jsonify({'error': '缺少 material_code_or_name'}), 400
-    # if not fertilizer_amount:
-    #     return jsonify({'error': '缺少 fertilizer_amount'}), 400
-    # if not dilution_factor:
-    #     return jsonify({'error': '缺少 dilution_factor'}), 400
-    # if not operator:
-    #     return jsonify({'error': '缺少 operator'}), 400
-    # if not process:
-    #     return jsonify({'error': '缺少 process'}), 400
+
 
     try:
         new_form = Form06(
@@ -857,13 +809,13 @@ def update_form06(id):
     if not form:
         return jsonify({'error': '肥料施用未找到'}), 404
     
-    form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d')
+    form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
     form.field_code = data['field_code']
     form.crop = data['crop']
     form.fertilizer_type = data['fertilizer_type']
     form.material_code_or_name = data['material_code_or_name']
-    form.fertilizer_amount = data['fertilizer_amount']
-    form.dilution_factor = data['dilution_factor']
+    form.fertilizer_amount = data['fertilizer_amount'] if data.get('fertilizer_amount') not in ['', 'None', None] else None
+    form.dilution_factor = data['dilution_factor'] if data.get('dilution_factor') not in ['', 'None', None] else None
     form.operator = data['operator']
     form.process = data['process']
     form.notes = data.get('notes')
@@ -923,13 +875,7 @@ def add_form07():
     fertilizer_material_name = data.get('fertilizer_material_name')
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not fertilizer_material_code:
-    #     return jsonify({'error': '缺少 fertilizer_material_code'}), 400
-    # if not fertilizer_material_name:
-    #     return jsonify({'error': '缺少 fertilizer_material_name'}), 400
+
     
     try:
         new_form = Form07(
@@ -1006,34 +952,12 @@ def add_form08():
     supplier = data.get('supplier')
     packaging_unit = data.get('packaging_unit')
     packaging_volume = data.get('packaging_volume')
-    date = datetime.strptime(data.get('date'), '%Y-%m-%d')
-    purchase_quantity = data.get('purchase_quantity')
-    usage_quantity = data.get('usage_quantity')
-    remaining_quantity = data.get('remaining_quantity')
+    date = datetime.strptime(data.get('date'), '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
+    purchase_quantity = data.get('purchase_quantity') if data.get('purchase_quantity') not in ['', 'None', None] else None
+    usage_quantity = data.get('usage_quantity') if data.get('usage_quantity') not in ['', 'None', None] else None
+    remaining_quantity = data.get('remaining_quantity') if data.get('remaining_quantity') not in ['', 'None', None] else None
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not material_name:
-    #     return jsonify({'error': '缺少 material_name'}), 400
-    # if not manufacturer:
-    #     return jsonify({'error': '缺少 manufacturer'}), 400
-    # if not supplier:
-    #     return jsonify({'error': '缺少 supplier'}), 400
-    # if not packaging_unit:
-    #     return jsonify({'error': '缺少 packaging_unit'}), 400
-    # if not packaging_volume:
-    #     return jsonify({'error': '缺少 packaging_volume'}), 400
-    # if not date:
-    #     return jsonify({'error': '缺少 date'}), 400
-    # if not purchase_quantity:
-    #     return jsonify({'error': '缺少 purchase_quantity'}), 400
-    # if not usage_quantity:
-    #     return jsonify({'error': '缺少 usage_quantity'}), 400
-    # if not remaining_quantity:
-    #     return jsonify({'error': '缺少 remaining_quantity'}), 400
-    
     try:
         new_form = Form08(
             user_id=user_id,
@@ -1069,10 +993,10 @@ def update_form08(id):
     form.supplier = data['supplier']
     form.packaging_unit = data['packaging_unit']
     form.packaging_volume = data['packaging_volume']
-    form.date = datetime.strptime(data['date'], '%Y-%m-%d')
-    form.purchase_quantity = data['purchase_quantity']
-    form.usage_quantity = data['usage_quantity']
-    form.remaining_quantity = data['remaining_quantity']
+    form.date = datetime.strptime(data['date'], '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None 
+    form.purchase_quantity = data['purchase_quantity'] if data.get('purchase_quantity') not in ['', 'None', None] else None
+    form.usage_quantity = data['usage_quantity'] if data.get('usage_quantity') not in ['', 'None', None] else None
+    form.remaining_quantity = data['remaining_quantity'] if data.get('remaining_quantity') not in ['', 'None', None] else None
     form.notes = data.get('notes')
     db.session.commit()
     return jsonify({'message': '肥料入出庫更新成功'})
@@ -1104,7 +1028,7 @@ def get_all_form08():
             "supplier": result.Form08.supplier,
             "packaging_unit": result.Form08.packaging_unit,
             "packaging_volume": result.Form08.packaging_volume,
-            "date": result.Form08.date.strftime('%Y-%m-%d') if result.Form08.date else None,
+            "date": result.Form08.date.strftime('%Y-%m-%d'),
             "purchase_quantity": str(result.Form08.purchase_quantity),
             "usage_quantity": str(result.Form08.usage_quantity),
             "remaining_quantity": str(result.Form08.remaining_quantity),
@@ -1125,44 +1049,20 @@ def add_form09():
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
     user_id = data.get('user_id')
-    date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d')
+    date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
     field_code = data.get('field_code')
     crop = data.get('crop')
     pest_target = data.get('pest_target')
     material_code_or_name = data.get('material_code_or_name')
-    water_volume = data.get('water_volume')
-    chemical_usage = data.get('chemical_usage')
-    dilution_factor = data.get('dilution_factor')
+    water_volume = data.get('water_volume') if data.get('water_volume') not in ['', 'None', None] else None
+    chemical_usage = data.get('chemical_usage') if data.get('chemical_usage') not in ['', 'None', None] else None
+    dilution_factor = data.get('dilution_factor') if data.get('dilution_factor') not in ['', 'None', None] else None
     safety_harvest_period = data.get('safety_harvest_period')
     operator_method = data.get('operator_method')
     operator = data.get('operator')
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not date_used:
-    #     return jsonify({'error': '缺少 date_used'}), 400
-    # if not field_code:  
-    #     return jsonify({'error': '缺少 field_code'}), 400
-    # if not crop:
-    #     return jsonify({'error': '缺少 crop'}), 400
-    # if not pest_target:
-    #     return jsonify({'error': '缺少 pest_target'}), 400
-    # if not material_code_or_name:
-    #     return jsonify({'error': '缺少 material_code_or_name'}), 400
-    # if not water_volume:
-    #     return jsonify({'error': '缺少 water_volume'}), 400
-    # if not chemical_usage:
-    #     return jsonify({'error': '缺少 chemical_usage'}), 400
-    # if not dilution_factor:
-    #     return jsonify({'error': '缺少 dilution_factor'}), 400
-    # if not safety_harvest_period:
-    #     return jsonify({'error': '缺少 safety_harvest_period'}), 400
-    # if not operator_method:
-    #     return jsonify({'error': '缺少 operator_method'}), 400
-    # if not operator:
-    #     return jsonify({'error': '缺少 operator'}), 400
+
     
     try:
         new_form = Form09(
@@ -1196,14 +1096,14 @@ def update_form09(id):
     if not form:
         return jsonify({'error': '有害生物防治或環境消毒資材施用未找到'}), 404
     
-    form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d')
+    form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
     form.field_code = data['field_code']
     form.crop = data['crop']
     form.pest_target = data['pest_target']
     form.material_code_or_name = data['material_code_or_name']
-    form.water_volume = data['water_volume']
-    form.chemical_usage = data['chemical_usage']
-    form.dilution_factor = data['dilution_factor']
+    form.water_volume = data['water_volume'] if data.get('water_volume') not in ['', 'None', None] else None
+    form.chemical_usage = data['chemical_usage'] if data.get('chemical_usage') not in ['', 'None', None] else None
+    form.dilution_factor = data['dilution_factor'] if data.get('dilution_factor') not in ['', 'None', None] else None
     form.safety_harvest_period = data['safety_harvest_period']
     form.operator_method = data['operator_method']
     form.operator = data['operator']
@@ -1265,13 +1165,7 @@ def add_form10():
     pest_control_material_name = data.get('pest_control_material_name')
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not pest_control_material_code:
-    #     return jsonify({'error': '缺少 pest_control_material_code'}), 400
-    # if not pest_control_material_name:
-    #     return jsonify({'error': '缺少 pest_control_material_name'}), 400  
+ 
     
     try:
         new_form = Form10(
@@ -1349,35 +1243,13 @@ def add_form11():
     supplier = data.get('supplier')
     packaging_unit = data.get('packaging_unit')
     packaging_volume = data.get('packaging_volume')
-    date = datetime.strptime(data.get('date'), '%Y-%m-%d')
-    purchase_quantity = data.get('purchase_quantity')
-    usage_quantity = data.get('usage_quantity')
-    remaining_quantity = data.get('remaining_quantity')
+    date = datetime.strptime(data.get('date'), '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
+    purchase_quantity = data.get('purchase_quantity') if data.get('purchase_quantity') not in ['', 'None', None] else None
+    usage_quantity = data.get('usage_quantity') if data.get('usage_quantity') not in ['', 'None', None] else None
+    remaining_quantity = data.get('remaining_quantity') if data.get('remaining_quantity') not in ['', 'None', None] else None
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not material_name:
-    #     return jsonify({'error': '缺少 material_name'}), 400
-    # if not dosage_form:
-    #     return jsonify({'error': '缺少 dosage_form'}), 400
-    # if not brand_name:
-    #     return jsonify({'error': '缺少 brand_name'}), 400
-    # if not supplier:
-    #     return jsonify({'error': '缺少 supplier'}), 400
-    # if not packaging_unit:
-    #     return jsonify({'error': '缺少 packaging_unit'}), 400
-    # if not packaging_volume:
-    #     return jsonify({'error': '缺少 packaging_volume'}), 400
-    # if not date:
-    #     return jsonify({'error': '缺少 date'}), 400
-    # if not purchase_quantity:
-    #     return jsonify({'error': '缺少 purchase_quantity'}), 400
-    # if not usage_quantity:
-    #     return jsonify({'error': '缺少 usage_quantity'}), 400
-    # if not remaining_quantity:
-    #     return jsonify({'error': '缺少 remaining_quantity'}), 400
+
 
     try:
         new_form = Form11(
@@ -1416,10 +1288,10 @@ def update_form11(id):
     form.supplier = data['supplier']
     form.packaging_unit = data['packaging_unit']
     form.packaging_volume = data['packaging_volume']
-    form.date = datetime.strptime(data['date'], '%Y-%m-%d')
-    form.purchase_quantity = data['purchase_quantity']
-    form.usage_quantity = data['usage_quantity']
-    form.remaining_quantity = data['remaining_quantity']
+    form.date = datetime.strptime(data['date'], '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
+    form.purchase_quantity = data['purchase_quantity'] if data.get('purchase_quantity') not in ['', 'None', None] else None
+    form.usage_quantity = data['usage_quantity'] if data.get('usage_quantity') not in ['', 'None', None] else None
+    form.remaining_quantity = data['remaining_quantity'] if data.get('remaining_quantity') not in ['', 'None', None] else None
     form.notes = data.get('notes')
     db.session.commit()
     return jsonify({'message': '有害生物防治或環境消毒資材入出庫更新成功'})
@@ -1473,29 +1345,15 @@ def add_form12():
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
     user_id = data.get('user_id')
-    date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d')
+    date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
     field_code = data.get('field_code')
     crop = data.get('crop')
     material_code_or_name = data.get('material_code_or_name')
-    usage_amount = data.get('usage_amount')
+    usage_amount = data.get('usage_amount') if data.get('usage_amount') not in ['', 'None', None] else None
     operator = data.get('operator')
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not date_used:
-    #     return jsonify({'error': '缺少 date_used'}), 400
-    # if not field_code:
-    #     return jsonify({'error': '缺少 field_code'}), 400
-    # if not crop:
-    #     return jsonify({'error': '缺少 crop'}), 400
-    # if not material_code_or_name:
-    #     return jsonify({'error': '缺少 material_code_or_name'}), 400
-    # if not usage_amount:
-    #     return jsonify({'error': '缺少 usage_amount'}), 400
-    # if not operator:
-    #     return jsonify({'error': '缺少 operator'}), 400
+
     
     try:
         new_form = Form12(
@@ -1524,11 +1382,11 @@ def update_form12(id):
     if not form:
         return jsonify({'error': '其他資材使用紀錄未找到'}), 404
     
-    form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d')
+    form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
     form.field_code = data['field_code']
     form.crop = data['crop']
     form.material_code_or_name = data['material_code_or_name']
-    form.usage_amount = data['usage_amount']
+    form.usage_amount = data['usage_amount'] if data.get('usage_amount') not in ['', 'None', None] else None
     form.operator = data['operator']
     form.notes = data.get('notes')
     db.session.commit()
@@ -1583,14 +1441,7 @@ def add_form13():
     other_material_name = data.get('other_material_name')
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not other_material_code:
-    #     return jsonify({'error': '缺少 other_material_code'}), 400
-    # if not other_material_name:
-    #     return jsonify({'error': '缺少 other_material_name'}), 400
-    
+
     try:
         new_form = Form13(
             user_id=user_id,
@@ -1666,33 +1517,13 @@ def add_form14():
     supplier = data.get('supplier')
     packaging_unit = data.get('packaging_unit')
     packaging_volume = data.get('packaging_volume')
-    date = datetime.strptime(data.get('date'), '%Y-%m-%d')
-    purchase_quantity = data.get('purchase_quantity')
-    usage_quantity = data.get('usage_quantity')
-    remaining_quantity = data.get('remaining_quantity')
+    date = datetime.strptime(data.get('date'), '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
+    purchase_quantity = data.get('purchase_quantity') if data.get('purchase_quantity') not in ['', 'None', None] else None
+    usage_quantity = data.get('usage_quantity') if data.get('usage_quantity') not in ['', 'None', None] else None
+    remaining_quantity = data.get('remaining_quantity') if data.get('remaining_quantity') not in ['', 'None', None] else None
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not material_name:
-    #     return jsonify({'error': '缺少 material_name'}), 400
-    # if not manufacturer:
-    #     return jsonify({'error': '缺少 manufacturer'}), 400
-    # if not supplier:
-    #     return jsonify({'error': '缺少 supplier'}), 400
-    # if not packaging_unit:
-    #     return jsonify({'error': '缺少 packaging_unit'}), 400
-    # if not packaging_volume:
-    #     return jsonify({'error': '缺少 packaging_volume'}), 400
-    # if not date:
-    #     return jsonify({'error': '缺少 date'}), 400
-    # if not purchase_quantity:
-    #     return jsonify({'error': '缺少 purchase_quantity'}), 400
-    # if not usage_quantity:
-    #     return jsonify({'error': '缺少 usage_quantity'}), 400
-    # if not remaining_quantity:
-    #     return jsonify({'error': '缺少 remaining_quantity'}), 400
+
     
     try:
         new_form = Form14(
@@ -1729,10 +1560,10 @@ def update_form14(id):
     form.supplier = data['supplier']
     form.packaging_unit = data['packaging_unit']
     form.packaging_volume = data['packaging_volume']
-    form.date = datetime.strptime(data['date'], '%Y-%m-%d')
-    form.purchase_quantity = data['purchase_quantity']
-    form.usage_quantity = data['usage_quantity']
-    form.remaining_quantity = data['remaining_quantity']
+    form.date = datetime.strptime(data['date'], '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
+    form.purchase_quantity = data['purchase_quantity'] if data.get('purchase_quantity') not in ['', 'None', None] else None
+    form.usage_quantity = data['usage_quantity'] if data.get('usage_quantity') not in ['', 'None', None] else None
+    form.remaining_quantity = data['remaining_quantity'] if data.get('remaining_quantity') not in ['', 'None', None] else None
     form.notes = data.get('notes')
     db.session.commit()
     return jsonify({'message': '其他資材入出庫紀錄更新成功'})
@@ -1785,23 +1616,13 @@ def add_form15():
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
     user_id = data.get('user_id')
-    date = datetime.strptime(data.get('date'), '%Y-%m-%d')
+    date = datetime.strptime(data.get('date'), '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
     item = data.get('item')
     operation = data.get('operation')
     recorder = data.get('recorder')
     notes = data.get('notes')
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not date:
-    #     return jsonify({'error': '缺少 date'}), 400
-    # if not item:
-    #     return jsonify({'error': '缺少 item'}), 400
-    # if not operation:
-    #     return jsonify({'error': '缺少 operation'}), 400
-    # if not recorder:
-    #     return jsonify({'error': '缺少 recorder'}), 400
+
     
     try:
         new_form = Form15(
@@ -1828,7 +1649,7 @@ def update_form15(id):
     if not form:
         return jsonify({'error': '場地設施之保養、維修及清潔管理紀錄未找到'}), 404
     
-    form.date = datetime.strptime(data['date'], '%Y-%m-%d')
+    form.date = datetime.strptime(data['date'], '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
     form.item = data['item']
     form.operation = data['operation']
     form.recorder = data['recorder']
@@ -1879,23 +1700,11 @@ def add_form16():
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
     user_id = data.get('user_id')
-    date = datetime.strptime(data.get('date'), '%Y-%m-%d')
+    date = datetime.strptime(data.get('date'), '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
     item = data.get('item')
     operation = data.get('operation')
     recorder = data.get('recorder')
     notes = data.get('notes')
-
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not date:
-    #     return jsonify({'error': '缺少 date'}), 400
-    # if not item:
-    #     return jsonify({'error': '缺少 item'}), 400
-    # if not operation:
-    #     return jsonify({'error': '缺少 operation'}), 400
-    # if not recorder:
-    #     return jsonify({'error': '缺少 recorder'}), 400
 
     try:
         new_form = Form16(
@@ -1922,7 +1731,7 @@ def update_form16(id):
     if not form:
         return jsonify({'error': '器具/機械/設備之保養、維修、校正及清潔管理紀錄未找到'}), 404
     
-    form.date = datetime.strptime(data['date'], '%Y-%m-%d')
+    form.date = datetime.strptime(data['date'], '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
     form.item = data['item']
     form.operation = data['operation']
     form.recorder = data['recorder']
@@ -1973,38 +1782,16 @@ def add_form17():
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
     user_id = data.get('user_id')
-    harvest_date = datetime.strptime(data.get('harvest_date'), '%Y-%m-%d')
+    harvest_date = datetime.strptime(data.get('harvest_date'), '%Y-%m-%d') if data.get('harvest_date') not in ['', 'None', None] else None
     field_code = data.get('field_code')
     crop_name = data.get('crop_name')
     batch_or_trace_no = data.get('batch_or_trace_no')
-    harvest_weight = data.get('harvest_weight')
-    process_date = datetime.strptime(data.get('process_date'), '%Y-%m-%d')
+    harvest_weight = data.get('harvest_weight') if data.get('harvest_weight') not in ['', 'None', None] else None
+    process_date = datetime.strptime(data.get('process_date'), '%Y-%m-%d') if data.get('process_date') not in ['', 'None', None] else None
     post_harvest_treatment = data.get('post_harvest_treatment')
-    post_treatment_weight = data.get('post_treatment_weight')
+    post_treatment_weight = data.get('post_treatment_weight') if data.get('post_treatment_weight') not in ['', 'None', None] else None
     verification_status = data.get('verification_status') 
     notes = data.get('notes')
-
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not harvest_date:
-    #     return jsonify({'error': '缺少 harvest_date'}), 400
-    # if not field_code:
-    #     return jsonify({'error': '缺少 field_code'}), 400
-    # if not crop_name:
-    #     return jsonify({'error': '缺少 crop_name'}), 400
-    # if not batch_or_trace_no:
-    #     return jsonify({'error': '缺少 batch_or_trace_no'}), 400
-    # if not harvest_weight:
-    #     return jsonify({'error': '缺少 harvest_weight'}), 400
-    # if not process_date:
-    #     return jsonify({'error': '缺少 process_date'}), 400
-    # if not post_harvest_treatment:
-    #     return jsonify({'error': '缺少 post_harvest_treatment'}), 400
-    # if not post_treatment_weight:   
-    #     return jsonify({'error': '缺少 post_treatment_weight'}), 400
-    # if not verification_status:
-    #     return jsonify({'error': '缺少 verification_status'}), 400 
 
     try:
         new_form = Form17(
@@ -2036,14 +1823,14 @@ def update_form17(id):
     if not form:
         return jsonify({'error': '採收及採後處理紀錄未找到'}), 404
     
-    form.harvest_date = datetime.strptime(data['harvest_date'], '%Y-%m-%d')
+    form.harvest_date = datetime.strptime(data['harvest_date'], '%Y-%m-%d') if data.get('harvest_date') not in ['', 'None', None] else None
     form.field_code = data['field_code']
     form.crop_name = data['crop_name']
     form.batch_or_trace_no = data['batch_or_trace_no']
-    form.harvest_weight = data['harvest_weight']
-    form.process_date = datetime.strptime(data['process_date'], '%Y-%m-%d')
+    form.harvest_weight = data['harvest_weight'] if data.get('harvest_weight') not in ['', 'None', None] else None
+    form.process_date = datetime.strptime(data['process_date'], '%Y-%m-%d') if data.get('process_date') not in ['', 'None', None] else None
     form.post_harvest_treatment = data['post_harvest_treatment']
-    form.post_treatment_weight = data['post_treatment_weight']
+    form.post_treatment_weight = data['post_treatment_weight'] if data.get('post_treatment_weight') not in ['', 'None', None] else None
     form.verification_status = data['verification_status'] 
     form.notes = data.get('notes')
     db.session.commit()
@@ -2098,12 +1885,12 @@ def add_form18():
     
     user_id = data.get('user_id') 
     arena = data.get('arena')
-    process_date = datetime.strptime(data.get('process_date'), '%Y-%m-%d')
+    process_date = datetime.strptime(data.get('process_date'), '%Y-%m-%d') if data.get('process_date') not in ['', 'None', None] else None
     item = data.get('item')
     batch_number = data.get('batch_number')
-    fresh_weight = data.get('fresh_weight')
+    fresh_weight = data.get('fresh_weight') if data.get('fresh_weight') not in ['', 'None', None] else None
     operation = data.get('operation')
-    dry_weight = data.get('dry_weight')
+    dry_weight = data.get('dry_weight') if data.get('dry_weight') not in ['', 'None', None] else None
     remarks = data.get('remarks')
 
     try:
@@ -2135,12 +1922,12 @@ def update_form18(id):
         return jsonify({'error': '乾燥作業紀錄未找到'}), 404
     
     form.arena = data['arena']
-    form.process_date = datetime.strptime(data['process_date'], '%Y-%m-%d')
+    form.process_date = datetime.strptime(data['process_date'], '%Y-%m-%d') if data.get('process_date') not in ['', 'None', None] else None
     form.item = data['item']
     form.batch_number = data['batch_number']
-    form.fresh_weight = data['fresh_weight']
+    form.fresh_weight = data['fresh_weight'] if data.get('fresh_weight') not in ['', 'None', None] else None
     form.operation = data['operation']
-    form.dry_weight = data['dry_weight']
+    form.dry_weight = data['dry_weight'] if data.get('dry_weight') not in ['', 'None', None] else None
     form.remarks = data.get('remarks')
     db.session.commit()
     return jsonify({'message': '乾燥作業紀錄更新成功'})
@@ -2192,11 +1979,11 @@ def add_form19():
         
     user_id = data.get('user_id')
     package = data.get('package')
-    sale_date = datetime.strptime(data.get('sale_date'), '%Y-%m-%d')
+    sale_date = datetime.strptime(data.get('sale_date'), '%Y-%m-%d') if data.get('sale_date') not in ['', 'None', None] else None
     product_name = data.get('product_name')
     sales_target = data.get('sales_target')
     batch_number = data.get('batch_number')
-    shipment_quantity = data.get('shipment_quantity')
+    shipment_quantity = data.get('shipment_quantity') if data.get('shipment_quantity') not in ['', 'None', None] else None
     packaging_spec = data.get('packaging_spec')
     label_usage_quantity = data.get('label_usage_quantity')
     label_void_quantity = data.get('label_void_quantity')
@@ -2233,11 +2020,11 @@ def update_form19(id):
         return jsonify({'error': '包裝及出貨紀錄未找到'}), 404
     
     form.package = data['package']
-    form.sale_date = datetime.strptime(data['sale_date'], '%Y-%m-%d')
+    form.sale_date = datetime.strptime(data['sale_date'], '%Y-%m-%d') if data.get('sale_date') not in ['', 'None', None] else None
     form.product_name = data['product_name']
     form.sales_target = data['sales_target']
     form.batch_number = data['batch_number']
-    form.shipment_quantity = data['shipment_quantity']
+    form.shipment_quantity = data['shipment_quantity'] if data.get('shipment_quantity') not in ['', 'None', None] else None
     form.packaging_spec = data['packaging_spec']
     form.label_usage_quantity = data['label_usage_quantity']
     form.label_void_quantity = data['label_void_quantity']
@@ -2294,7 +2081,7 @@ def add_form20():
     
     user_id = data.get('user_id')
     checkitem = data.get('checkitem')
-    jobdate = datetime.strptime(data.get('jobdate'), '%Y-%m-%d')
+    jobdate = datetime.strptime(data.get('jobdate'), '%Y-%m-%d') if data.get('jobdate') not in ['', 'None', None] else None
     operator_name = data.get('temperature')  
 
     # # 檢查必要欄位是否存在
@@ -2326,7 +2113,7 @@ def update_form20(id):
         return jsonify({'error': '作業人員衛生及健康狀態檢查紀錄未找到'}), 404
     
     form.checkitem = data['checkitem']
-    form.jobdate = datetime.strptime(data['jobdate'], '%Y-%m-%d')
+    form.jobdate = datetime.strptime(data['jobdate'], '%Y-%m-%d') if data.get('jobdate') not in ['', 'None', None] else None
     form.operator_name = data['operator_name']
     db.session.commit()
     return jsonify({'message': '作業人員衛生及健康狀態檢查紀錄更新成功'})
@@ -2372,31 +2159,15 @@ def add_form22():
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
     user_id = data.get('user_id')
-    date = datetime.strptime(data.get('date'), '%Y-%m-%d')
+    date = datetime.strptime(data.get('date'), '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
     customer_name = data.get('customer_name')
     customer_phone = data.get('customer_phone')
     complaint = data.get('complaint')
     resolution = data.get('resolution')
     processor_name = data.get('processor_name')
-    processor_date = datetime.strptime(data.get('processor_date'), '%Y-%m-%d')
+    processor_date = datetime.strptime(data.get('processor_date'), '%Y-%m-%d') if data.get('processor_date') not in ['', 'None', None] else None
 
-    # # 檢查必要欄位是否存在
-    # if not user_id:
-    #     return jsonify({'error': '缺少 user_id'}), 400
-    # if not date:
-    #     return jsonify({'error': '缺少 date'}), 400
-    # if not customer_name:
-    #     return jsonify({'error': '缺少 customer_name'}), 400
-    # if not customer_phone:
-    #     return jsonify({'error': '缺少 customer_phone'}), 400
-    # if not complaint:
-    #     return jsonify({'error': '缺少 complaint'}), 400
-    # if not resolution:
-    #     return jsonify({'error': '缺少 resolution'}), 400
-    # if not processor_name:
-    #     return jsonify({'error': '缺少 processor_name'}), 400
-    # if not processor_date:
-    #     return jsonify({'error': '缺少 processor_date'}), 400
+
 
     try:
         new_form = Form22(
@@ -2424,13 +2195,13 @@ def update_form22(id):
     if not form:
         return jsonify({'error': '客戶抱怨/回饋紀錄未找到'}), 404
 
-    form.date = datetime.strptime(data['date'], '%Y-%m-%d')
+    form.date = datetime.strptime(data['date'], '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
     form.customer_name = data['customer_name']
     form.customer_phone = data['customer_phone']
     form.complaint = data['complaint']
     form.resolution = data['resolution']
     form.processor_name = data['processor_name']
-    form.processor_date = datetime.strptime(data['processor_date'], '%Y-%m-%d')
+    form.processor_date = datetime.strptime(data['processor_date'], '%Y-%m-%d') if data.get('processor_date') not in ['', 'None', None] else None
     db.session.commit()
     return jsonify({'message': '客戶抱怨/回饋紀錄更新成功'})
 

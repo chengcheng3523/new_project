@@ -94,7 +94,7 @@ CREATE TABLE form02 (
     cultivated_crop      VARCHAR(100),           -- 栽培作物
     crop_variety         VARCHAR(100),           -- 栽培品種
     seed_source          VARCHAR(255),           -- 種子(苗)來源
-    seedling_purchase_date DATE,                -- 育苗(購入)日期
+    seedling_purchase_date DATE NULL,                -- 育苗(購入)日期
     seedling_purchase_type VARCHAR(50),         -- 育苗(購入)種類
     notes                TEXT,                            -- 備註
     created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -119,7 +119,7 @@ CREATE TABLE form03 (
     id                   INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id              INT NOT NULL,                    -- 關聯 `users` 表
 
-    operation_date       DATE,                   -- 作業日期
+    operation_date       DATE NULL,                   -- 作業日期
     field_code           VARCHAR(50),            -- 田區代號
     crop                 VARCHAR(100),           -- 作物
     crop_content         TEXT,                   -- 作物內容（工作代碼及描述）
@@ -148,7 +148,7 @@ WHERE u.username = 'farmer1';
 CREATE TABLE form04 (
     id                   INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id              INT NOT NULL,                    -- 關聯 `users` 表
-    preparation_date     DATE,                   -- 配製日期
+    preparation_date     DATE NULL,                   -- 配製日期
     material_code_or_name VARCHAR(100),          -- 資材代碼或資材名稱
     usage_amount         VARCHAR(100),         -- 使用量(公斤/公升)
     preparation_process  TEXT,                            -- 配製流程簡述
@@ -200,7 +200,7 @@ WHERE nutrient_material_code = 'M000-0000';
 CREATE TABLE form06 (
     id                 INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id            INT NOT NULL,           -- 關聯 `users` 表
-    date_used          DATE,           -- 使用日期
+    date_used          DATE NULL,           -- 使用日期
     field_code         VARCHAR(20),           -- 田區代號
     crop               VARCHAR(50),           -- 作物
     fertilizer_type    VARCHAR(100),           -- 施肥別 (基肥, 追肥)
@@ -259,7 +259,7 @@ CREATE TABLE form08 (
     supplier VARCHAR(100),                                  -- 供應商
     packaging_unit VARCHAR(100), -- 包裝單位□包 □瓶 □罐 □其他_______
     packaging_volume VARCHAR(50),                  -- 包裝容量，前面是數字，後面試單位選項（如：公克、公斤、毫升、公升等）
-    date DATE,                                     -- 日期
+    DATE NULL DATE NULL,                                     -- 日期
     purchase_quantity DECIMAL(10, 2),              -- 購入量
     usage_quantity DECIMAL(10, 2),                 -- 使用量
     remaining_quantity DECIMAL(10, 2),            -- 剩餘量
@@ -269,12 +269,12 @@ CREATE TABLE form08 (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
 );
 --  資料示例form08（肥料入出庫紀錄）
-INSERT INTO form08 (user_id, material_name, manufacturer, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
+INSERT INTO form08 (user_id, material_name, manufacturer, supplier, packaging_unit, packaging_volume, DATE NULL, purchase_quantity, usage_quantity, remaining_quantity, notes)
 VALUES 
     (1, 'ooxx資材', '某某廠商', '某某供應商', '包', '10公斤', '2025-02-05', 100.00, 10.00, 90.00, '無');
 -- 查詢肥料入出庫紀錄
 SELECT f.id, f.material_name, f.manufacturer, f.supplier, f.packaging_unit, f.packaging_volume, 
-       f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, f.notes, 
+       f.DATE NULL, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, f.notes, 
        u.username, u.farmer_name
 FROM form08 f
 JOIN users u ON f.user_id = u.id
@@ -284,7 +284,7 @@ WHERE f.material_name = 'ooxx資材';
 CREATE TABLE form09 (
     id INT AUTO_INCREMENT PRIMARY KEY,                        -- 編號，自動遞增
     user_id INT NOT NULL,                    -- 關聯 `users` 表
-    date_used DATE,                                   -- 使用日期
+    date_used DATE NULL,                                   -- 使用日期
     field_code VARCHAR(50),                            -- 田區代號
     crop VARCHAR(100),                                -- 作物名稱
     pest_target VARCHAR(100),                         -- 防治對象（如：蟲）
@@ -342,7 +342,7 @@ CREATE TABLE form11 (
     supplier VARCHAR(100),                           -- 供應商
     packaging_unit VARCHAR(100),             -- 包裝單位
     packaging_volume VARCHAR(100),                  -- 包裝容量
-    date DATE,                              -- 日期
+    DATE NULL DATE NULL,                              -- 日期
     purchase_quantity DECIMAL(10, 2),                -- 購入量
     usage_quantity DECIMAL(10, 2),                   -- 使用量
     remaining_quantity DECIMAL(10, 2),               -- 剩餘量
@@ -353,12 +353,12 @@ CREATE TABLE form11 (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE  -- 外鍵，關聯 `users` 表
 );
 -- 資料示例form11（有害生物防治或環境消毒資材入出庫紀錄）
-INSERT INTO form11 (user_id, material_name, dosage_form, brand_name, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
+INSERT INTO form11 (user_id, material_name, dosage_form, brand_name, supplier, packaging_unit, packaging_volume, DATE NULL, purchase_quantity, usage_quantity, remaining_quantity, notes)
 VALUES 
     (1, 'ooxx資材', '顆粒型', '某某廠', '供應商A', '包', 10.0, '2025-02-05', 20.0, 10.0, 10.0, '無');
 -- 查詢有害生物防治或環境消毒資材入出庫紀錄
 SELECT f.id, f.material_name, f.dosage_form, f.brand_name, f.supplier, f.packaging_unit, 
-       f.packaging_volume, f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, 
+       f.packaging_volume, f.DATE NULL, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, 
        u.username, u.farmer_name, f.notes
 FROM form11 f
 JOIN users u ON f.user_id = u.id
@@ -368,7 +368,7 @@ WHERE f.material_name = 'ooxx資材';
 CREATE TABLE form12 (
     id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                             -- 關聯 `users` 表
-    date_used DATE,                          -- 使用日期
+    date_used DATE NULL,                          -- 使用日期
     field_code VARCHAR(100),                 -- 田區代號
     crop VARCHAR(100),                       -- 作物名稱
     material_code_or_name VARCHAR(255),      -- 資材代碼或資材名稱
@@ -421,7 +421,7 @@ CREATE TABLE form14 (
     supplier VARCHAR(255),                            -- 供應商
     packaging_unit VARCHAR(100),             -- 包裝單位
     packaging_volume VARCHAR(50),                     -- 包裝容量 (例如：公克、公斤、毫升、公升、其他)
-    date DATE,                               -- 日期
+    DATE NULL DATE NULL,                               -- 日期
     purchase_quantity DECIMAL(10, 2),        -- 購入量 (例如：10公升)
     usage_quantity DECIMAL(10, 2),           -- 使用量 (例如：10公升)
     remaining_quantity DECIMAL(10, 2),       -- 剩餘量 (例如：10公升)
@@ -432,12 +432,12 @@ CREATE TABLE form14 (
 );
 
 -- 資料示例
-INSERT INTO form14 (user_id, material_name, manufacturer, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
+INSERT INTO form14 (user_id, material_name, manufacturer, supplier, packaging_unit, packaging_volume, DATE NULL, purchase_quantity, usage_quantity, remaining_quantity, notes)
 VALUES 
     (1, 'ooxx資材', '廠商', '供應商', '包', '10公斤', '2025-02-05', 10.00, 5.00, 5.00, '無');
  
 -- 查詢與 `users` 表關聯的其他資材入出庫紀錄
-SELECT f.id, f.material_name, f.manufacturer, f.supplier, f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, u.username, u.farmer_name, f.notes
+SELECT f.id, f.material_name, f.manufacturer, f.supplier, f.DATE NULL, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, u.username, u.farmer_name, f.notes
 FROM form14 f
 JOIN users u ON f.user_id = u.id
 WHERE f.material_name = 'ooxx資材';
@@ -451,7 +451,7 @@ WHERE f.material_name = 'ooxx資材';
 CREATE TABLE form15 (
     id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                             -- 關聯 `users` 表
-    date DATE,                               -- 日期
+    DATE NULL DATE NULL,                               -- 日期
     item VARCHAR(100),                       -- 項目
     operation VARCHAR(100),                  -- 作業內容
     recorder VARCHAR(255),                   -- 記錄人
@@ -461,11 +461,11 @@ CREATE TABLE form15 (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
 );
 -- 資料示例
-INSERT INTO form15 (user_id, date, item, operation, recorder, notes)
+INSERT INTO form15 (user_id, DATE NULL, item, operation, recorder, notes)
 VALUES 
     (1,  '2025-02-05', '育苗場所', '清潔', '王小明', '清理育苗場所的灰塵及雜物');
 -- 查詢與 `users` 表關聯的作業記錄
-SELECT f.id, f.date, f.item, f.operation, f.recorder, f.notes, u.username, u.farmer_name
+SELECT f.id, f.DATE NULL, f.item, f.operation, f.recorder, f.notes, u.username, u.farmer_name
 FROM form15 f
 JOIN users u ON f.user_id = u.id
 WHERE f.item = '育苗場所';
@@ -474,7 +474,7 @@ WHERE f.item = '育苗場所';
 CREATE TABLE form16 (
     id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                             -- 關聯 `users` 表
-    date DATE,                               -- 日期
+    DATE NULL DATE NULL,                               -- 日期
     item VARCHAR(100),                       -- 項目
     operation VARCHAR(100),                  -- 作業內容
     recorder VARCHAR(255),                   -- 記錄人
@@ -484,12 +484,12 @@ CREATE TABLE form16 (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
 );
 -- 資料示例
-INSERT INTO form16 (user_id, date, item, operation, recorder, notes)
+INSERT INTO form16 (user_id, DATE NULL, item, operation, recorder, notes)
 VALUES 
     (1, '2025-02-05', '噴霧機', '保養', '王小明', '更換噴嘴，清洗濾網');
 
 -- 查詢與 `users` 表關聯的作業記錄
-SELECT f.id, f.date, f.item, f.operation, f.recorder, f.notes, u.username, u.farmer_name
+SELECT f.id, f.DATE NULL, f.item, f.operation, f.recorder, f.notes, u.username, u.farmer_name
 FROM form16 f
 JOIN users u ON f.user_id = u.id
 WHERE f.item = '噴霧機';
@@ -499,12 +499,12 @@ WHERE f.item = '噴霧機';
 CREATE TABLE form17 (
     id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                   -- 關聯 `users` 表
-    harvest_date DATE,                      -- 採收日期
+    harvest_date DATE NULL,                      -- 採收日期
     field_code VARCHAR(50),                 -- 田區代號
     crop_name VARCHAR(255),                 -- 作物名稱
     batch_or_trace_no VARCHAR(50),          -- 批次編號或履歷編號
     harvest_weight DECIMAL(10, 2),          -- 採收重量 (處理前)
-    process_date DATE,                      -- 處理日期
+    process_date DATE NULL,                      -- 處理日期
     post_harvest_treatment VARCHAR(100),    -- 採後處理內容
     post_treatment_weight DECIMAL(10, 2),   -- 處理後重量(公斤)
 
@@ -530,7 +530,7 @@ CREATE TABLE form18 (
     id INT AUTO_INCREMENT PRIMARY KEY,                     -- 編號
     user_id INT NOT NULL,                            -- 關聯 `users` 表
     arena VARCHAR(255),                    -- 處理場所
-    process_date DATE,                     -- 處理日期
+    process_date DATE NULL,                     -- 處理日期
     item VARCHAR(255),                     -- 品項
     batch_number VARCHAR(50),              -- 批次編號
     fresh_weight DECIMAL(10, 2),           -- 鮮重 (公斤)
@@ -556,7 +556,7 @@ CREATE TABLE form19 (
     id INT AUTO_INCREMENT PRIMARY KEY,                     -- 編號
     user_id INT NOT NULL,                            -- 關聯 `users` 表
     package VARCHAR(255),                   -- 包裝場所
-    sale_date DATE,                         -- 販售日期
+    sale_date DATE NULL,                         -- 販售日期
     product_name VARCHAR(255),              -- 產品名稱
     sales_target TEXT,                      -- 銷售對象
     batch_number VARCHAR(50),               -- 批次編號
@@ -584,7 +584,7 @@ CREATE TABLE form20 (
     id INT AUTO_INCREMENT PRIMARY KEY,                     -- 編號
     user_id INT NOT NULL,                            -- 關聯 `users` 表
     checkitem TEXT,                         -- 檢查項目
-    jobdate DATE,                           -- 作業日期
+    jobdate DATE NULL,                           -- 作業日期
     operator_name VARCHAR(255),             -- 作業人員姓名
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
@@ -603,24 +603,24 @@ JOIN users u ON f.user_id = u.id;
 CREATE TABLE form22 (
     id INT AUTO_INCREMENT PRIMARY KEY,                     -- 編號
     user_id INT NOT NULL,                            -- 關聯 `users` 表
-    date DATE,                              -- 日期
+    DATE NULL DATE NULL,                              -- 日期
     customer_name VARCHAR(255),             -- 客戶名稱
     customer_phone VARCHAR(50),             -- 客戶電話
     complaint TEXT,                         -- 客訴內容
     resolution TEXT,                        -- 處理結果
     processor_name VARCHAR(255) ,           -- 處理人簽名
-    processor_date DATE,                    -- 處理日期
+    processor_date DATE NULL,                    -- 處理日期
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
 );
 
 -- 插入資料範例
-INSERT INTO form22 (user_id, date, customer_name, customer_phone, complaint, resolution,  processor_name, processor_date)
+INSERT INTO form22 (user_id, DATE NULL, customer_name, customer_phone, complaint, resolution,  processor_name, processor_date)
 VALUES (1,  '2025-02-05', '王小明', '0988-888-888', '我是客訴內容區', '我是處理結果區', '王小明 (處理人)', '2025-02-06');
 
 -- 查詢與 `users` 表關聯的客戶抱怨/回饋紀錄
-SELECT f.id, f.date, f.customer_name, f.complaint, f.resolution, u.username, u.farmer_name, f.processor_name, f.processor_date
+SELECT f.id, f.DATE NULL, f.customer_name, f.complaint, f.resolution, u.username, u.farmer_name, f.processor_name, f.processor_date
 FROM form22 f
 JOIN users u ON f.user_id = u.id;
 
