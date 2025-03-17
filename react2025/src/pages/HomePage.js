@@ -11,8 +11,6 @@ import Page02 from '../Form-Page/Page02';
 import Page002 from '../Form-Page/Page002';
 import Page03 from '../Form-Page/Page03';
 
-import Page04 from '../Form-Page/Page04';
-import Page05 from '../Form-Page/Page05';
 import Page06 from '../Form-Page/Page06';
 import Page07 from '../Form-Page/Page07';
 import Page08 from '../Form-Page/Page08';
@@ -74,10 +72,6 @@ const HomePage =()=> {
       setSelectedForm(isAuthenticated ? <Page02 /> : <div>資料: Page02</div>);
     } else if (title === 'Page03') {
       setSelectedForm(isAuthenticated ? <Page03 /> : <div>資料: Page03</div>);
-    } else if (title === 'Page04') {
-      setSelectedForm(isAuthenticated ? <Page04 /> : <div>資料: Page04</div>);
-    } else if (title === 'Page05') {
-      setSelectedForm(isAuthenticated ? <Page05 /> : <div>資料: Page05</div>);
 
     } else if (title === 'Page06') {
       setSelectedForm(isAuthenticated ? <Page06 /> : <div>資料: Page06</div>);
@@ -104,12 +98,6 @@ const HomePage =()=> {
       setSelectedForm(isAuthenticated ? <Page16 /> : <div>資料: Page16</div>);
     } else if (title === 'Page17') {
       setSelectedForm(isAuthenticated ? <Page17 /> : <div>資料: Page17</div>);
-    // } else if (title === 'Page18') {
-    //   setSelectedForm(isAuthenticated ? <Page18 /> : <div>資料: Page18</div>);
-    // } else if (title === 'Page19') {
-    //   setSelectedForm(isAuthenticated ? <Page19 /> : <div>資料: Page19</div>);
-    // } else if (title === 'Page20') {
-    //   setSelectedForm(isAuthenticated ? <Page20 /> : <div>資料: Page20</div>);
 
     } else if (title === 'Page22') {
       setSelectedForm(isAuthenticated ? <Page22 /> : <div>資料: Page22</div>);
@@ -140,12 +128,6 @@ const HomePage =()=> {
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page03')}>
           <TitleCard title="栽培工作" />
-        </ProductContainer>
-        <ProductContainer onClick={() => handleCardClick('Page04')}>
-          <TitleCard title="養液配製" />
-        </ProductContainer>
-        <ProductContainer onClick={() => handleCardClick('Page05')}>
-          <TitleCard title="養液配製資材與代碼" />
         </ProductContainer>
 
         <ProductContainer onClick={() => handleCardClick('Page06')}>
@@ -186,15 +168,7 @@ const HomePage =()=> {
         <ProductContainer onClick={() => handleCardClick('Page17')}>
           <TitleCard title="採收及採後處理" />
         </ProductContainer>
-        {/* <ProductContainer onClick={() => handleCardClick('Page18')}>
-          <TitleCard title="暫時不可用" />
-        </ProductContainer>
-        <ProductContainer onClick={() => handleCardClick('Page19')}>
-          <TitleCard title="暫時不可用" />
-        </ProductContainer>
-        <ProductContainer onClick={() => handleCardClick('Page20')}>
-          <TitleCard title="暫時不可用" />
-        </ProductContainer> */}
+
 
         <ProductContainer onClick={() => handleCardClick('Page22')}>
           <TitleCard title="客戶抱怨/回饋" />

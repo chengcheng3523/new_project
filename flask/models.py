@@ -85,31 +85,6 @@ class Form03(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-# 養液配製紀錄
-class Form04(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    preparation_date = db.Column(db.Date)
-    material_code_or_name = db.Column(db.String(50))
-    usage_amount = db.Column(db.Numeric(10, 2))
-    preparation_process = db.Column(db.Text)
-    final_ph_value = db.Column(db.Numeric(10, 2))
-    final_ec_value = db.Column(db.Numeric(10, 2))
-    preparer_name = db.Column(db.String(50))
-    notes = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-# 養液配製資材與代碼對照表
-class Form05(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    nutrient_material_code = db.Column(db.String(50))
-    nutrient_material_name = db.Column(db.String(50))
-    notes = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
 # 肥料施用紀錄
 class Form06(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
