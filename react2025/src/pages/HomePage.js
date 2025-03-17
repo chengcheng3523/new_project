@@ -11,6 +11,11 @@ import Page02 from '../Form-Page/Page02';
 import Page002 from '../Form-Page/Page002';
 import Page03 from '../Form-Page/Page03';
 
+<<<<<<< HEAD
+=======
+// import Page04 from '../Form-Page/Page04';
+// import Page05 from '../Form-Page/Page05';
+>>>>>>> 3ea3e11c18ac0d316d9885e95b7fb48691767418
 import Page06 from '../Form-Page/Page06';
 import Page07 from '../Form-Page/Page07';
 import Page08 from '../Form-Page/Page08';
@@ -72,6 +77,13 @@ const HomePage =()=> {
       setSelectedForm(isAuthenticated ? <Page02 /> : <div>資料: Page02</div>);
     } else if (title === 'Page03') {
       setSelectedForm(isAuthenticated ? <Page03 /> : <div>資料: Page03</div>);
+<<<<<<< HEAD
+=======
+    // } else if (title === 'Page04') {
+    //   setSelectedForm(isAuthenticated ? <Page04 /> : <div>資料: Page04</div>);
+    // } else if (title === 'Page05') {
+    //   setSelectedForm(isAuthenticated ? <Page05 /> : <div>資料: Page05</div>);
+>>>>>>> 3ea3e11c18ac0d316d9885e95b7fb48691767418
 
     } else if (title === 'Page06') {
       setSelectedForm(isAuthenticated ? <Page06 /> : <div>資料: Page06</div>);
@@ -129,6 +141,10 @@ const HomePage =()=> {
         <ProductContainer onClick={() => handleCardClick('Page03')}>
           <TitleCard title="栽培工作" />
         </ProductContainer>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3ea3e11c18ac0d316d9885e95b7fb48691767418
 
         <ProductContainer onClick={() => handleCardClick('Page06')}>
           <TitleCard title="肥料施用" />

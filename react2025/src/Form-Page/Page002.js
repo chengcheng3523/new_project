@@ -159,7 +159,7 @@ const Page002 = () => {
       <Form onSubmit={handleSubmit}>
         <h4>表1-2.生產計畫</h4>
         <FormField
-          label="場區代號"
+          label="場區代號(田區代號)field_code"
           name="area_code"
           value={formData.area_code}
           onChange={handleChange}

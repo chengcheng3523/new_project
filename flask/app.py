@@ -380,7 +380,7 @@ def get_user_form002(user_id):
             'id': result.Form002.id,
             'user_id': result.Form002.user_id,
             'area_code': result.Form002.area_code,
-            'area_size': str(result.Form002.area_size),
+            'area_size': str(result.Form002.area_size) if result.Form002.area_size else None,
             'month': result.Form002.month,
             'crop_info': result.Form002.crop_info,
             'notes': result.Form002.notes
@@ -507,8 +507,7 @@ def add_form03():
     if not data:
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
-    user_id = data.get('user_id')
-    operation_date =  datetime.strptime(data.get('operation_date'), '%Y-%m-%d') if data.get('operation_date') not in ['', 'None', None] else None
+    operation_date = datetime.strptime(data.get('operation_date'), '%Y-%m-%d') if data.get('operation_date') not in ['', 'None', None] else None
     field_code = data.get('field_code')
     crop = data.get('crop')
     crop_content = data.get('crop_content')
@@ -516,7 +515,6 @@ def add_form03():
     
     try:
         new_form = Form03(
-            user_id=user_id,
             operation_date=operation_date,
             field_code=field_code,
             crop=crop,
@@ -537,7 +535,7 @@ def update_form03(id):
     data = request.get_json()
     form = Form03.query.get(id)
     if not form:
-        return jsonify({'error': '栽培工作 not found未找到'}), 404
+        return jsonify({'error': '栽培工作未找到'}), 404
     
     form.operation_date = datetime.strptime(data['operation_date'], '%Y-%m-%d') if data.get('operation_date') not in ['', 'None', None] else None
     form.field_code = data['field_code']
@@ -553,21 +551,21 @@ def delete_form03(id):
     record = Form03.query.get(id)
     if not record:
         return jsonify({'error': 'Record not found'}), 404
-    
+
     db.session.delete(record)
     db.session.commit()
     return jsonify({'message': 'Record deleted successfully'})
 
 # 查詢所有使用者的栽培
 @app.route('/api/form03', methods=['GET'])
-def get_all_form03(): 
+def get_all_form03():
     results = db.session.query(Form03, users.farmer_name).\
-        join(users, users.id == Form03.user_id).all()
-    
+        join(LandParcel, LandParcel.id == Form03.field_code).\
+        join(users, users.id == LandParcel.user_id).all()
+
     forms = [
         {
             "id": result.Form03.id,
-            "user_id": result.Form03.user_id,
             "farmer_name": result.farmer_name,
             "operation_date": result.Form03.operation_date.strftime('%Y-%m-%d') if result.Form03.operation_date else None,
             "field_code": result.Form03.field_code,

@@ -60,7 +60,10 @@ const App = () => {
           <Route path="/Page002" element={< Page002 />} />
           <Route path="/Page03" element={< Page03 />} />
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3ea3e11c18ac0d316d9885e95b7fb48691767418
           <Route path="/Page06" element={< Page06 />} />
           <Route path="/Page07" element={< Page07 />} />
           <Route path="/Page08" element={< Page08 />} />

@@ -237,7 +237,7 @@ const Page001 = () => {
           type="text"
           value={formData.total_area}
           onChange={handleChange}
-          label="栽培總面積:"
+          label="栽培總面積（公頃）:"
         />
         <FormField
           id="notes"
@@ -274,7 +274,7 @@ const Page001 = () => {
             <th>行動電話</th>
             <th>住 址</th>
             <th>e-mail</th>
-            <th>栽培總面積</th>
+            <th>栽培總面積（公頃）</th>
             <th>備註</th>
             <th>農地區號</th>
             {isAdmin && <th>操作</th>} {/* 只有管理员显示操作按钮 */}

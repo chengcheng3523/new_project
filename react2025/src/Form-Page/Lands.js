@@ -169,7 +169,7 @@ const Lands = () => {
           type="text"
           value={formData.number}
           onChange={handleChange}
-          label="編號:"
+          label="編號"
         />
         <FormField
           id="land_parcel_number"
@@ -177,7 +177,7 @@ const Lands = () => {
           type="text"
           value={formData.land_parcel_number}
           onChange={handleChange}
-          label="農地地籍號碼:"
+          label="農地地籍號碼"
         />
         <FormField
           id="area"
@@ -185,7 +185,7 @@ const Lands = () => {
           type="text"
           value={formData.area}
           onChange={handleChange}
-          label="面積:"
+          label="面積（公頃）"
         />
         <FormField
           id="crop"
@@ -193,7 +193,7 @@ const Lands = () => {
           type="text"
           value={formData.crop}
           onChange={handleChange}
-          label="種植作物:"
+          label="種植作物"
         />
         <FormField
           id="notes"
@@ -201,7 +201,7 @@ const Lands = () => {
           type="text"
           value={formData.notes}
           onChange={handleChange}
-          label="備註:"
+          label="備註"
         />
         <Button type="submit" disabled={loading}>
           {loading ? '儲存中...' : '儲存'}
@@ -216,7 +216,7 @@ const Lands = () => {
             <th>id</th>
             <th>編號</th>
             <th>農地地籍號碼</th>
-            <th>面積</th>
+            <th>面積（公頃）</th>
             <th>種植作物</th>
             <th>備註</th>
             {isAdmin && <th>操作</th>}
