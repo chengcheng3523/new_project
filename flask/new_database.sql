@@ -146,10 +146,6 @@ JOIN users u ON f.user_id = u.id
 
 WHERE u.username = 'farmer1';
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 3ea3e11c18ac0d316d9885e95b7fb48691767418
 -- form06（肥料施用紀錄）
 CREATE TABLE form06 (
     id                 INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
