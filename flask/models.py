@@ -29,9 +29,9 @@ class users(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-# 定义 land_parcels 数据模型
-class LandParcel(db.Model):
-    __tablename__ = 'land_parcels'
+# 定义 landls 数据模型
+class Lands(db.Model):
+    __tablename__ = 'landls'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -48,7 +48,7 @@ class Form002(db.Model):
     __tablename__ = 'form002'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    
+    lands_id = db.Column(db.Integer, db.ForeignKey('lands.id'), nullable=False)
     area_code = db.Column(db.String(20) )
     area_size = db.Column(db.Numeric(10, 2) )
     month = db.Column(db.String(10) )

@@ -33,7 +33,7 @@ def test_db_connection():
 # ----------------------------------------------------------------------------------------------
 # 定義資料表模型
 from models import db  # 从 models.py 导入 db 实例
-from models import users, LandParcel, Form002, Form02, Form03, Form04, Form05, Form06, Form07, Form08, Form09
+from models import users, Lands, Form002, Form02, Form03, Form06, Form07, Form08, Form09
 from models import Form10, Form11, Form12, Form13, Form14, Form15, Form16, Form17, Form18, Form19, Form20, Form22
 
 db.init_app(app)  # 初始化 SQLAlchemy 並與 Flask 應用程式關聯
@@ -109,7 +109,7 @@ def create_user_profile():
 
         # 更新使用者的基本資料
         existing_user.unit_name = data.get('unit_name')
-        existing_user.land_parcel_id = data.get('land_parcel_id')
+        existing_user.lands_id = data.get('lands_id')
         existing_user.farmer_name = data.get('farmer_name')
         existing_user.phone = data.get('phone')
         existing_user.fax = data.get('fax')
@@ -146,7 +146,7 @@ def get_users():
                 'email': user.email,
                 'total_area': str(user.total_area),
                 'notes': user.notes,
-                'land_parcel_id': user.land_parcel_id
+                'lands_id': user.lands_id
             }
             for user in users_data
         ]
@@ -170,7 +170,7 @@ def update_users(id):
 
         # 更新其他欄位
         for field in ['unit_name', 'farmer_name', 'phone', 'fax', 'mobile', 
-                      'address', 'email', 'total_area', 'notes', 'land_parcel_id']:
+                      'address', 'email', 'total_area', 'notes', 'lands_id']:
             if field in data:
                 if field == 'total_area' and (data[field] == '' or data[field] == 'None'):
                     setattr(user, field, None)  # 如果是空字符串或字符串 'None'，將total_area設為None
@@ -220,8 +220,8 @@ def login():
 # 農地資訊
 
 # 新增農地資訊 API
-@app.route('/api/land_parcels', methods=['POST'])
-def add_land_parcel():
+@app.route('/api/lands', methods=['POST'])
+def add_lands():
     print("Received POST request")  # 新增调试信息
     data = request.get_json()
     if not data:
@@ -229,80 +229,123 @@ def add_land_parcel():
 
     user_id = data.get('user_id')
     number = data.get('number')
-    land_parcel_number = data.get('land_parcel_number')
+    lands_number = data.get('lands_number')
     area = data.get('area') if data.get('area') not in ['', 'None', None] else None
     crop = data.get('crop')
     notes = data.get('notes')
 
-    new_land_parcel = LandParcel(
+    new_lands = Lands(
         user_id=user_id,
         number=number,
-        land_parcel_number=land_parcel_number,
+        lands_number=lands_number,
         area=area,
         crop=crop,
         notes=notes
     )
 
-    db.session.add(new_land_parcel)
+    db.session.add(new_lands)
     db.session.commit()
 
-    return jsonify({'status': '農地資訊新增成功', 'land_parcel_id': new_land_parcel.id}), 201
+    return jsonify({'status': '農地資訊新增成功', 'lands_id': new_lands.id}), 201
 
 # 更新農地資訊 API
-@app.route('/api/land_parcels/<int:id>', methods=['PUT'])
-def update_land_parcel(id):
+@app.route('/api/lands/<int:id>', methods=['PUT'])
+def update_lands(id):
     data = request.get_json()
-    land_parcel = LandParcel.query.get(id)
+    lands = Lands.query.get(id)
 
-    if not land_parcel:
+    if not lands:
         return jsonify({'error': '農地資訊未找到'}), 404
 
-    land_parcel.number = data.get('number', land_parcel.number)
-    land_parcel.land_parcel_number = data.get('land_parcel_number', land_parcel.land_parcel_number)
-    land_parcel.area = data.get('area') if data.get('area') not in ['', 'None', None] else None
-    land_parcel.crop = data.get('crop', land_parcel.crop)
-    land_parcel.notes = data.get('notes', land_parcel.notes)
+    lands.number = data.get('number', lands.number)
+    lands.lands_number = data.get('lands_number', lands.lands_number)
+    lands.area = data.get('area') if data.get('area') not in ['', 'None', None] else None
+    lands.crop = data.get('crop', lands.crop)
+    lands.notes = data.get('notes', lands.notes)
 
     db.session.commit()
     return jsonify({'status': '農地資訊更新成功'}), 200
 
 # 删除農地資訊 API
-@app.route('/api/land_parcels/<int:id>', methods=['DELETE'])
-def delete_land_parcel(id):
+@app.route('/api/lands/<int:id>', methods=['DELETE'])
+def delete_lands(id):
     print(f"Attempting to delete ID: {id}")  # 新增调试信息
-    land_parcel = LandParcel.query.get(id)
-    if not land_parcel:
+    lands = Lands.query.get(id)
+    if not lands:
         print(f"ID {id} not found")  # 新增调试信息
         return jsonify({'error': '農地資訊未找到'}), 404
 
-    db.session.delete(land_parcel)
+    db.session.delete(lands)
     db.session.commit()
     return jsonify({'status': '農地資訊已删除'}), 200
 
 # 查詢所有農地資訊 API
-@app.route('/api/land_parcels', methods=['GET'])
-def get_land_parcels():
+@app.route('/api/lands', methods=['GET'])
+def get_lands():
     results = db.session.query(
-        LandParcel,
+        Lands,
         users.farmer_name
     ).join(users).all()
 
-    land_parcels = [
+    lands = [
         {
-            'id': result.LandParcel.id,
-            'user_id': result.LandParcel.user_id,
+            'id': result.Lands.id,
+            'user_id': result.Lands.user_id,
             'farmer_name': result.farmer_name,
-            'number': result.LandParcel.number,
-            'land_parcel_number': result.LandParcel.land_parcel_number,
-            'area': str(result.LandParcel.area),
-            'crop': result.LandParcel.crop,
-            'notes': result.LandParcel.notes
+            'number': result.Lands.number,
+            'lands_number': result.Lands.lands_number,
+            'area': str(result.Lands.area),
+            'crop': result.Lands.crop,
+            'notes': result.Lands.notes
         }
         for result in results
     ]
-    return jsonify(land_parcels)
+    return jsonify(lands)
 
 # ----------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 生產計畫
 
 #  新增生產計畫
@@ -313,15 +356,22 @@ def add_form002():
         return jsonify({'error': '請提供 JSON 數據'}), 400
 
     user_id = data.get('user_id')
+    lands_id = data.get('lands_id')
     area_code = data.get('area_code') 
     area_size = data.get('area_size') if data.get('area_size') not in ['', 'None', None] else None
     month = data.get('month')
     crop_info = data.get('crop_info')
     notes = data.get('notes')
 
+    # 驗證 lands_id 是否有效
+    lands = Lands.query.get(lands_id)
+    if not lands:
+        return jsonify({'error': '無效的農地 ID'}), 400
+
     try:
         new_form = Form002(
             user_id=user_id,
+            lands_id=lands_id,
             area_code=area_code,
             area_size=area_size,
             month=month,
@@ -409,6 +459,43 @@ def get_all_form002():
         for result in results
     ]
     return jsonify(forms)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # ----------------------------------------------------------------------------------------------
 # 種子(苗)登記
@@ -560,8 +647,8 @@ def delete_form03(id):
 @app.route('/api/form03', methods=['GET'])
 def get_all_form03():
     results = db.session.query(Form03, users.farmer_name).\
-        join(LandParcel, LandParcel.id == Form03.field_code).\
-        join(users, users.id == LandParcel.user_id).all()
+        join(Lands, Lands.id == Form03.field_code).\
+        join(users, users.id == Lands.user_id).all()
 
     forms = [
         {

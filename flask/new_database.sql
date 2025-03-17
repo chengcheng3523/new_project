@@ -16,13 +16,13 @@ CREATE TABLE users(
     email       VARCHAR(50) COMMENT 'e-mail',
     total_area  DECIMAL(10,2) COMMENT '栽培總面積',
     notes       VARCHAR(50) COMMENT '備註',
-    land_parcel_id  VARCHAR(20) COMMENT '地號',
+    lands_id  VARCHAR(20) COMMENT '地號',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- 插入使用者資料
-INSERT INTO users (username, plain_password, password, unit_name, farmer_name, phone, fax, mobile, address, email, total_area, notes, land_parcel_id)
+INSERT INTO users (username, plain_password, password, unit_name, farmer_name, phone, fax, mobile, address, email, total_area, notes, lands_id)
 VALUES
     ('帳號', '原始密碼', '加密後的密碼', '單位名稱', '經營農戶姓名', '聯絡電話', '傳真', '行動電話', '住址', 'e-mail', 5.5, '備註', 'LP003'),
     ('farmer1', '原始密碼', 'hashed_password', '農場 A', '張三', '02-12345678', '02-87654321', '0912-345678', '住址', 'farmer1@example.com', 5.5, 'notes', 'LP004'),
@@ -34,13 +34,13 @@ VALUES
 UPDATE users SET password = 'scrypt:32768:8:1$GecnsTV9ESdKmZ6l$87571fe224e1a108335d3061c51aca78e66d1a4d7f3a42cf3bcbdee24a6cb38bb08f3c36d411cbb4b0a173639f5ef7b77d3e1810497db66c43586e52c40afc85' WHERE username = 'newuser';
 UPDATE users SET password = 'scrypt:32768:8:1$GecnsTV9ESdKmZ6l$87571fe224e1a108335d3061c51aca78e66d1a4d7f3a42cf3bcbdee24a6cb38bb08f3c36d411cbb4b0a173639f5ef7b77d3e1810497db66c43586e52c40afc85' WHERE username = 'user';
 
--- land_parcels（農地資訊）
-CREATE TABLE land_parcels (
+-- lands（農地資訊）
+CREATE TABLE lands (
     id                 INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id            INT NOT NULL,                    -- 關聯 `users` 表
-    -- land_parcels 表中的 user_id 是手動指定的，並且必須是 users 表中已經存在的 id
+    -- lands 表中的 user_id 是手動指定的，並且必須是 users 表中已經存在的 id
     number             VARCHAR(50),            -- 農地編號
-    land_parcel_number VARCHAR(50),            -- 農地地籍號碼
+    lands_number VARCHAR(50),            -- 農地地籍號碼
     area               DECIMAL(10,2),          -- 面積（單位：公頃）
     crop               VARCHAR(100),                    -- 種植作物
     notes              TEXT,                            -- 備註
@@ -48,17 +48,17 @@ CREATE TABLE land_parcels (
     updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
--- 資料示例land_parcels（農地資訊）
-INSERT INTO land_parcels (user_id, number, land_parcel_number, area, crop, notes)
+-- 資料示例lands（農地資訊）
+INSERT INTO lands (user_id, number, lands_number, area, crop, notes)
 VALUES
     (1, '農地編號', '農地地籍號碼', 1.2, '種植作物', '備註'),
     (2, 'LP001', '123456-7890', 1.2, '小白菜', '土壤肥沃，適合蔬菜種植'),
     (1, 'LP002', '123456-7891', 2.5, '玉米', '土壤較乾燥，適合玉米種植');
 
 -- 查詢農戶的所有農地
-SELECT u.username, u.farmer_name, l.land_parcel_number, l.area, l.crop, l.notes
+SELECT u.username, u.farmer_name, l.lands_number, l.area, l.crop, l.notes
 FROM users u
-JOIN land_parcels l ON u.id = l.user_id
+JOIN lands l ON u.id = l.user_id
 WHERE u.username = 'farmer1';
 
 -- form002（生產計畫）
@@ -129,7 +129,7 @@ CREATE TABLE form03 (
     created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    -- FOREIGN KEY (land_parcel_id) REFERENCES land_parcels(id) ON DELETE CASCADE
+    -- FOREIGN KEY (lands_id) REFERENCES lands(id) ON DELETE CASCADE
 );
 
 -- 資料示例form03（栽培工作紀錄）
