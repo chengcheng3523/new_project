@@ -19,8 +19,7 @@ import Page001 from './Form-Page/Page001'; // 表1-1
 import Page02 from './Form-Page/Page02'; // 表1-2 未完成
 import Page002 from './Form-Page/Page002'; // 表2
 import Page03 from './Form-Page/Page03'; // 表3
-import Page04 from './Form-Page/Page04'; // 表4
-import Page05 from './Form-Page/Page05'; // 表5
+
 import Page06 from './Form-Page/Page06'; // 表6
 import Page07 from './Form-Page/Page07'; // 表7
 import Page08 from './Form-Page/Page08'; // 表8
@@ -61,8 +60,6 @@ const App = () => {
           <Route path="/Page002" element={< Page002 />} />
           <Route path="/Page03" element={< Page03 />} />
 
-          <Route path="/Page04" element={< Page04 />} />
-          <Route path="/Page05" element={< Page05 />} />
           <Route path="/Page06" element={< Page06 />} />
           <Route path="/Page07" element={< Page07 />} />
           <Route path="/Page08" element={< Page08 />} />
