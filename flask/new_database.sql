@@ -146,57 +146,6 @@ JOIN users u ON f.user_id = u.id
 
 WHERE u.username = 'farmer1';
 
--- form04（養液配製紀錄）
-CREATE TABLE form04 (
-    id                   INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
-    user_id              INT NOT NULL,                    -- 關聯 `users` 表
-    preparation_date     DATE NULL,                   -- 配製日期
-    material_code_or_name VARCHAR(100),          -- 資材代碼或資材名稱
-    usage_amount         VARCHAR(100),         -- 使用量(公斤/公升)
-    preparation_process  TEXT,                            -- 配製流程簡述
-    final_ph_value       DECIMAL(5, 2),                   -- 最終 pH 值
-    final_ec_value       DECIMAL(5, 2),                   -- 最終 EC 值(mS/cm)
-    preparer_name        VARCHAR(100),                    -- 配製人員名稱
-    notes                TEXT,                            -- 備註
-    created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
--- 資料示例form04（養液配製紀錄）
-INSERT INTO form04 (user_id, preparation_date, material_code_or_name, usage_amount, preparation_process, final_ph_value, final_ec_value, preparer_name, notes)
-VALUES 
-    (1, '2025-02-01', 'M000-0000', 10.00, '混合資材 A、B，調整 pH 值', 7.8, 2.2, '王小明', '間作及敷蓋稻草'),
-    (2, '2025-03-15', 'ooxx資材', 15.00, '混合資材 C，調整 EC 值', 6.5, 2.0, '李小華', '施用前先清理設備');
--- 查詢某農戶的所有養液配製紀錄
-SELECT u.username, u.farmer_name, f.preparation_date, f.material_code_or_name, f.usage_amount, f.preparation_process, f.final_ph_value, f.final_ec_value, f.preparer_name, f.notes
-FROM form04 f
-JOIN users u ON f.user_id = u.id
-WHERE u.username = 'farmer1';
-
--- form05（養液配製資材與代碼對照表）
-CREATE TABLE form05 (
-    id INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
-    user_id INT NOT NULL,               -- 關聯 `users` 表
-    nutrient_material_code VARCHAR(20),  -- 養液配製資材代碼
-    nutrient_material_name VARCHAR(100), -- 養液配製資材名稱
-    notes TEXT,                         -- 備註
-    
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
--- 資料示例form05（養液配製資材與代碼對照表）
-INSERT INTO form05 (user_id, nutrient_material_code, nutrient_material_name, notes)
-VALUES 
-    (1, 'M000-0000', 'ooxx資材', '備註'),
-    (2, 'M000-0001', 'yyzz資材', '需要存放於陰涼處');
-
--- 查詢養液配製資材代碼及名稱
-SELECT u.username, u.farmer_name, f.nutrient_material_code, f.nutrient_material_name, f.notes
-FROM form05 f
-JOIN users u ON f.user_id = u.id
-WHERE nutrient_material_code = 'M000-0000';
 
 -- form06（肥料施用紀錄）
 CREATE TABLE form06 (
