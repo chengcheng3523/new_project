@@ -16,19 +16,18 @@ CREATE TABLE users(
     email       VARCHAR(50) COMMENT 'e-mail',
     total_area  DECIMAL(10,2) COMMENT '栽培總面積',
     notes       VARCHAR(50) COMMENT '備註',
-    lands_id  VARCHAR(20) COMMENT '地號',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- 插入使用者資料
-INSERT INTO users (username, plain_password, password, unit_name, farmer_name, phone, fax, mobile, address, email, total_area, notes, lands_id)
+INSERT INTO users (username, plain_password, password, unit_name, farmer_name, phone, fax, mobile, address, email, total_area, notes)
 VALUES
-    ('帳號', '原始密碼', '加密後的密碼', '單位名稱', '經營農戶姓名', '聯絡電話', '傳真', '行動電話', '住址', 'e-mail', 5.5, '備註', 'LP003'),
-    ('farmer1', '原始密碼', 'hashed_password', '農場 A', '張三', '02-12345678', '02-87654321', '0912-345678', '住址', 'farmer1@example.com', 5.5, 'notes', 'LP004'),
-    ('farmer2', '原始密碼', 'hashed_password', '農場 B', '張三', '02-12345678', '02-87654321', '0912-345678', '台北市XX路', 'farmer1@example.com', 5.5, 'notes', 'LP0025'),
-    ('newuser', 'password123', '加密後的密碼', 'New User Unit', 'New User', '987654321', '987654321', '987654321', 'New User Address', 'newuser@example.com', 0, 'New user notes', 'LP002'),
-    ('user', '123456', '加密後的密碼', 'User Unit', 'User', '123456789', '123456789', '123456789', 'User Address', 'user@example.com', 0, 'User notes', 'LP001');
+    ('帳號', '原始密碼', '加密後的密碼', '單位名稱', '經營農戶姓名', '聯絡電話', '傳真', '行動電話', '住址', 'e-mail', 5.5, '備註'),
+    ('farmer1', '原始密碼', 'hashed_password', '農場 A', '張三', '02-12345678', '02-87654321', '0912-345678', '住址', 'farmer1@example.com', 5.5, 'notes'),
+    ('farmer2', '原始密碼', 'hashed_password', '農場 B', '張三', '02-12345678', '02-87654321', '0912-345678', '台北市XX路', 'farmer1@example.com', 5.5, 'notes'),
+    ('newuser', 'password123', '加密後的密碼', 'New User Unit', 'New User', '987654321', '987654321', '987654321', 'New User Address', 'newuser@example.com', 0, 'New user notes'),
+    ('user', '123456', '加密後的密碼', 'User Unit', 'User', '123456789', '123456789', '123456789', 'User Address', 'user@example.com', 0, 'User notes');
 
 -- 更新資料庫中的密碼哈希
 UPDATE users SET password = 'scrypt:32768:8:1$GecnsTV9ESdKmZ6l$87571fe224e1a108335d3061c51aca78e66d1a4d7f3a42cf3bcbdee24a6cb38bb08f3c36d411cbb4b0a173639f5ef7b77d3e1810497db66c43586e52c40afc85' WHERE username = 'newuser';
@@ -40,7 +39,7 @@ CREATE TABLE lands (
     user_id            INT NOT NULL,                    -- 關聯 `users` 表
     -- lands 表中的 user_id 是手動指定的，並且必須是 users 表中已經存在的 id
     number             VARCHAR(50),            -- 農地編號
-    lands_number VARCHAR(50),            -- 農地地籍號碼
+    lands_number       VARCHAR(50),            -- 農地地籍號碼
     area               DECIMAL(10,2),          -- 面積（單位：公頃）
     crop               VARCHAR(100),                    -- 種植作物
     notes              TEXT,                            -- 備註
@@ -65,26 +64,31 @@ WHERE u.username = 'farmer1';
 CREATE TABLE form002 (
     id               INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id          INT NOT NULL,                    -- 關聯 `users` 表
-    area_code        VARCHAR(20),            -- 場區代號
-    area_size        DECIMAL(10,2),          -- 場區面積（公頃）
-    month            VARCHAR(10),            -- 月份（1月-12月）
-    crop_info        VARCHAR(255),           -- 種植作物種類、產期、預估產量（公斤）
-    notes            TEXT,                            -- 備註
+    lands_id         INT NOT NULL,                    -- 關聯 `lands` 表
+    area_code        VARCHAR(20),                     -- 場區代號
+    area_size        DECIMAL(10,2),                   -- 場區面積（公頃）
+    month            VARCHAR(10),                     -- 月份（1月-12月）
+    crop_info        VARCHAR(255),                    -- 種植作物種類、產期、預估產量（公斤）
+    notes            TEXT,                             -- 備註
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (lands_id) REFERENCES lands(id) ON DELETE CASCADE
 );
 -- 資料示例form002（生產計畫）
-INSERT INTO form002 (user_id, area_code, area_size, month, crop_info, notes)
+INSERT INTO form002 (user_id,lands_id, area_code, area_size, month, crop_info, notes)
 VALUES 
-    (1,  '場區代號', 2.5, '月份', '種植作物種類、產期、預估產量（公斤）', '備註'),
-    (1,  'AC123456', 2.5, '3月', '小白菜/1000', '間作及敷蓋稻草'),
-    (1,  'AC654321', 1.8, '6月', '玉米/500', '施有機肥'),
-    (2,  'AC987654', 3.2, '9月', '水稻/2000', '水源充足');
---  查詢某農戶的生產計畫 
+    (1,1,  '場區代號', 2.5, '月份', '種植作物種類、產期、預估產量（公斤）', '備註'),
+    (1,2,  'AC123456', 2.5, '3月', '小白菜/1000', '間作及敷蓋稻草'),
+    (1,3,  'AC654321', 1.8, '6月', '玉米/500', '施有機肥'),
+    (2,3,  'AC987654', 3.2, '9月', '水稻/2000', '水源充足');
+
+-- 確保 form002 表中的 area_code 欄位只能選擇 lands 表中的 number 欄位值。
+
 SELECT u.username, u.farmer_name, f.area_code, f.area_size, f.month, f.crop_info, f.notes
 FROM form002 f
 JOIN users u ON f.user_id = u.id
+JOIN lands l ON f.lands_id = l.id
 WHERE u.username = 'farmer1';
 
 -- form02（種子(苗)登記表）
@@ -107,7 +111,7 @@ INSERT INTO form02 (user_id, cultivated_crop, crop_variety, seed_source, seedlin
 VALUES 
     (1,  '高麗菜', '高麗菜', '自行育苗', '2025-02-01', '種苗', '間作及敷蓋稻草'),
     (2, '高麗菜', '高麗菜', '自行育苗', '2025-02-01', '種苗', '間作及敷蓋稻草'),
-    (2, '高麗菜', '高麗菜', '購買來源：XYZ公司', '2025-03-15', '種子', '施有機肥');
+    (2, '高麗菜', '高麗菜', '購買來源：XYZ公司', '2025-03-15', '種子', '施有機肥'),
     (1,  '高麗菜', '高麗菜', '購買來源：XYZ公司', '2025-03-15', '種子', '施有機肥');
 
 -- 查詢某農戶的所有種子登記
@@ -573,102 +577,3 @@ VALUES (1,  '2025-02-05', '王小明', '0988-888-888', '我是客訴內容區', 
 SELECT f.id, f.date, f.customer_name, f.complaint, f.resolution, u.username, u.farmer_name, f.processor_name, f.processor_date
 FROM form22 f
 JOIN users u ON f.user_id = u.id;
-
-
-
--- --------------------------------------------------------------------------------------------------------------------
-
--- form_templates（表單類型模板）
--- 定義不同類型的表單模板，方便未來新增不同表單類型。
-CREATE TABLE form_templates (
-    template_id INT AUTO_INCREMENT PRIMARY KEY, -- 模板唯一識別碼
-    template_name VARCHAR(100) NOT NULL,        -- 模板名稱
-    description TEXT,                           -- 模板描述，說明此模板的用途
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- 模板建立時間
-);
-INSERT INTO form_templates (template_name, description)
-VALUES ('Template Name', 'Description of the template'),
-       ('农作物信息模板', '用于记录农作物相关信息的模板');
-
--- forms（表單主表）
--- 用來儲存使用者提交的表單，每筆表單會對應到一個特定的表單模板。
-CREATE TABLE forms (
-    form_id INT AUTO_INCREMENT PRIMARY KEY, -- 表單唯一識別碼
-    user_id INT NOT NULL,                  -- 提交表單的使用者 ID
-    template_id INT NOT NULL,              -- 表單所屬的模板 ID
-    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 表單提交時間
-    status ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING', -- 表單狀態：待審核、已通過、被拒絕
-    FOREIGN KEY (user_id) REFERENCES users(ID) ON DELETE CASCADE, -- 關聯到使用者表
-    FOREIGN KEY (template_id) REFERENCES form_templates(template_id) ON DELETE CASCADE -- 關聯到表單模板表
-);
--- 新增一筆表單記錄
-INSERT INTO forms (user_id, template_id, status)
-VALUES (1, 1, 'PENDING');
--- 查詢
-SELECT * FROM forms WHERE user_id = 1;
-
--- form_fields（表單欄位設定）
--- 定義每個表單模板所包含的欄位及其屬性，例如欄位名稱、資料型別等。
-CREATE TABLE form_fields (
-    field_id INT AUTO_INCREMENT PRIMARY KEY, -- 欄位唯一識別碼
-    template_id INT NOT NULL,                -- 關聯的表單模板 ID
-    field_name VARCHAR(100) NOT NULL,        -- 欄位名稱
-    field_type VARCHAR(100) NOT NULL, -- 欄位型別：文字、數字、日期、布林值、JSON
-    is_required BOOLEAN DEFAULT TRUE,        -- 是否為必填欄位
-    FOREIGN KEY (template_id) REFERENCES form_templates(template_id) ON DELETE CASCADE -- 關聯到表單模板表
-);
-INSERT INTO form_fields (template_id, field_name, field_type, is_required)
-VALUES (1, 'Sample Field', 'TEXT', TRUE);
-
--- form_data（表單資料）
--- 儲存使用者實際填寫的表單內容，採用 key-value 形式，適用於不同類型的表單欄位。
-CREATE TABLE form_data (
-    data_id INT AUTO_INCREMENT PRIMARY KEY, -- 資料唯一識別碼
-    form_id INT NOT NULL,                   -- 關聯的表單 ID
-    field_id INT NOT NULL,                  -- 對應的欄位 ID
-    field_value TEXT NOT NULL,              -- 使用者填入的欄位值
-    FOREIGN KEY (form_id) REFERENCES forms(form_id) ON DELETE CASCADE, -- 關聯到表單主表
-    FOREIGN KEY (field_id) REFERENCES form_fields(field_id) ON DELETE CASCADE -- 關聯到表單欄位設定表
-);
-INSERT INTO form_data (form_id, field_id, field_value)
-VALUES (1, 1, 'Sample Data');
-
--- public_records（公開查詢資料）
--- 儲存已審核通過並可公開查詢的表單資料，使用 JSON 格式方便擴展。
-CREATE TABLE public_records (
-    record_id INT AUTO_INCREMENT PRIMARY KEY, -- 公開資料唯一識別碼
-    form_id INT NOT NULL,                     -- 關聯的表單 ID
-    public_data JSON NOT NULL,                -- 以 JSON 格式儲存的公開表單內容
-    published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 公開發布時間
-    FOREIGN KEY (form_id) REFERENCES forms(form_id) ON DELETE CASCADE -- 關聯到表單主表
-);
-INSERT INTO public_records (form_id, public_data)
-VALUES (1, '{"field1": "value1", "field2": "value2"}');
--- 三種查詢方法
-SELECT * FROM public_records;
-SELECT * FROM public_records WHERE form_id = 1;
-SELECT public_data FROM public_records WHERE form_id = 1;
-
-
--- 📌 範例資料（農產品種植報告表單的一筆填寫資料）：
--- form_data 表範例：
--- data_id | form_id | field_id | field_value
--- ------------------------------------------
---   1     |   101   |    1     | "水稻"
---   2     |   101   |    2     | "2.5"
---   3     |   101   |    3     | "2024-01-15"
---   4     |   101   |    4     | "TRUE"
-
--- public_records JSON 格式範例：
--- {
---     "作物名稱": "水稻",
---     "種植面積(公頃)": 2.5,
---     "播種日期": "2024-01-15",
---     "使用農藥": true
--- }
-
--- ✅ 設計優勢：
--- 1. **靈活性**：新增表單類型或欄位時，只需更新 form_templates 和 form_fields，無需更動資料庫結構。
--- 2. **擴展性**：支援多種欄位型別，未來可擴展至圖片上傳、地理座標等。
--- 3. **一致性**：使用關聯式設計確保資料一致性，並透過外鍵維護資料完整性。
--- 4. **公開透明**：public_records 提供審核後的資料公開查詢，方便資訊共享與透明化管理。

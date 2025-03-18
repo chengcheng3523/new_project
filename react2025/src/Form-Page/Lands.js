@@ -16,7 +16,7 @@ const Lands = () => {
     id: null,
     user_id: userId, 
     number: '',
-    land_parcel_number: '',
+    lands_number: '',
     area: '',
     crop: '',
     notes: '',
@@ -29,14 +29,14 @@ const Lands = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:5000/api/land_parcels');
+      const response = await axios.get('http://127.0.0.1:5000/api/lands');
       console.log('原始數據:', response.data); // 打印原始數據確認結構
       if (Array.isArray(response.data)) {
         const transformedData = response.data.map(item => ({
-          id: item.id, // 使用 land_parcel_number 作为唯一标识符
+          id: item.id, // 使用 lands_number 作为唯一标识符
           user_id: item.user_id,
           number: item.number,
-          land_parcel_number: item.land_parcel_number,
+          lands_number: item.lands_number,
           area: item.area,
           crop: item.crop,
           notes: item.notes,
@@ -92,7 +92,7 @@ const Lands = () => {
       if (formData.id) {
         // 更新現有資料，使用 PUT 請求
         if (isAdmin) {
-          response = await axios.put(`http://127.0.0.1:5000/api/land_parcels/${formData.id}`, formData);
+          response = await axios.put(`http://127.0.0.1:5000/api/lands/${formData.id}`, formData);
         } else {
           alert('您沒有權限更新資料！');
           setLoading(false);
@@ -100,14 +100,14 @@ const Lands = () => {
         }
       } else {
         // 新增資料
-        response = await axios.post('http://127.0.0.1:5000/api/land_parcels', { ...formData, user_id: userId });
+        response = await axios.post('http://127.0.0.1:5000/api/lands', { ...formData, user_id: userId });
       }
       fetchData();
       setFormData({
         id: null,
         user_id: userId, 
         number: '',
-        land_parcel_number: '',
+        lands_number: '',
         area: '',
         crop: '',
         notes: '',
@@ -119,6 +119,7 @@ const Lands = () => {
     } catch (error) {
       console.error('發送請求失敗:', error);
       alert('儲存失敗，請稍後重試！');
+      console.error(error.response.data);  // 打印错误详细信息
     } finally {
       setLoading(false);
     }
@@ -132,7 +133,7 @@ const Lands = () => {
       return;
     }
     try {
-      const response = await axios.delete(`http://127.0.0.1:5000/api/land_parcels/${id}`);
+      const response = await axios.delete(`http://127.0.0.1:5000/api/lands/${id}`);
       console.log('删除成功:', response.data);
       fetchData(); // 刷新数据
       alert('成功刪除資料！');
@@ -150,7 +151,7 @@ const Lands = () => {
       id: record.id,
       user_id: record.user_id,
       number: record.number,
-      land_parcel_number: record.land_parcel_number,
+      lands_number: record.lands_number,
       area: record.area,
       crop: record.crop,
       notes: record.notes,
@@ -172,10 +173,10 @@ const Lands = () => {
           label="編號"
         />
         <FormField
-          id="land_parcel_number"
-          name="land_parcel_number"
+          id="lands_number"
+          name="lands_number"
           type="text"
-          value={formData.land_parcel_number}
+          value={formData.lands_number}
           onChange={handleChange}
           label="農地地籍號碼"
         />
@@ -227,7 +228,7 @@ const Lands = () => {
             <tr key={record.id || record.FieldCode}>
                 <td>{record.id}</td>
                 <td>{record.number}</td>
-                <td>{record.land_parcel_number}</td>
+                <td>{record.lands_number}</td>
                 <td>{record.area}</td>
                 <td>{record.crop}</td>
                 <td>{record.notes}</td>

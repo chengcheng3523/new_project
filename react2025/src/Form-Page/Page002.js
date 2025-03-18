@@ -32,7 +32,7 @@ const Page002 = () => {
       console.log('原始數據:', response.data); // 打印原始數據確認結構
       if (Array.isArray(response.data)) {
         const transformedData = response.data.map(item => ({
-          id: item.id, // 使用 land_parcel_number 作为唯一标识符
+          id: item.id,
           user_id: item.user_id,
           area_code: item.area_code,
           area_size: item.area_size,

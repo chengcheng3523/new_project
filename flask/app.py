@@ -109,7 +109,6 @@ def create_user_profile():
 
         # 更新使用者的基本資料
         existing_user.unit_name = data.get('unit_name')
-        existing_user.lands_id = data.get('lands_id')
         existing_user.farmer_name = data.get('farmer_name')
         existing_user.phone = data.get('phone')
         existing_user.fax = data.get('fax')
@@ -145,8 +144,7 @@ def get_users():
                 'address': user.address,
                 'email': user.email,
                 'total_area': str(user.total_area),
-                'notes': user.notes,
-                'lands_id': user.lands_id
+                'notes': user.notes
             }
             for user in users_data
         ]
@@ -170,7 +168,7 @@ def update_users(id):
 
         # 更新其他欄位
         for field in ['unit_name', 'farmer_name', 'phone', 'fax', 'mobile', 
-                      'address', 'email', 'total_area', 'notes', 'lands_id']:
+                      'address', 'email', 'total_area', 'notes']:
             if field in data:
                 if field == 'total_area' and (data[field] == '' or data[field] == 'None'):
                     setattr(user, field, None)  # 如果是空字符串或字符串 'None'，將total_area設為None
@@ -217,6 +215,34 @@ def login():
     return jsonify(error='帳號或密碼錯誤'), 401
 
 # ----------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 農地資訊
 
 # 新增農地資訊 API
@@ -304,48 +330,6 @@ def get_lands():
 
 # ----------------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # 生產計畫
 
 #  新增生產計畫
@@ -356,22 +340,22 @@ def add_form002():
         return jsonify({'error': '請提供 JSON 數據'}), 400
 
     user_id = data.get('user_id')
-    lands_id = data.get('lands_id')
     area_code = data.get('area_code') 
     area_size = data.get('area_size') if data.get('area_size') not in ['', 'None', None] else None
     month = data.get('month')
     crop_info = data.get('crop_info')
     notes = data.get('notes')
 
-    # 驗證 lands_id 是否有效
-    lands = Lands.query.get(lands_id)
+    # 驗證 area_code 是否有效
+    lands = Lands.query.get(area_code)
     if not lands:
         return jsonify({'error': '無效的農地 ID'}), 400
+    if not Lands.query.filter_by(number=area_code).first():
+        return jsonify({'error': '無效的田區代號'}), 400
 
     try:
         new_form = Form002(
             user_id=user_id,
-            lands_id=lands_id,
             area_code=area_code,
             area_size=area_size,
             month=month,
@@ -394,7 +378,11 @@ def update_form002(id):
     if not form:
         return jsonify({'error': '生產計畫未找到'}), 404
     
-    form.area_code = data.get('area_code', form.area_code)
+    area_code = data.get('area_code', form.area_code)
+    if not Lands.query.filter_by(number=area_code).first():
+        return jsonify({'error': '無效的田區代號'}), 400
+    
+    form.area_code = area_code
     form.area_size = data.get('area_size', form.area_size) if data.get('area_size') not in ['', 'None', None] else None
     form.month = data.get('month', form.month)
     form.crop_info = data.get('crop_info', form.crop_info)
@@ -414,36 +402,14 @@ def delete_form002(id):
     db.session.commit()
     return jsonify({'status': '生產計畫已刪除'}), 200
 
-# 查詢某使用者的生產計畫
-@app.route('/api/form002/user/<int:user_id>', methods=['GET'])
-def get_user_form002(user_id):
-    results = db.session.query(
-        Form002, db.column('users.farmer_name')
-    ).join(
-        db.table('users'), Form002.user_id == db.column('users.id')
-    ).filter(
-        Form002.user_id == user_id
-    ).all()
 
-    form_list = [
-        {
-            'id': result.Form002.id,
-            'user_id': result.Form002.user_id,
-            'area_code': result.Form002.area_code,
-            'area_size': str(result.Form002.area_size) if result.Form002.area_size else None,
-            'month': result.Form002.month,
-            'crop_info': result.Form002.crop_info,
-            'notes': result.Form002.notes
-        }
-        for result in results
-    ]
-    return jsonify(form_list)
-
-# 查詢所有生產計畫 API
 @app.route('/api/form002', methods=['GET'])
-def get_all_form002():
-    results = db.session.query(Form002, users.farmer_name).\
-        join(users, users.id == Form002.user_id).all()
+def get_all_form002(): 
+    results = db.session.query(
+        Form002,
+        users.farmer_name,
+        Lands.number
+    ).select_from(Form002).join(users).join(Lands).all()
 
     forms = [
         {
@@ -459,8 +425,6 @@ def get_all_form002():
         for result in results
     ]
     return jsonify(forms)
-
-
 
 
 

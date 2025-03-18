@@ -25,7 +25,6 @@ const Page001 = () => {
     email: '',
     total_area: '',
     notes: '',
-    land_parcel_id: '',
 
   });
 
@@ -50,7 +49,6 @@ const Page001 = () => {
           email: item.email,
           total_area: item.total_area,
           notes: item.notes,
-          land_parcel_id: item.land_parcel_id,  // 需要确认该字段是否在数据中
         }));
  
         setData( transformedData ); // 設置數據狀態
@@ -126,7 +124,6 @@ const Page001 = () => {
         email: '',
         total_area: '',
         notes: '',
-        land_parcel_id: '',
       }); // 清空表單
       alert('成功儲存資料！'); // 成功提示
       console.log('成功發送請求，回應:', response.data);
@@ -166,7 +163,6 @@ const Page001 = () => {
       email: record.email,
       total_area: record.total_area,
       notes: record.notes,
-      land_parcel_id: record.land_parcel_id,
     });
   };
 
@@ -247,14 +243,6 @@ const Page001 = () => {
           onChange={handleChange}
           label="備註:"
         />
-        <FormField
-          id="land_parcel_id"
-          name="land_parcel_id"
-          type="text"
-          value={formData.land_parcel_id}
-          onChange={handleChange}
-          label="農地區號:" 
-        />
         <Button type="submit" disabled={loading}>
           {loading ? '儲存中...' : '儲存'}
         </Button>
@@ -276,7 +264,6 @@ const Page001 = () => {
             <th>e-mail</th>
             <th>栽培總面積（公頃）</th>
             <th>備註</th>
-            <th>農地區號</th>
             {isAdmin && <th>操作</th>} {/* 只有管理员显示操作按钮 */}
           </tr>
         </thead>
@@ -294,7 +281,6 @@ const Page001 = () => {
               <td>{record.email}</td>
               <td>{record.total_area}</td>
               <td>{record.notes}</td>
-              <td>{record.land_parcel_id}</td>
               {isAdmin && (
                 <td>
                 <EditButton className="btn btn-warning btn-sm" onClick={() => handleEdit(record)}>更正</EditButton>

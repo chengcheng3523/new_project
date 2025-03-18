@@ -15,8 +15,7 @@ class users(db.Model):
     username = db.Column(db.String(255)) # 'username' 欄位：字串類型 (最多 255 個字元)，不可為空 (nullable=False)
     password = db.Column(db.String(255)) # 'password' 欄位：字串類型 (最多 255 個字元)，不可為空 (nullable=False)
     unit_name = db.Column(db.String(255))       # 'unit_name' 欄位：字串類型 (最多 255 個字元)，不可為空，代表所屬單位名稱
-    land_parcel_id = db.Column(db.String(20))   # 'land_parcel_id' 欄位：字串類型 (最多 20 個字元)，不可為空，代表土地地段編號
-
+    
     plain_password = db.Column(db.String(255), comment='原始密碼')  # '這個之後可移除
     farmer_name = db.Column(db.String(50), comment='經營農戶姓名')
     phone = db.Column(db.String(50), comment='聯絡電話')
@@ -29,27 +28,34 @@ class users(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-# 定义 landls 数据模型
+    # 關聯Users 关联到 Lands 和 Form002
+    lands = db.relationship('Lands', backref='user', lazy=True)
+    form002_records = db.relationship('Form002', backref='user', lazy=True)
+
+# 定义 lands 数据模型
 class Lands(db.Model):
-    __tablename__ = 'landls'
+    __tablename__ = 'lands'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    number = db.Column(db.String(50) )
-    land_parcel_number = db.Column(db.String(50) )
+    number = db.Column(db.String(50), unique=True, nullable=False)
+    lands_number = db.Column(db.String(50) )# 確保這行存在
     area = db.Column(db.Numeric(10, 2) )
     crop = db.Column(db.String(100))
     notes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # 反向關聯Lands 关联到 Form002
+    form002_records = db.relationship('Form002', backref='land', lazy=True)
 
 # 生產計畫模型
 class Form002(db.Model):
     __tablename__ = 'form002'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    lands_id = db.Column(db.Integer, db.ForeignKey('lands.id'), nullable=False)
-    area_code = db.Column(db.String(20) )
+    lands_id = db.Column(db.Integer, db.ForeignKey('lands.id'), nullable=False, unique=True)
+    area_code = db.Column(db.String(20))
     area_size = db.Column(db.Numeric(10, 2) )
     month = db.Column(db.String(10) )
     crop_info = db.Column(db.String(255) )
@@ -57,7 +63,10 @@ class Form002(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-
+    @staticmethod
+    def validate_area_code(area_code):
+        land = Lands.query.filter_by(number=area_code).first()
+        return land if land else None
 
 # 種苗登記表
 class Form02(db.Model):
