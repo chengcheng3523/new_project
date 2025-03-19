@@ -77,8 +77,6 @@ const Page002 = () => {
     e.preventDefault();
     setLoading(true);
 
-
-
   try {
     let response;
     if (formData.id) {

@@ -336,27 +336,29 @@ def get_lands():
 @app.route('/api/form002', methods=['POST'])
 def add_form002():
     data = request.get_json()
-    if not data:
-        return jsonify({'error': '請提供 JSON 數據'}), 400
+    print("收到的請求數據:", data)
 
     user_id = data.get('user_id')
-    area_code = data.get('area_code') 
+    area_code = data.get('area_code')  # area_code 其實對應 number
     area_size = data.get('area_size') if data.get('area_size') not in ['', 'None', None] else None
     month = data.get('month')
     crop_info = data.get('crop_info')
     notes = data.get('notes')
 
-    # 驗證 area_code 是否有效
-    lands = Lands.query.get(area_code)
+    # 使用 `number` 查找 `lands_id`
+    lands = Lands.query.filter_by(number=area_code).first()
+    
     if not lands:
-        return jsonify({'error': '無效的農地 ID'}), 400
-    if not Lands.query.filter_by(number=area_code).first():
-        return jsonify({'error': '無效的田區代號'}), 400
+        print(f"❌ 錯誤: 找不到 area_code={area_code} 對應的 lands_id")  # ← 新增錯誤提示
+        return jsonify({'error': f'找不到 area_code={area_code} 對應的農地'}), 400
+    
+    lands_id = lands.id  # 取得 lands_id
+    print(f"✅ 成功找到 lands_id={lands_id} 對應的 area_code={area_code}")
 
     try:
         new_form = Form002(
             user_id=user_id,
-            area_code=area_code,
+            lands_id=lands_id,  # 自動關聯 lands_id
             area_size=area_size,
             month=month,
             crop_info=crop_info,
@@ -365,10 +367,12 @@ def add_form002():
 
         db.session.add(new_form)
         db.session.commit()
-        return jsonify({'status': '生產計畫新增成功', 'form_id': new_form.id}), 201
+        return jsonify({'status': '生產計畫新增成功', 'form_id': new_form.id, 'lands_id': lands_id}), 201
     except Exception as e:
         print(f"Error occurred while adding form002: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+
     
 # 更新生產計畫
 @app.route('/api/form002/<int:id>', methods=['PUT'])
@@ -407,17 +411,17 @@ def delete_form002(id):
 def get_all_form002(): 
     results = db.session.query(
         Form002,
-        users.farmer_name,
-        Lands.number
-    ).select_from(Form002).join(users).join(Lands).all()
+        users.farmer_name.label("farmer_name"),
+        Lands.number.label("land_number")
+    ).join(users, Form002.user_id == users.id).join(Lands, Form002.lands_id == Lands.id).all()
 
     forms = [
         {
             'id': result.Form002.id,
             'user_id': result.Form002.user_id,
-            'farmer_name': result.farmer_name,
-            'area_code': result.Form002.area_code,
-            'area_size': str(result.Form002.area_size),
+            'farmer_name': result.farmer_name,  
+            'area_code': result.land_number,  # 修正這裡
+            'area_size': float(result.Form002.area_size) if result.Form002.area_size else None,
             'month': result.Form002.month,
             'crop_info': result.Form002.crop_info,
             'notes': result.Form002.notes

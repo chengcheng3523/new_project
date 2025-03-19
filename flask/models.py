@@ -36,17 +36,17 @@ class users(db.Model):
 class Lands(db.Model):
     __tablename__ = 'lands'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # lands_id
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     number = db.Column(db.String(50), unique=True, nullable=False)
-    lands_number = db.Column(db.String(50) )# 確保這行存在
-    area = db.Column(db.Numeric(10, 2) )
+    lands_number = db.Column(db.String(50), unique=True, nullable=False)  # lands_number 對應 area_code
+    area = db.Column(db.Numeric(10, 2))
     crop = db.Column(db.String(100))
     notes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # 反向關聯Lands 关联到 Form002
+
+    # 反向關聯到 Form002
     form002_records = db.relationship('Form002', backref='land', lazy=True)
 
 # 生產計畫模型
@@ -54,7 +54,7 @@ class Form002(db.Model):
     __tablename__ = 'form002'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    lands_id = db.Column(db.Integer, db.ForeignKey('lands.id'), nullable=False, unique=True)
+    lands_id = db.Column(db.Integer, db.ForeignKey('lands.id'), nullable=False)
     area_code = db.Column(db.String(20))
     area_size = db.Column(db.Numeric(10, 2) )
     month = db.Column(db.String(10) )
@@ -63,10 +63,11 @@ class Form002(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    @staticmethod
-    def validate_area_code(area_code):
-        land = Lands.query.filter_by(number=area_code).first()
-        return land if land else None
+@staticmethod
+def validate_area_code(area_code):
+    if not area_code:
+        return False  # 避免 None 或空字串
+    return db.session.query(db.exists().where(Lands.number == area_code)).scalar()
 
 # 種苗登記表
 class Form02(db.Model):
