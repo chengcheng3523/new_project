@@ -329,15 +329,37 @@ def get_lands():
     return jsonify(lands)
 
 # ----------------------------------------------------------------------------------------
-# 選擇田區代號
+# 選擇田區代號area_codes
 # 查詢所有有效的 number
 @app.route('/api/valid_area_codes', methods=['GET'])
 def get_valid_area_codes():
     try:
-        # 假設 Lands 是你的資料表模型
+        # Lands 是你的資料表模型
         lands = Lands.query.all()  # 查詢所有 lands 資料
         valid_area_codes = [land.number for land in lands]  # 獲取所有有效的 area_code (即 number)
         return jsonify(valid_area_codes), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# 選擇田區代號field_codes
+@app.route('/api/valid_field_codes', methods=['GET'])
+def get_valid_field_codes():
+    try:
+        # Lands 是你的資料表模型
+        lands = Lands.query.all()  # 查詢所有 lands 資料
+        valid_field_codes = [land.number for land in lands]  # 獲取所有有效的 field_code (即 number)
+        return jsonify(valid_field_codes), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# 選擇作物
+@app.route('/api/valid_crop', methods=['GET'])
+def get_valid_crop():
+    try:
+        # Lands 是你的資料表模型
+        lands = Lands.query.all()  # 查詢所有 lands 資料
+        valid_crop = [land.crop for land in lands]  # 獲取所有有效的 crop (即 crop)
+        return jsonify(valid_crop), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
