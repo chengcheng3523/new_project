@@ -5,6 +5,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthContext from '../components/auth/AuthContext';
 import FormField from '../components/common/FormField';
+import FieldSelect from '../components/common/FieldSelect';
 import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
 import { useNavigate } from 'react-router-dom';
@@ -22,9 +23,21 @@ const Page002 = () => {
     notes: '',
   });
 
+  const [validAreaCodes, setValidAreaCodes] = useState([]);  // 儲存有效的 area_code
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // 請求所有有效的 area_code
+  const fetchValidAreaCodes = useCallback(async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:5000/api/valid_area_codes');
+      setValidAreaCodes(response.data);  // 設置有效的 area_code
+    } catch (error) {
+      console.error('無法獲取有效的 area_codes:', error);
+      alert('無法載入有效的田區代號，請稍後再試！');
+    }
+  }, []);
 
   const fetchData = useCallback(async () => {
     try {
@@ -58,8 +71,9 @@ const Page002 = () => {
       navigate('/login'); // 重定向到登入頁面
       return;
     }
+    fetchValidAreaCodes(); // 加載有效的 area_code
     fetchData(); // 組件加載時獲取數據
-  }, [fetchData, navigate, userId]);
+  }, [fetchValidAreaCodes,fetchData, navigate, userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -156,13 +170,20 @@ const Page002 = () => {
       <Clearfix height="100px" />
       <Form onSubmit={handleSubmit}>
         <h4>表1-2.生產計畫</h4>
-        <FormField
-          label="場區代號(田區代號)field_code"
+        <FieldSelect
+          label="田區代號"
           name="area_code"
           value={formData.area_code}
           onChange={handleChange}
-          disabled={loading}
-        />
+          type="select"
+        >
+          <option value="">選擇田區代號</option>
+          {validAreaCodes.map((areaCode) => (
+            <option key={areaCode} value={areaCode}>
+              {areaCode}
+            </option>
+          ))}
+        </FieldSelect>
         <FormField
           label="場區面積(公頃)"
           name="area_size"

@@ -329,7 +329,19 @@ def get_lands():
     return jsonify(lands)
 
 # ----------------------------------------------------------------------------------------
+# 選擇田區代號
+# 查詢所有有效的 number
+@app.route('/api/valid_area_codes', methods=['GET'])
+def get_valid_area_codes():
+    try:
+        # 假設 Lands 是你的資料表模型
+        lands = Lands.query.all()  # 查詢所有 lands 資料
+        valid_area_codes = [land.number for land in lands]  # 獲取所有有效的 area_code (即 number)
+        return jsonify(valid_area_codes), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
+# ----------------------------------------------------------------------------------------
 # 生產計畫
 
 #  新增生產計畫

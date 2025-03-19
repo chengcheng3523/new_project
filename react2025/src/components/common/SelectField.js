@@ -1,3 +1,4 @@
+// 一個單選的下拉選單並且支持一個(其他)選項
 import React, { useState, useEffect } from 'react';
 import Label from './Label';
 import styled from "styled-components";
