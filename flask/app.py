@@ -738,8 +738,7 @@ def get_all_form03():
 @app.route('/api/form06', methods=['POST'])
 def add_form06():
     data = request.get_json()
-    if not data:
-        return jsonify({'error': '請提供 JSON 數據'}), 400
+    print("收到的請求數據:", data)
     
     user_id = data.get('user_id')
     date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
@@ -753,9 +752,20 @@ def add_form06():
     process = data.get('process')
     notes = data.get('notes')
 
+    # 使用 `number` 查找 `lands_id`
+    lands = Lands.query.filter_by(number=field_code).first()
+    
+    if not lands:
+        print(f"❌ 錯誤: 找不到 field_code={field_code} 對應的 lands_id")  # ← 新增錯誤提示
+        return jsonify({'error': f'找不到 field_code={field_code} 對應的農地'}), 400
+    
+    lands_id = lands.id  # 取得 lands_id
+    print(f"✅ 成功找到 lands_id={lands_id} 對應的 field_code={field_code}")
+
     try:
         new_form = Form06(
             user_id=user_id,
+            lands_id=lands_id,  # 自動關聯 lands_id
             date_used=date_used,
             field_code=field_code,
             crop=crop,
@@ -780,11 +790,24 @@ def add_form06():
 def update_form06(id):
     data = request.get_json()
     form = Form06.query.get(id)
+    print("收到的更新數據:", data)
+    
+    form = Form06.query.get(id)
     if not form:
         return jsonify({'error': '肥料施用未找到'}), 404
     
+    # 获取 field_code，如果没有传递就使用原来的 field_code
+    field_code = data.get('field_code', form.field_code)
+
+    # 如果 field_code 更新了，检查是否存在对应的农地
+    if field_code != form.field_code:
+        lands = Lands.query.filter_by(number=field_code).first()
+        if not lands:
+            return jsonify({'error': '無效的田區代號'}), 400
+        form.lands_id = lands.id  # 更新关联的 lands_id
+
     form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
-    form.field_code = data['field_code']
+    form.field_code = field_code
     form.crop = data['crop']
     form.fertilizer_type = data['fertilizer_type']
     form.material_code_or_name = data['material_code_or_name']
@@ -793,19 +816,24 @@ def update_form06(id):
     form.operator = data['operator']
     form.process = data['process']
     form.notes = data.get('notes')
-    db.session.commit()
-    return jsonify({'message': '肥料施用更新成功'}),200
+
+    try:
+        db.session.commit()
+        return jsonify({'message': '肥料施用更新成功'}), 200
+    except Exception as e:
+        print(f"Error occurred while updating form06: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 # 刪除肥料施用
 @app.route('/api/form06/<int:id>', methods=['DELETE'])
 def delete_form06(id):
     record = Form06.query.get(id)
     if not record:
-        return jsonify({'error': 'Record not found'}), 404
+        return jsonify({'error': '肥料施用未找到'}), 404
     
     db.session.delete(record)
     db.session.commit()
-    return jsonify({'message': 'Record deleted successfully'})
+    return jsonify({'message': '肥料施用已刪除'}), 200
 
 # 查詢所有使用者的肥料施用
 @app.route('/api/form06', methods=['GET'])
@@ -819,7 +847,7 @@ def get_all_form06():
             "user_id": result.Form06.user_id,
             "farmer_name": result.farmer_name,
             "date_used": result.Form06.date_used.strftime('%Y-%m-%d') if result.Form06.date_used else None,
-            "field_code": result.Form06.field_code,
+            'field_code': result.land_number,  # 修正這裡
             "crop": result.Form06.crop,
             "fertilizer_type": result.Form06.fertilizer_type,
             "material_code_or_name": result.Form06.material_code_or_name,
@@ -1017,8 +1045,7 @@ def get_all_form08():
 @app.route('/api/form09', methods=['POST'])
 def add_form09():
     data = request.get_json()
-    if not data:
-        return jsonify({'error': '請提供 JSON 數據'}), 400
+    print("收到的請求數據:", data)
     
     user_id = data.get('user_id')
     date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
@@ -1033,10 +1060,21 @@ def add_form09():
     operator_method = data.get('operator_method')
     operator = data.get('operator')
     notes = data.get('notes')
+
+      # 使用 `number` 查找 `lands_id`
+    lands = Lands.query.filter_by(number=field_code).first()
     
+    if not lands:
+        print(f"❌ 錯誤: 找不到 field_code={field_code} 對應的 lands_id")  # ← 新增錯誤提示
+        return jsonify({'error': f'找不到 field_code={field_code} 對應的農地'}), 400
+    
+    lands_id = lands.id  # 取得 lands_id
+    print(f"✅ 成功找到 lands_id={lands_id} 對應的 field_code={field_code}")
+
     try:
         new_form = Form09(
             user_id=user_id,
+            lands_id=lands_id,  # 自動關聯 lands_id
             date_used=date_used,
             field_code=field_code,
             crop=crop,
@@ -1062,12 +1100,24 @@ def add_form09():
 @app.route('/api/form09/<int:id>', methods=['PUT'])
 def update_form09(id):
     data = request.get_json()
+    print("收到的更新數據:", data)
+
     form = Form09.query.get(id)
     if not form:
         return jsonify({'error': '有害生物防治或環境消毒資材施用未找到'}), 404
     
+    # 获取 field_code，如果没有传递就使用原来的 field_code
+    field_code = data.get('field_code', form.field_code)
+
+    # 如果 field_code 更新了，检查是否存在对应的农地
+    if field_code != form.field_code:
+        lands = Lands.query.filter_by(number=field_code).first()
+        if not lands:
+            return jsonify({'error': '無效的田區代號'}), 400
+        form.lands_id = lands.id  # 更新关联的 lands_id
+
     form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
-    form.field_code = data['field_code']
+    form.field_code = field_code
     form.crop = data['crop']
     form.pest_target = data['pest_target']
     form.material_code_or_name = data['material_code_or_name']
@@ -1078,9 +1128,14 @@ def update_form09(id):
     form.operator_method = data['operator_method']
     form.operator = data['operator']
     form.notes = data.get('notes')
-    db.session.commit()
-    return jsonify({'message': '有害生物防治或環境消毒資材施用更新成功'})
 
+    try:
+        db.session.commit()
+        return jsonify({'message': '有害生物防治或環境消毒資材施用更新成功'})
+    except Exception as e:
+        print(f"Error occurred while updating form09: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    
 # 刪除有害生物防治或環境消毒資材施用
 @app.route('/api/form09/<int:id>', methods=['DELETE'])
 def delete_form09(id):
@@ -1104,7 +1159,7 @@ def get_all_form09():
             "user_id": result.Form09.user_id,
             "farmer_name": result.farmer_name,
             "date_used": result.Form09.date_used.strftime('%Y-%m-%d') if result.Form09.date_used else None,
-            "field_code": result.Form09.field_code,
+            'field_code': result.land_number,  # 修正這裡
             "crop": result.Form09.crop,
             "pest_target": result.Form09.pest_target,
             "material_code_or_name": result.Form09.material_code_or_name,
@@ -1307,8 +1362,7 @@ def get_all_form11():
 @app.route('/api/form12', methods=['POST'])
 def add_form12():
     data = request.get_json()
-    if not data:
-        return jsonify({'error': '請提供 JSON 數據'}), 400
+    print("收到的請求數據:", data)
     
     user_id = data.get('user_id')
     date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
@@ -1318,6 +1372,16 @@ def add_form12():
     usage_amount = data.get('usage_amount') if data.get('usage_amount') not in ['', 'None', None] else None
     operator = data.get('operator')
     notes = data.get('notes')
+
+    # 使用 `number` 查找 `lands_id`
+    lands = Lands.query.filter_by(number=field_code).first()
+    
+    if not lands:
+        print(f"❌ 錯誤: 找不到 field_code={field_code} 對應的 lands_id")  # ← 新增錯誤提示
+        return jsonify({'error': f'找不到 field_code={field_code} 對應的農地'}), 400
+    
+    lands_id = lands.id  # 取得 lands_id
+    print(f"✅ 成功找到 lands_id={lands_id} 對應的 field_code={field_code}")
 
     try:
         new_form = Form12(
@@ -1342,19 +1406,36 @@ def add_form12():
 @app.route('/api/form12/<int:id>', methods=['PUT'])
 def update_form12(id):
     data = request.get_json()
+    print("收到的更新數據:", data)
+
     form = Form12.query.get(id)
     if not form:
         return jsonify({'error': '其他資材使用紀錄未找到'}), 404
     
+    # 获取 field_code，如果没有传递就使用原来的 field_code
+    field_code = data.get('field_code', form.field_code)
+
+    # 如果 field_code 更新了，检查是否存在对应的农地
+    if field_code != form.field_code:
+        lands = Lands.query.filter_by(number=field_code).first()
+        if not lands:
+            return jsonify({'error': '無效的田區代號'}), 400
+        form.lands_id = lands.id  # 更新关联的 lands_id
+    
     form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
-    form.field_code = data['field_code']
+    form.field_code = field_code
     form.crop = data['crop']
     form.material_code_or_name = data['material_code_or_name']
     form.usage_amount = data['usage_amount'] if data.get('usage_amount') not in ['', 'None', None] else None
     form.operator = data['operator']
     form.notes = data.get('notes')
-    db.session.commit()
-    return jsonify({'message': '其他資材使用紀錄更新成功'})
+
+    try:
+        db.session.commit()
+        return jsonify({'message': '其他資材使用紀錄更新成功'}), 200
+    except Exception as e:
+        print(f"Error occurred while updating form12: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 # 刪除其他資材使用紀錄
 @app.route('/api/form12/<int:id>', methods=['DELETE'])
@@ -1379,7 +1460,7 @@ def get_all_form12():
             "user_id": result.Form12.user_id,
             "farmer_name": result.farmer_name,
             "date_used": result.Form12.date_used.strftime('%Y-%m-%d') if result.Form12.date_used else None,
-            "field_code": result.Form12.field_code,
+            'field_code': result.land_number,  # 修正這裡
             "crop": result.Form12.crop,
             "material_code_or_name": result.Form12.material_code_or_name,
             "usage_amount": str(result.Form12.usage_amount),
@@ -1737,12 +1818,11 @@ def get_all_form16():
 @app.route('/api/form17', methods=['POST'])
 def add_form17():
     data = request.get_json()
-    if not data:
-        return jsonify({'error': '請提供 JSON 數據'}), 400
+    print("收到的請求數據:", data)
     
     user_id = data.get('user_id')
     harvest_date = datetime.strptime(data.get('harvest_date'), '%Y-%m-%d') if data.get('harvest_date') not in ['', 'None', None] else None
-    field_code = data.get('field_code')
+    field_code = data.get('field_code') # field_code 對應 number
     crop_name = data.get('crop_name')
     batch_or_trace_no = data.get('batch_or_trace_no')
     harvest_weight = data.get('harvest_weight') if data.get('harvest_weight') not in ['', 'None', None] else None
@@ -1752,9 +1832,20 @@ def add_form17():
     verification_status = data.get('verification_status') 
     notes = data.get('notes')
 
+    # 使用 `number` 查找 `lands_id`
+    lands = Lands.query.filter_by(number=field_code).first()
+    
+    if not lands:
+        print(f"❌ 錯誤: 找不到 field_code={field_code} 對應的 lands_id")  # ← 新增錯誤提示
+        return jsonify({'error': f'找不到 field_code={field_code} 對應的農地'}), 400
+    
+    lands_id = lands.id  # 取得 lands_id
+    print(f"✅ 成功找到 lands_id={lands_id} 對應的 field_code={field_code}")
+
     try:
         new_form = Form17(
             user_id=user_id,
+            lands_id=lands_id,  # 自動關聯 lands_id
             harvest_date=harvest_date,
             field_code=field_code,
             crop_name=crop_name,
@@ -1778,12 +1869,24 @@ def add_form17():
 @app.route('/api/form17/<int:id>', methods=['PUT'])
 def update_form17(id):
     data = request.get_json()
+    print("收到的更新數據:", data)
+
     form = Form17.query.get(id)
     if not form:
         return jsonify({'error': '採收及採後處理紀錄未找到'}), 404
-    
+
+    # 获取 field_code，如果没有传递就使用原来的 field_code
+    field_code = data.get('field_code', form.field_code)
+
+    # 如果 field_code 更新了，检查是否存在对应的农地
+    if field_code != form.field_code:
+        lands = Lands.query.filter_by(number=field_code).first()
+        if not lands:
+            return jsonify({'error': '無效的田區代號'}), 400
+        form.lands_id = lands.id  # 更新关联的 lands_id
+
     form.harvest_date = datetime.strptime(data['harvest_date'], '%Y-%m-%d') if data.get('harvest_date') not in ['', 'None', None] else None
-    form.field_code = data['field_code']
+    form.field_code = field_code
     form.crop_name = data['crop_name']
     form.batch_or_trace_no = data['batch_or_trace_no']
     form.harvest_weight = data['harvest_weight'] if data.get('harvest_weight') not in ['', 'None', None] else None
@@ -1818,7 +1921,7 @@ def get_all_form17():
             "user_id": result.Form17.user_id,
             "farmer_name": result.farmer_name,
             "harvest_date": result.Form17.harvest_date.strftime('%Y-%m-%d') if result.Form17.harvest_date else None,
-            "field_code": result.Form17.field_code,
+            'field_code': result.land_number,  # 修正這裡
             "crop_name": result.Form17.crop_name,
             "batch_or_trace_no": result.Form17.batch_or_trace_no,
             "harvest_weight": str(result.Form17.harvest_weight),

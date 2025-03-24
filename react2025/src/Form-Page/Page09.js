@@ -231,23 +231,22 @@ const Page09 = () => {
         value={formData.date_used}
         onChange={handleChange}
         type="date"
-        
       />
 
-      <FieldSelect
-        Name="field_code"
-        type="select"
-        value={formData.field_code}
-        onChange={handleChange}
-        label="田區代號:"
-        >
-        <option value="">選擇田區代號</option>
-        {validFieldCodes.map((fieldCode) => (
-          <option key={fieldCode} value={fieldCode}>
-            {fieldCode}
-          </option>
-        ))}
-      </FieldSelect>
+        <FieldSelect
+          name="field_code"
+          type="select"
+          value={formData.field_code}
+          onChange={handleChange}
+          label="田區代號:"
+          >
+          <option value="">選擇田區代號</option>
+          {validFieldCodes.map((fieldCode) => (
+            <option key={fieldCode} value={fieldCode}>
+              {fieldCode}
+            </option>
+          ))}
+        </FieldSelect>
 
       <FieldSelect
         name="crop"

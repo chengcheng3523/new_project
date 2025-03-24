@@ -15,7 +15,6 @@ class users(db.Model):
     username = db.Column(db.String(255)) # 'username' 欄位：字串類型 (最多 255 個字元)，不可為空 (nullable=False)
     password = db.Column(db.String(255)) # 'password' 欄位：字串類型 (最多 255 個字元)，不可為空 (nullable=False)
     unit_name = db.Column(db.String(255))       # 'unit_name' 欄位：字串類型 (最多 255 個字元)，不可為空，代表所屬單位名稱
-    
     plain_password = db.Column(db.String(255), comment='原始密碼')  # '這個之後可移除
     farmer_name = db.Column(db.String(50), comment='經營農戶姓名')
     phone = db.Column(db.String(50), comment='聯絡電話')
