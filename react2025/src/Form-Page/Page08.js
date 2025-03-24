@@ -85,15 +85,20 @@ const Page08 = () => {
 
       // 自動計算剩餘量
       let newFormData = { ...formData, [name]: value };
+
       if (name === 'purchase_quantity' || name === 'usage_quantity') {
         const purchase = parseFloat(newFormData.purchase_quantity) || 0;
         const usage = parseFloat(newFormData.usage_quantity) || 0;
-        newFormData.remaining_quantity = (purchase - usage).toFixed(2);
+        newFormData.remaining_quantity = (purchase - usage).toFixed(2);  // 自動更新剩餘量
       }
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
+
+      // 自動更新包裝容量
+      if (name === 'volumeValue' || name === 'volumeUnit' || name === 'volumeUnit_other') {
+        const packagingVolume = `${newFormData.volumeValue} ${newFormData.volumeUnit === '其他' ? newFormData.volumeUnit_other : newFormData.volumeUnit}`;
+        newFormData.packaging_volume = packagingVolume;
+      }
+
+      setFormData(newFormData);
     };
   
     const handleSubmit = async (e) => {
@@ -101,20 +106,20 @@ const Page08 = () => {
       setLoading(true);
   
 
-  // 驗證使用量和剩餘量不超過購入量
-  const purchase = parseFloat(formData.purchase_quantity);
-  const usage = parseFloat(formData.usage_quantity) || 0;
-  const remaining = parseFloat(formData.remaining_quantity) || 0;
-  if (usage > purchase) {
-    alert('使用量不能大於購入量！');
-    setLoading(false);
-    return;
-  }
-  if (remaining > purchase) {
-    alert('剩餘量不能大於購入量！');
-    setLoading(false);
-    return;
-  }
+    // 驗證使用量和剩餘量不超過購入量
+    const purchase = parseFloat(formData.purchase_quantity);
+    const usage = parseFloat(formData.usage_quantity) || 0;
+    const remaining = parseFloat(formData.remaining_quantity) || 0;
+    if (usage > purchase) {
+      alert('使用量不能大於購入量！');
+      setLoading(false);
+      return;
+    }
+    if (remaining > purchase) {
+      alert('剩餘量不能大於購入量！');
+      setLoading(false);
+      return;
+    }
 
   // 合併包裝容量
   // const packaging_volume = `${formData.volumeValue} ${formData.volumeUnit}`;
