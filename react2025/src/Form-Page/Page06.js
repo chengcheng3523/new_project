@@ -5,6 +5,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthContext from '../components/auth/AuthContext';
 import FormField from '../components/common/FormField'; 
+import FieldSelect from '../components/common/FieldSelect';
 import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
 import { useNavigate } from 'react-router-dom';
@@ -28,9 +29,32 @@ const Page06 = () => {
     notes: '',
   });
   
+  const [validFieldCodes, setvalidFieldCodes] = useState([]);  // 儲存有效的 field_code
+  const [validcrops, setvalidcrops] = useState([]);  // 儲存有效的 crop
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // 請求所有有效的 field_code
+  const fetchValidFieldCodes = useCallback(async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:5000/api/valid_field_codes');
+      setvalidFieldCodes(response.data);  // 設置有效的 field_code
+    } catch (error) {
+      console.error('無法獲取有效的 field_codes:', error);
+      alert('無法載入有效的田區代號，請稍後再試！');
+    }
+  }, []);
+
+  const fetchValidCrops = useCallback(async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:5000/api/valid_crops');
+      setvalidcrops(response.data);  // 設置有效的 crop
+    } catch (error) {
+      console.error('無法獲取有效的 crop:', error);
+      alert('無法載入有效的田區代號，請稍後再試！');
+    }
+  }, []);
 
   const fetchData = useCallback(async () => {
     try {
@@ -70,8 +94,10 @@ const Page06 = () => {
       navigate('/login'); // 重定向到登入頁面
       return;
     }
+    fetchValidFieldCodes(); // 組件加載時獲取有效的 field_code
+    fetchValidCrops(); // 組件加載時獲取有效的 crop
     fetchData(); // 組件加載時獲取數據
-  }, [fetchData, navigate, userId]);
+  }, [fetchValidFieldCodes, fetchValidCrops, fetchData, navigate, userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -193,20 +219,38 @@ const Page06 = () => {
           onChange={handleChange}
           disabled={loading}
         />
-        <FormField
-          label="田區代號"
+
+        <FieldSelect
           name="field_code"
+          type="select"
           value={formData.field_code}
           onChange={handleChange}
-          disabled={loading}
-        />
-        <FormField
-          label="作物"
+          label="田區代號:"
+          >
+          <option value="">選擇田區代號</option>
+          {validFieldCodes.map((fieldCode) => (
+            <option key={fieldCode} value={fieldCode}>
+              {fieldCode}
+            </option>
+          ))}
+        </FieldSelect>
+
+
+        <FieldSelect
           name="crop"
+          type="select"
           value={formData.crop}
           onChange={handleChange}
-          disabled={loading}
-        />
+          label="作物:"
+          >
+          <option value="">選擇作物</option>
+          {validcrops.map((crop) => (
+            <option key={crop} value={crop}>
+              {crop}
+            </option>
+          ))}
+        </FieldSelect>
+
         <FormField
           label="施肥別 (基肥, 追肥)"
           name="fertilizer_type"

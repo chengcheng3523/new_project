@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthContext from '../components/auth/AuthContext';
 import FormField from '../components/common/FormField';
 import SelectField from '../components/common/SelectField';
+import FieldSelect from '../components/common/FieldSelect';
 import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +18,7 @@ const Page02 = () => {
   const [formData, setFormData] = useState({
     id: null,
     user_id: userId, 
-    cultivated_crop: '',
+    crop: '',
     crop_variety: '',
     seed_source: '',
     seedling_purchase_date: '',
@@ -26,9 +27,21 @@ const Page02 = () => {
     notes: '',
   });
 
+  const [validcrops, setvalidcrops] = useState([]);  // 儲存有效的 crop
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const fetchValidCrops = useCallback(async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:5000/api/valid_crops');
+      setvalidcrops(response.data);  // 設置有效的 crop
+    } catch (error) {
+      console.error('無法獲取有效的 crop:', error);
+      alert('無法載入有效的田區代號，請稍後再試！');
+    }
+  }, []);
+
 
   const fetchData = useCallback(async () => {
     try {
@@ -38,7 +51,7 @@ const Page02 = () => {
         const transformedData = response.data.map(item => ({
           id: item.id, // 使用 land_parcel_number 作为唯一标识符
           user_id: item.user_id,
-          cultivated_crop: item.cultivated_crop,
+          crop: item.crop,
           crop_variety: item.crop_variety,
           seed_source: item.seed_source,
           seedling_purchase_date: item.seedling_purchase_date,
@@ -64,7 +77,8 @@ const Page02 = () => {
       return;
     }
     fetchData(); // 組件加載時獲取數據
-  }, [fetchData, navigate, userId]);
+    fetchValidCrops(); // 組件加載時獲取有效的 crop
+  }, [fetchData, fetchValidCrops, navigate, userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -103,7 +117,7 @@ const Page02 = () => {
         // 新增資料
         response = await axios.post('http://127.0.0.1:5000/api/form02', {
           user_id: userId,
-          cultivated_crop: formData.cultivated_crop,
+          crop: formData.crop,
           crop_variety: formData.crop_variety,
           seed_source: formData.seed_source,
           seedling_purchase_date: formData.seedling_purchase_date,
@@ -115,7 +129,7 @@ const Page02 = () => {
       setFormData({
         id: null,
         user_id: userId,
-        cultivated_crop: '',
+        crop: '',
         crop_variety: '',
         seed_source: '',
         seedling_purchase_date: '',
@@ -158,7 +172,7 @@ const Page02 = () => {
     const isOtherUnit = !['自行育苗'].includes(record.seedling_purchase_type);
     setFormData({
       id: record.id,
-      cultivated_crop: record.cultivated_crop,
+      crop: record.crop,
       crop_variety: record.crop_variety,
       seed_source: record.seed_source,
       seedling_purchase_type: isOtherUnit ? '購買來源' : record.seedling_purchase_type || '',
@@ -175,14 +189,22 @@ const Page02 = () => {
       <Clearfix height="100px" />
       <Form onSubmit={handleSubmit}>
         <h4>表2.種子(苗)登記表</h4>
-        <FormField
-          label="栽培作物"
-          name="cultivated_crop"
-          value={formData.cultivated_crop}
-          onChange={handleChange}
-          disabled={loading}
 
-        />
+        <FieldSelect
+          name="crop"
+          type="select"
+          value={formData.crop}
+          onChange={handleChange}
+          label="栽培作物:"
+          >
+          <option value="">選擇作物</option>
+          {validcrops.map((crop) => (
+            <option key={crop} value={crop}>
+              {crop}
+            </option>
+          ))}
+        </FieldSelect>
+
         <FormField
           label="栽培品種"
           name="crop_variety"
@@ -258,7 +280,7 @@ const Page02 = () => {
           {data.map((record) => (
             <tr key={record.id || record.FieldCode}>
               <td>{record.id}</td>
-              <td>{record.cultivated_crop}</td>
+              <td>{record.crop}</td>
               <td>{record.crop_variety}</td>
               <td>{record.seed_source}</td>
               <td>{moment(record.seedling_purchase_date).format('YYYY-MM-DD')}</td> 

@@ -25,8 +25,9 @@ const Page03 = () => {
     crop_content_other: '', // 新增：當選擇「其他」時的單位輸入
     notes: '',
   });
+  
   const [validFieldCodes, setvalidFieldCodes] = useState([]);  // 儲存有效的 field_code
-  const [validcrops, setvalidcrops] = useState([]);  // 儲存有效的 field_code
+  const [validcrops, setvalidcrops] = useState([]);  // 儲存有效的 crop
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ const Page03 = () => {
   const fetchValidCrops = useCallback(async () => {
     try {
       const response = await axios.get('http://127.0.0.1:5000/api/valid_crops');
-      setvalidcrops(response.data);  // 設置有效的 field_code
+      setvalidcrops(response.data);  // 設置有效的 crop
     } catch (error) {
       console.error('無法獲取有效的 crop:', error);
       alert('無法載入有效的田區代號，請稍後再試！');
@@ -89,6 +90,7 @@ const Page03 = () => {
     fetchValidCrops(); // 組件加載時獲取有效的 crop
     fetchData(); // 組件加載時獲取數據
   }, [fetchValidFieldCodes, fetchValidCrops, fetchData, navigate, userId]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -239,7 +241,7 @@ const Page03 = () => {
           onChange={handleChange}
           label="作物:"
           >
-          <option value="">選擇田區代號</option>
+          <option value="">選擇作物</option>
           {validcrops.map((crop) => (
             <option key={crop} value={crop}>
               {crop}

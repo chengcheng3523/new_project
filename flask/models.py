@@ -69,12 +69,12 @@ def validate_area_code(area_code):
         return False  # 避免 None 或空字串
     return db.session.query(db.exists().where(Lands.number == area_code)).scalar()
 
-# 種苗登記表
+# Form02 種苗登記表
 class Form02(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
-    cultivated_crop = db.Column(db.String(100) )
+    lands_id = db.Column(db.Integer, db.ForeignKey('lands.id'), nullable=False)
+    crop = db.Column(db.String(100) )
     crop_variety = db.Column(db.String(100) )
     seed_source = db.Column(db.String(255))
     seedling_purchase_date = db.Column(db.Date)
@@ -83,10 +83,17 @@ class Form02(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    @staticmethod
+    def validate_crop(crop):
+        if not crop:
+            return False  # 避免 None 或空字串
+        return db.session.query(db.exists().where(Lands.crop == crop)).scalar()
+    
 # 栽培工作模型
 class Form03(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    lands_id = db.Column(db.Integer, db.ForeignKey('lands.id'), nullable=False)
     operation_date = db.Column(db.Date)
     field_code = db.Column(db.String(50))
     crop = db.Column(db.String(100))
@@ -99,6 +106,7 @@ class Form03(db.Model):
 class Form06(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    lands_id = db.Column(db.Integer, db.ForeignKey('lands.id'), nullable=False)
     # 使用日期
     date_used = db.Column(db.Date)
     # 田區代號
@@ -153,6 +161,7 @@ class Form08(db.Model):
 class Form09(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)            # 編號，自動遞增
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
+    lands_id = db.Column(db.Integer, db.ForeignKey('lands.id'), nullable=False)
     date_used = db.Column(db.Date)                              # 使用日期
     field_code = db.Column(db.String(50))                       # 田區代號
     crop = db.Column(db.String(100))                            # 作物名稱
@@ -200,6 +209,8 @@ class Form11(db.Model):
 class Form12(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 編號，自動遞增
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
+    lands_id = db.Column(db.Integer, db.ForeignKey('lands.id'), nullable=False)
+    
     date_used = db.Column(db.Date)  # 使用日期
     field_code = db.Column(db.String(100))  # 田區代號
     crop = db.Column(db.String(100))  # 作物名稱
@@ -269,6 +280,7 @@ class Form17(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
     harvest_date = db.Column(db.Date)  # 採收日期
     field_code = db.Column(db.String(50))  # 田區代號
+    lands_id = db.Column(db.Integer, db.ForeignKey('lands.id'), nullable=False)
     crop_name = db.Column(db.String(255))  # 作物名稱
     batch_or_trace_no = db.Column(db.String(50), nullable=True)  # 批次編號或履歷編號
     harvest_weight = db.Column(db.Numeric(10, 2))  # 採收重量 (處理前)

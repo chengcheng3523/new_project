@@ -37,8 +37,7 @@ UPDATE users SET password = 'scrypt:32768:8:1$GecnsTV9ESdKmZ6l$87571fe224e1a1083
 CREATE TABLE lands (
     id                 INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id            INT NOT NULL,                    -- 關聯 `users` 表
-    -- lands 表中的 user_id 是手動指定的，並且必須是 users 表中已經存在的 id
-    number             VARCHAR(50),            -- 農地編號
+    number             VARCHAR(50) UNIQUE,            -- 農地編號
     lands_number       VARCHAR(50),            -- 農地地籍號碼
     area               DECIMAL(10,2),          -- 面積（單位：公頃）
     crop               VARCHAR(100),                    -- 種植作物
@@ -52,13 +51,9 @@ INSERT INTO lands (user_id, number, lands_number, area, crop, notes)
 VALUES
     (1, '農地編號', '農地地籍號碼', 1.2, '種植作物', '備註'),
     (2, 'LP001', '123456-7890', 1.2, '小白菜', '土壤肥沃，適合蔬菜種植'),
-    (1, 'LP002', '123456-7891', 2.5, '玉米', '土壤較乾燥，適合玉米種植');
-
--- 查詢農戶的所有農地
-SELECT u.username, u.farmer_name, l.lands_number, l.area, l.crop, l.notes
-FROM users u
-JOIN lands l ON u.id = l.user_id
-WHERE u.username = 'farmer1';
+    (1, 'LP002', '123456-7891', 2.5, '玉米', '土壤較乾燥，適合玉米種植'),
+    (1, 'LP003', '123456-7892', 1.0, '高麗菜', '備註'),
+    (1, 'LP004', '123456-7893', 1.0, '小黃瓜', '備註');
 
 -- form002（生產計畫）
 CREATE TABLE form002 (
@@ -75,27 +70,21 @@ CREATE TABLE form002 (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (lands_id) REFERENCES lands(id) ON DELETE CASCADE
 );
--- 資料示例form002（生產計畫）
-INSERT INTO form002 (user_id,lands_id, area_code, area_size, month, crop_info, notes)
+
+-- 插入 form002 数据
+INSERT INTO form002 (user_id, lands_id, area_code, area_size, month, crop_info, notes)
 VALUES 
-    (1,1,  '場區代號', 2.5, '月份', '種植作物種類、產期、預估產量（公斤）', '備註'),
-    (1,2,  'AC123456', 2.5, '3月', '小白菜/1000', '間作及敷蓋稻草'),
-    (1,3,  'AC654321', 1.8, '6月', '玉米/500', '施有機肥'),
-    (2,3,  'AC987654', 3.2, '9月', '水稻/2000', '水源充足');
-
--- 確保 form002 表中的 area_code 欄位只能選擇 lands 表中的 number 欄位值。
-
-SELECT u.username, u.farmer_name, f.area_code, f.area_size, f.month, f.crop_info, f.notes
-FROM form002 f
-JOIN users u ON f.user_id = u.id
-JOIN lands l ON f.lands_id = l.id
-WHERE u.username = 'farmer1';
+    (1, 1, '農地編號', 2.5, '1月', '種植作物種類、產期、預估產量（公斤）', '備註'),
+    (1, 2, 'LP001', 2.5, '3月', '小白菜/1000', '間作及敷蓋稻草'),
+    (1, 3, 'LP002', 1.8, '6月', '玉米/500', '施有機肥'),
+    (2, 3, 'LP002', 3.2, '9月', '水稻/2000', '水源充足');
 
 -- form02（種子(苗)登記表）
 CREATE TABLE form02 (
     id                   INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id              INT NOT NULL,                    -- 關聯 `users` 表
-    cultivated_crop      VARCHAR(100),           -- 栽培作物
+    lands_id         INT NOT NULL,                    -- 關聯 `lands` 表
+    crop      VARCHAR(100),           -- 栽培作物
     crop_variety         VARCHAR(100),           -- 栽培品種
     seed_source          VARCHAR(255),           -- 種子(苗)來源
     seedling_purchase_date DATE NULL,                -- 育苗(購入)日期
@@ -103,28 +92,25 @@ CREATE TABLE form02 (
     notes                TEXT,                            -- 備註
     created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (lands_id) REFERENCES lands(id) ON DELETE CASCADE
 );
 
 -- 資料示例form02（種子(苗)登記表）
-INSERT INTO form02 (user_id, cultivated_crop, crop_variety, seed_source, seedling_purchase_date, seedling_purchase_type, notes)
+INSERT INTO form02 (user_id, lands_id, crop, crop_variety, seed_source, seedling_purchase_date, seedling_purchase_type, notes)
 VALUES 
-    (1,  '高麗菜', '高麗菜', '自行育苗', '2025-02-01', '種苗', '間作及敷蓋稻草'),
-    (2, '高麗菜', '高麗菜', '自行育苗', '2025-02-01', '種苗', '間作及敷蓋稻草'),
-    (2, '高麗菜', '高麗菜', '購買來源：XYZ公司', '2025-03-15', '種子', '施有機肥'),
-    (1,  '高麗菜', '高麗菜', '購買來源：XYZ公司', '2025-03-15', '種子', '施有機肥');
+    (1,  1, '高麗菜', '高麗菜', '自行育苗', '2025-02-01', '種苗', '間作及敷蓋稻草'),
+    (2,  1,'高麗菜', '高麗菜', '自行育苗', '2025-02-01', '種苗', '間作及敷蓋稻草'),
+    (2,  1,'高麗菜', '高麗菜', '購買來源：XYZ公司', '2025-03-15', '種子', '施有機肥'),
+    (1,  1, '高麗菜', '高麗菜', '購買來源：XYZ公司', '2025-03-15', '種子', '施有機肥');
 
--- 查詢某農戶的所有種子登記
-SELECT u.username, u.farmer_name, f.cultivated_crop, f.crop_variety, f.seed_source, f.seedling_purchase_date, f.seedling_purchase_type, f.notes
-FROM form02 f
-JOIN users u ON f.user_id = u.id
-WHERE u.username = 'farmer1';
+
 
 -- form03（栽培工作紀錄）
 CREATE TABLE form03 (
     id                   INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id              INT NOT NULL,                    -- 關聯 `users` 表
-
+    lands_id         INT NOT NULL,                    -- 關聯 `lands` 表
     operation_date       DATE NULL,                   -- 作業日期
     field_code           VARCHAR(50),            -- 田區代號
     crop                 VARCHAR(100),           -- 作物
@@ -132,28 +118,23 @@ CREATE TABLE form03 (
     notes                TEXT,                            -- 備註
     created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    -- FOREIGN KEY (lands_id) REFERENCES lands(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (lands_id) REFERENCES lands(id) ON DELETE CASCADE
 );
 
 -- 資料示例form03（栽培工作紀錄）
-INSERT INTO form03 (user_id, operation_date, field_code, crop, crop_content, notes)
+INSERT INTO form03 (user_id, lands_id, operation_date, field_code, crop, crop_content, notes)
 VALUES 
-    (1, '2025-02-01', 'F000-0000', '高麗菜', '1-1 整地, 4-2 灌溉', '間作及敷蓋稻草'),
-    (1, '2025-02-05', 'F000-0001', '高麗菜', '2-1 介質消毒, 5-2 追肥', '使用有機肥料'),
-    (2, '2025-03-15', 'F000-0002', '小黃瓜', '4-3 培土, 6-6 除草', '增加水源');
+    (1, 1, '2025-02-01', 'F000-0000', '高麗菜', '1-1 整地, 4-2 灌溉', '間作及敷蓋稻草'),
+    (1, 2, '2025-02-05', 'F000-0001', '高麗菜', '2-1 介質消毒, 5-2 追肥', '使用有機肥料'),
+    (2, 3, '2025-03-15', 'F000-0002', '小黃瓜', '4-3 培土, 6-6 除草', '增加水源');
 
--- 查詢某農戶的所有栽培工作紀錄
-SELECT u.username, u.farmer_name, f.operation_date, f.field_code, f.crop, f.crop_content, f.notes
-FROM form03 f
-JOIN users u ON f.user_id = u.id
-
-WHERE u.username = 'farmer1';
 
 -- form06（肥料施用紀錄）
 CREATE TABLE form06 (
     id                 INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
     user_id            INT NOT NULL,           -- 關聯 `users` 表
+    lands_id         INT NOT NULL,                    -- 關聯 `lands` 表
     date_used          DATE NULL,           -- 使用日期
     field_code         VARCHAR(20),           -- 田區代號
     crop               VARCHAR(50),           -- 作物
@@ -165,43 +146,35 @@ CREATE TABLE form06 (
     process            TEXT,                            -- 製作流程
     notes              TEXT,                            -- 備註
     created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (lands_id) REFERENCES lands(id) ON DELETE CASCADE
 );
 -- 資料示例form06（肥料施用紀錄）
-INSERT INTO form06 (user_id, date_used, field_code, crop, fertilizer_type, material_code_or_name, fertilizer_amount, dilution_factor, operator, process, notes)
+INSERT INTO form06 (user_id, lands_id, date_used, field_code, crop, fertilizer_type, material_code_or_name, fertilizer_amount, dilution_factor, operator, process, notes)
 VALUES 
-    (1, '2025-02-01', 'F000-0000', '高麗菜', '基肥', 'M000-0000', 10.00, NULL, '王小明', '間作及敷蓋稻草', '注意施肥均勻'),
-    (1, '2025-03-15', 'F000-0001', '小白菜', '追肥', 'ooxx資材', 15.00, 0.5, '李小華', '進行追肥', '施肥後進行灌溉');
--- 查詢某田區的所有肥料施用紀錄
-SELECT f.date_used, f.field_code, f.crop, f.fertilizer_type, f.material_code_or_name, f.fertilizer_amount, f.dilution_factor, f.operator, f.process, f.notes
-FROM form06 f
-JOIN users u ON f.user_id = u.id
-WHERE f.field_code = 'F000-0000';
+    (1, 1, '2025-02-01', 'F000-0000', '高麗菜', '基肥', 'M000-0000', 10.00, NULL, '王小明', '間作及敷蓋稻草', '注意施肥均勻'),
+    (1, 2, '2025-03-15', 'F000-0001', '小白菜', '追肥', 'ooxx資材', 15.00, 0.5, '李小華', '進行追肥', '施肥後進行灌溉');
+
 
 -- form07（肥料資材與代碼對照表）
 CREATE TABLE form07 (
     id INT AUTO_INCREMENT PRIMARY KEY,                    -- 唯一編號
     user_id INT NOT NULL,                                  -- 關聯 `users` 表
-    fertilizer_material_code VARCHAR(20),          -- 肥料資材代碼
+    fertilizer_material_code VARCHAR(20) UNIQUE,          -- 肥料資材代碼
     fertilizer_material_name VARCHAR(100),         -- 肥料資材名稱
     notes TEXT,                                            -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, -- 外鍵，關聯 `users` 表
-    UNIQUE(fertilizer_material_code)                        -- 确保 `fertilizer_material_code` 是唯一的
+    UNIQUE(fertilizer_material_code),                        -- 确保 `fertilizer_material_code` 是唯一的
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- 插入資料範例
-INSERT INTO form07 (user_id, fertilizer_material_code, fertilizer_material_name, notes)
-VALUES (1, 'M000-0000', 'ooxx資材', '備註'),
-       (1, 'M000-0001', 'yyzz資材', '適合高濃度施用');
-
--- 查詢與 `users` 表關聯的肥料資材代碼及名稱
-SELECT f.fertilizer_material_code, f.fertilizer_material_name, f.notes, u.username, u.farmer_name
-FROM form07 f
-JOIN users u ON f.user_id = u.id
-WHERE f.fertilizer_material_code = 'M000-0000';
-
+INSERT INTO form07 (user_id, lands_id, fertilizer_material_code, fertilizer_material_name, notes)
+VALUES (1, 1, 'M000-0000', 'ooxx資材', '備註'),
+       (1, 2, 'M000-0001', 'yyzz資材', '適合高濃度施用');
 
 
 -- form08（肥料入出庫紀錄）
@@ -238,6 +211,7 @@ WHERE f.material_name = 'ooxx資材';
 CREATE TABLE form09 (
     id INT AUTO_INCREMENT PRIMARY KEY,                        -- 編號，自動遞增
     user_id INT NOT NULL,                    -- 關聯 `users` 表
+    lands_id         INT NOT NULL,                    -- 關聯 `lands` 表
     date_used DATE NULL,                                   -- 使用日期
     field_code VARCHAR(50),                            -- 田區代號
     crop VARCHAR(100),                                -- 作物名稱
@@ -251,17 +225,15 @@ CREATE TABLE form09 (
     operator VARCHAR(100),                            -- 操作人員
     notes TEXT,                                                -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- 建立時間
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間 
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (lands_id) REFERENCES lands(id) ON DELETE CASCADE
 );
 -- 資料示例 form09（有害生物防治或環境消毒資材施用紀錄）
-INSERT INTO form09 (user_id, date_used, field_code, crop, pest_target, material_code_or_name, water_volume, chemical_usage, dilution_factor, safety_harvest_period, operator_method, operator, notes)
+INSERT INTO form09 (user_id, lands_id, date_used, field_code, crop, pest_target, material_code_or_name, water_volume, chemical_usage, dilution_factor, safety_harvest_period, operator_method, operator, notes)
 VALUES 
-    (1, '2025-02-05', 'F000-0000', '高麗菜', '蟲', 'M000-0000', 10.00, 0.5, 2.4, 14, '噴灑', '王小明', '無');
--- 查詢有害生物防治或環境消毒資材施用紀錄
-SELECT id, date_used, field_code, crop, pest_target, material_code_or_name, water_volume, chemical_usage, dilution_factor, safety_harvest_period, operator_method, operator, notes
-FROM form09
-WHERE crop = '高麗菜' AND pest_target = '蟲';
+    (1, 1, '2025-02-05', 'F000-0000', '高麗菜', '蟲', 'M000-0000', 10.00, 0.5, 2.4, 14, '噴灑', '王小明', '無');
+
 
 -- form10（防治資材與代碼對照表）
 CREATE TABLE form10 (
@@ -322,6 +294,7 @@ WHERE f.material_name = 'ooxx資材';
 CREATE TABLE form12 (
     id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                             -- 關聯 `users` 表
+    lands_id         INT NOT NULL,                    -- 關聯 `lands` 表
     date_used DATE NULL,                          -- 使用日期
     field_code VARCHAR(100),                 -- 田區代號
     crop VARCHAR(100),                       -- 作物名稱
@@ -330,20 +303,15 @@ CREATE TABLE form12 (
     operator VARCHAR(100),                   -- 操作人員
     notes TEXT,                                       -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- 建立時間
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE  -- 外鍵，關聯 `users` 表
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (lands_id) REFERENCES lands(id) ON DELETE CASCADE
 );
 
 -- 資料示例form12（其他資材使用紀錄）
-INSERT INTO form12 (user_id, date_used, field_code, crop, material_code_or_name, usage_amount, operator, notes)
+INSERT INTO form12 (user_id, lands_id, date_used, field_code, crop, material_code_or_name, usage_amount, operator, notes)
 VALUES 
-    (1, '2025-02-05', 'F000-0000', '高麗菜', 'M000-0000/ooxx資材', 10.0, '王小明', '間作及敷蓋稻草');
-
---  查詢其他資材使用紀錄
-SELECT f.id, f.date_used, f.field_code, f.crop, f.material_code_or_name, f.usage_amount, f.operator, f.notes, u.username, u.farmer_name
-FROM form12 f
-JOIN users u ON f.user_id = u.id
-WHERE f.crop = '高麗菜';
+    (1, 1, '2025-02-05', 'F000-0000', '高麗菜', 'M000-0000/ooxx資材', 10.0, '王小明', '間作及敷蓋稻草');
 
 
 -- form13（其他資材與代碼對照表）
@@ -395,11 +363,6 @@ SELECT f.id, f.material_name, f.manufacturer, f.supplier, f.date, f.purchase_qua
 FROM form14 f
 JOIN users u ON f.user_id = u.id
 WHERE f.material_name = 'ooxx資材';
-
-
-
-
-
 
 -- form15（場地設施之保養、維修及清潔管理紀錄）
 CREATE TABLE form15 (
@@ -453,6 +416,7 @@ WHERE f.item = '噴霧機';
 CREATE TABLE form17 (
     id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                   -- 關聯 `users` 表
+    lands_id         INT NOT NULL,                    -- 關聯 `lands` 表
     harvest_date DATE NULL,                      -- 採收日期
     field_code VARCHAR(50),                 -- 田區代號
     crop_name VARCHAR(255),                 -- 作物名稱
@@ -465,18 +429,14 @@ CREATE TABLE form17 (
     verification_status VARCHAR(100),       -- 驗證狀態 
     notes TEXT,                             -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    -- 建立時間
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE    -- 外鍵，關聯 `users` 表
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (lands_id) REFERENCES lands(id) ON DELETE CASCADE
 );
 -- 資料示例
-INSERT INTO form17 (user_id, harvest_date, field_code, crop_name, batch_or_trace_no, harvest_weight, process_date, post_harvest_treatment, post_treatment_weight, verification_status, notes)
+INSERT INTO form17 (user_id, lands_id, harvest_date, field_code, crop_name, batch_or_trace_no, harvest_weight, process_date, post_harvest_treatment, post_treatment_weight, verification_status, notes)
 VALUES 
-    (1,  '2025-02-05', 'F000-0000', '高麗菜', 'ABCD-EFHG-IJKL', 10.00, '2025-02-06', '清洗', 9.50, '非驗證產品', '間作及敷蓋稻草');
--- 查詢與 `users` 表關聯的採收與處理記錄
-SELECT f.id, f.harvest_date, f.crop_name, f.post_harvest_treatment, f.post_treatment_weight, f.verification_status, f.notes, u.username, u.farmer_name
-FROM form17 f
-JOIN users u ON f.user_id = u.id
-WHERE f.crop_name = '高麗菜';
+    (1, 1,  '2025-02-05', 'F000-0000', '高麗菜', 'ABCD-EFHG-IJKL', 10.00, '2025-02-06', '清洗', 9.50, '非驗證產品', '間作及敷蓋稻草');
 
 
 -- form18（乾燥作業紀錄）
