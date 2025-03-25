@@ -730,6 +730,148 @@ def get_all_form03():
 
     return jsonify(forms)
 # ----------------------------------------------------------------------------------------------
+# 資材選單
+
+# 肥料
+@app.route('/api/fertilizer-options', methods=['GET'])
+def get_fertilizer_options():
+    results = db.session.query(Form07.fertilizer_material_code, Form07.fertilizer_material_name).distinct().all()
+
+    options = [
+        {
+            "code": result.fertilizer_material_code,
+            "name": result.fertilizer_material_name
+        }
+        for result in results
+    ]
+    return jsonify(options)
+
+# 藥
+
+# 其他
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # ----------------------------------------------------------------------------------------------
 # 肥料施用
@@ -745,7 +887,7 @@ def add_form06():
     field_code = data.get('field_code')
     crop = data.get('crop')
     fertilizer_type = data.get('fertilizer_type')
-    material_code_or_name = data.get('material_code_or_name')
+    fertilizer_material_name = data.get('fertilizer_material_name')
     fertilizer_amount = data.get('fertilizer_amount') if data.get('fertilizer_amount') not in ['', 'None', None] else None
     dilution_factor = data.get('dilution_factor') if data.get('dilution_factor') not in ['', 'None', None] else None
     operator = data.get('operator')
@@ -770,7 +912,7 @@ def add_form06():
             field_code=field_code,
             crop=crop,
             fertilizer_type=fertilizer_type,
-            material_code_or_name=material_code_or_name,
+            fertilizer_material_name=fertilizer_material_name,
             fertilizer_amount=fertilizer_amount,
             dilution_factor=dilution_factor,
             operator=operator,
@@ -810,7 +952,7 @@ def update_form06(id):
     form.field_code = field_code
     form.crop = data['crop']
     form.fertilizer_type = data['fertilizer_type']
-    form.material_code_or_name = data['material_code_or_name']
+    form.fertilizer_material_name = data['fertilizer_material_name']
     form.fertilizer_amount = data['fertilizer_amount'] if data.get('fertilizer_amount') not in ['', 'None', None] else None
     form.dilution_factor = data['dilution_factor'] if data.get('dilution_factor') not in ['', 'None', None] else None
     form.operator = data['operator']
@@ -838,19 +980,22 @@ def delete_form06(id):
 # 查詢所有使用者的肥料施用
 @app.route('/api/form06', methods=['GET'])
 def get_all_form06():
-    results = db.session.query(Form06, users.farmer_name).\
-        join(users, users.id == Form06.user_id).all()
-    
+    results = db.session.query(
+        Form06,
+        users.farmer_name.label("farmer_name"),
+        Lands.number.label("land_number")
+    ).join(users, Form06.user_id == users.id).join(Lands, Form06.lands_id == Lands.id).all()
+
     forms = [
         {
             "id": result.Form06.id,
             "user_id": result.Form06.user_id,
             "farmer_name": result.farmer_name,
             "date_used": result.Form06.date_used.strftime('%Y-%m-%d') if result.Form06.date_used else None,
-            'field_code': result.land_number,  # 修正這裡
+            'field_code': result.land_number,   # 修正這裡
             "crop": result.Form06.crop,
             "fertilizer_type": result.Form06.fertilizer_type,
-            "material_code_or_name": result.Form06.material_code_or_name,
+            "fertilizer_material_name": result.Form06.fertilizer_material_name,
             "fertilizer_amount": str(result.Form06.fertilizer_amount),
             "dilution_factor": str(result.Form06.dilution_factor),
             "operator": result.Form06.operator,
@@ -947,7 +1092,7 @@ def add_form08():
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
     user_id = data.get('user_id')
-    material_name = data.get('material_name')
+    fertilizer_material_name = data.get('fertilizer_material_name')
     manufacturer = data.get('manufacturer')
     supplier = data.get('supplier')
     packaging_unit = data.get('packaging_unit')
@@ -961,7 +1106,7 @@ def add_form08():
     try:
         new_form = Form08(
             user_id=user_id,
-            material_name=material_name,
+            fertilizer_material_name=fertilizer_material_name,
             manufacturer=manufacturer,
             supplier=supplier,
             packaging_unit=packaging_unit,
@@ -988,7 +1133,7 @@ def update_form08(id):
     if not form:
         return jsonify({'error': '肥料入出庫未找到'}), 404
     
-    form.material_name = data['material_name']
+    form.fertilizer_material_name = data['fertilizer_material_name']
     form.manufacturer = data['manufacturer']
     form.supplier = data['supplier']
     form.packaging_unit = data['packaging_unit']
@@ -1023,7 +1168,7 @@ def get_all_form08():
             "id": result.Form08.id,
             "user_id": result.Form08.user_id,
             "farmer_name": result.farmer_name,
-            "material_name": result.Form08.material_name,
+            "fertilizer_material_name": result.Form08.fertilizer_material_name,
             "manufacturer": result.Form08.manufacturer,
             "supplier": result.Form08.supplier,
             "packaging_unit": result.Form08.packaging_unit,
@@ -1052,7 +1197,7 @@ def add_form09():
     field_code = data.get('field_code')
     crop = data.get('crop')
     pest_target = data.get('pest_target')
-    material_code_or_name = data.get('material_code_or_name')
+    pest_control_material_name = data.get('pest_control_material_name')
     water_volume = data.get('water_volume') if data.get('water_volume') not in ['', 'None', None] else None
     chemical_usage = data.get('chemical_usage') if data.get('chemical_usage') not in ['', 'None', None] else None
     dilution_factor = data.get('dilution_factor') if data.get('dilution_factor') not in ['', 'None', None] else None
@@ -1079,7 +1224,7 @@ def add_form09():
             field_code=field_code,
             crop=crop,
             pest_target=pest_target,
-            material_code_or_name=material_code_or_name,
+            pest_control_material_name=pest_control_material_name,
             water_volume=water_volume,
             chemical_usage=chemical_usage,
             dilution_factor=dilution_factor,
@@ -1120,7 +1265,7 @@ def update_form09(id):
     form.field_code = field_code
     form.crop = data['crop']
     form.pest_target = data['pest_target']
-    form.material_code_or_name = data['material_code_or_name']
+    form.pest_control_material_name = data['pest_control_material_name']
     form.water_volume = data['water_volume'] if data.get('water_volume') not in ['', 'None', None] else None
     form.chemical_usage = data['chemical_usage'] if data.get('chemical_usage') not in ['', 'None', None] else None
     form.dilution_factor = data['dilution_factor'] if data.get('dilution_factor') not in ['', 'None', None] else None
@@ -1150,8 +1295,11 @@ def delete_form09(id):
 # 查詢所有使用者的有害生物防治或環境消毒資材施用
 @app.route('/api/form09', methods=['GET'])
 def get_all_form09():
-    results = db.session.query(Form09, users.farmer_name).\
-        join(users, users.id == Form09.user_id).all()
+    results = db.session.query(
+        Form09,
+        users.farmer_name.label("farmer_name"),
+        Lands.number.label("land_number")
+    ).join(users, Form09.user_id == users.id).join(Lands, Form09.lands_id == Lands.id).all()
     
     forms = [
         {
@@ -1162,7 +1310,7 @@ def get_all_form09():
             'field_code': result.land_number,  # 修正這裡
             "crop": result.Form09.crop,
             "pest_target": result.Form09.pest_target,
-            "material_code_or_name": result.Form09.material_code_or_name,
+            "pest_control_material_name": result.Form09.pest_control_material_name,
             "water_volume": str(result.Form09.water_volume),
             "chemical_usage": str(result.Form09.chemical_usage),
             "dilution_factor": str(result.Form09.dilution_factor),
@@ -1260,7 +1408,7 @@ def add_form11():
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
     user_id = data.get('user_id')
-    material_name = data.get('material_name')
+    pest_control_material_name = data.get('pest_control_material_name')
     dosage_form = data.get('dosage_form')
     brand_name  = data.get('brand_name')
     supplier = data.get('supplier')
@@ -1275,7 +1423,7 @@ def add_form11():
     try:
         new_form = Form11(
             user_id=user_id,
-            material_name=material_name,
+            pest_control_material_name=pest_control_material_name,
             dosage_form=dosage_form,
             brand_name=brand_name,
             supplier=supplier,
@@ -1303,7 +1451,7 @@ def update_form11(id):
     if not form:
         return jsonify({'error': '有害生物防治或環境消毒資材入出庫未找到'}), 404
     
-    form.material_name = data['material_name']
+    form.pest_control_material_name = data['pest_control_material_name']
     form.dosage_form = data['dosage_form']
     form.brand_name = data['brand_name']
     form.supplier = data['supplier']
@@ -1339,7 +1487,7 @@ def get_all_form11():
             "id": result.Form11.id,
             "user_id": result.Form11.user_id,
             "farmer_name": result.farmer_name,
-            "material_name": result.Form11.material_name,
+            "pest_control_material_name": result.Form11.pest_control_material_name,
             "dosage_form": result.Form11.dosage_form,
             "brand_name": result.Form11.brand_name,
             "supplier": result.Form11.supplier,
@@ -1368,7 +1516,7 @@ def add_form12():
     date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
     field_code = data.get('field_code')
     crop = data.get('crop')
-    material_code_or_name = data.get('material_code_or_name')
+    other_material_name = data.get('other_material_name')
     usage_amount = data.get('usage_amount') if data.get('usage_amount') not in ['', 'None', None] else None
     operator = data.get('operator')
     notes = data.get('notes')
@@ -1389,7 +1537,7 @@ def add_form12():
             date_used=date_used,
             field_code=field_code,
             crop=crop,
-            material_code_or_name=material_code_or_name,
+            other_material_name=other_material_name,
             usage_amount=usage_amount,
             operator=operator,
             notes=notes
@@ -1425,7 +1573,7 @@ def update_form12(id):
     form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
     form.field_code = field_code
     form.crop = data['crop']
-    form.material_code_or_name = data['material_code_or_name']
+    form.other_material_name = data['other_material_name']
     form.usage_amount = data['usage_amount'] if data.get('usage_amount') not in ['', 'None', None] else None
     form.operator = data['operator']
     form.notes = data.get('notes')
@@ -1451,8 +1599,11 @@ def delete_form12(id):
 # 查詢所有使用者的其他資材使用紀錄
 @app.route('/api/form12', methods=['GET'])
 def get_all_form12():
-    results = db.session.query(Form12, users.farmer_name).\
-        join(users, users.id == Form12.user_id).all()
+    results = db.session.query(
+        Form12,
+        users.farmer_name.label("farmer_name"),
+        Lands.number.label("land_number")
+    ).join(users, Form12.user_id == users.id).join(Lands, Form12.lands_id == Lands.id).all()
     
     forms = [
         {
@@ -1462,7 +1613,7 @@ def get_all_form12():
             "date_used": result.Form12.date_used.strftime('%Y-%m-%d') if result.Form12.date_used else None,
             'field_code': result.land_number,  # 修正這裡
             "crop": result.Form12.crop,
-            "material_code_or_name": result.Form12.material_code_or_name,
+            "other_material_name": result.Form12.other_material_name,
             "usage_amount": str(result.Form12.usage_amount),
             "operator": result.Form12.operator,
             "notes": result.Form12.notes
@@ -1556,7 +1707,7 @@ def add_form14():
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
     user_id = data.get('user_id')
-    material_name = data.get('material_name')
+    other_material_name = data.get('other_material_name')
     manufacturer = data.get('manufacturer')
     supplier = data.get('supplier')
     packaging_unit = data.get('packaging_unit')
@@ -1570,7 +1721,7 @@ def add_form14():
     try:
         new_form = Form14(
             user_id=user_id,
-            material_name=material_name,
+            other_material_name=other_material_name,
             manufacturer=manufacturer,
             supplier=supplier,
             packaging_unit=packaging_unit,
@@ -1597,7 +1748,7 @@ def update_form14(id):
     if not form:
         return jsonify({'error': '其他資材入出庫紀錄未找到'}), 404
     
-    form.material_name = data['material_name']
+    form.other_material_name = data['other_material_name']
     form.manufacturer = data['manufacturer']
     form.supplier = data['supplier']
     form.packaging_unit = data['packaging_unit']
@@ -1632,7 +1783,7 @@ def get_all_form14():
             "id": result.Form14.id,
             "user_id": result.Form14.user_id,
             "farmer_name": result.farmer_name,
-            "material_name": result.Form14.material_name,
+            "other_material_name": result.Form14.other_material_name,
             "manufacturer": result.Form14.manufacturer,
             "supplier": result.Form14.supplier,
             "packaging_unit": result.Form14.packaging_unit,
@@ -1912,8 +2063,11 @@ def delete_form17(id):
 # 查詢所有使用者的採收及採後處理紀錄
 @app.route('/api/form17', methods=['GET'])
 def get_all_form17():
-    results = db.session.query(Form17, users.farmer_name).\
-        join(users, users.id == Form17.user_id).all()
+    results = db.session.query(
+        Form17,
+        users.farmer_name.label("farmer_name"),
+        Lands.number.label("land_number")
+    ).join(users, Form17.user_id == users.id).join(Lands, Form17.lands_id == Lands.id).all()
     
     forms = [
         {

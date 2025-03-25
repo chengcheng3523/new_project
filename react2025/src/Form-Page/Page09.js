@@ -22,7 +22,7 @@ const Page09 = () => {
     field_code: '',
     crop: '',
     pest_target: '',
-    material_code_or_name: '',
+    pest_control_material_name: '',
     water_volume: '',
     chemical_usage: '',
     dilution_factor: '',
@@ -72,7 +72,7 @@ const Page09 = () => {
           field_code: item.field_code,
           crop: item.crop,
           pest_target: item.pest_target,
-          material_code_or_name: item.material_code_or_name,
+          pest_control_material_name: item.pest_control_material_name,
           water_volume: item.water_volume,
           chemical_usage: item.chemical_usage,
           dilution_factor: item.dilution_factor,
@@ -142,7 +142,7 @@ const Page09 = () => {
           field_code: formData.field_code,
           crop: formData.crop,
           pest_target: formData.pest_target,
-          material_code_or_name: formData.material_code_or_name,
+          pest_control_material_name: formData.pest_control_material_name,
           water_volume: formData.water_volume,
           chemical_usage: formData.chemical_usage,
           dilution_factor: formData.dilution_factor,
@@ -160,7 +160,7 @@ const Page09 = () => {
         field_code: '',
         crop: '',
         pest_target: '',
-        material_code_or_name: '',
+        pest_control_material_name: '',
         water_volume: '',
         chemical_usage: '',
         dilution_factor: '',
@@ -209,7 +209,7 @@ const Page09 = () => {
       field_code: record.field_code,
       crop: record.crop,
       pest_target: record.pest_target,
-      material_code_or_name: record.material_code_or_name,
+      pest_control_material_name: record.pest_control_material_name,
       water_volume: record.water_volume,
       chemical_usage: record.chemical_usage,
       dilution_factor: record.dilution_factor,
@@ -272,8 +272,8 @@ const Page09 = () => {
       />
       <FormField
         label="資材代碼或名稱"
-        name="material_code_or_name"
-        value={formData.material_code_or_name}
+        name="pest_control_material_name"
+        value={formData.pest_control_material_name}
         onChange={handleChange}
         
       />
@@ -368,7 +368,7 @@ const Page09 = () => {
               <td>{record.field_code}</td>
               <td>{record.crop}</td>
               <td>{record.pest_target}</td>
-              <td>{record.material_code_or_name}</td>
+              <td>{record.pest_control_material_name}</td>
               <td>{record.water_volume}</td>
               <td>{record.chemical_usage}</td>
               <td>{record.dilution_factor}</td>

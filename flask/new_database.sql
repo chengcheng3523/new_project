@@ -139,7 +139,7 @@ CREATE TABLE form06 (
     field_code         VARCHAR(20),           -- 田區代號
     crop               VARCHAR(50),           -- 作物
     fertilizer_type    VARCHAR(100),           -- 施肥別 (基肥, 追肥)
-    material_code_or_name VARCHAR(100),       -- 資材代碼或資材名稱
+    fertilizer_material_name VARCHAR(100),       -- 資材代碼或資材名稱
     fertilizer_amount  DECIMAL(10, 2),           -- 肥料使用量 (公斤/公升)
     dilution_factor    DECIMAL(5, 2),           -- 稀釋倍數 (液肥適用)
     operator           VARCHAR(100),           -- 操作人員
@@ -151,7 +151,7 @@ CREATE TABLE form06 (
     FOREIGN KEY (lands_id) REFERENCES lands(id) ON DELETE CASCADE
 );
 -- 資料示例form06（肥料施用紀錄）
-INSERT INTO form06 (user_id, lands_id, date_used, field_code, crop, fertilizer_type, material_code_or_name, fertilizer_amount, dilution_factor, operator, process, notes)
+INSERT INTO form06 (user_id, lands_id, date_used, field_code, crop, fertilizer_type, fertilizer_material_name, fertilizer_amount, dilution_factor, operator, process, notes)
 VALUES 
     (1, 1, '2025-02-01', 'F000-0000', '高麗菜', '基肥', 'M000-0000', 10.00, NULL, '王小明', '間作及敷蓋稻草', '注意施肥均勻'),
     (1, 2, '2025-03-15', 'F000-0001', '小白菜', '追肥', 'ooxx資材', 15.00, 0.5, '李小華', '進行追肥', '施肥後進行灌溉');
@@ -172,16 +172,16 @@ CREATE TABLE form07 (
 );
 
 -- 插入資料範例
-INSERT INTO form07 (user_id, lands_id, fertilizer_material_code, fertilizer_material_name, notes)
-VALUES (1, 1, 'M000-0000', 'ooxx資材', '備註'),
-       (1, 2, 'M000-0001', 'yyzz資材', '適合高濃度施用');
+INSERT INTO form07 (user_id, fertilizer_material_code, fertilizer_material_name, notes)
+VALUES (1, 'M000-0000', 'ooxx資材', '備註'),
+       (1, 'M000-0001', 'yyzz資材', '適合高濃度施用');
 
 
 -- form08（肥料入出庫紀錄）
 CREATE TABLE form08 (
     id INT AUTO_INCREMENT PRIMARY KEY,                     -- 編號，自動遞增
     user_id              INT NOT NULL,                    -- 關聯 `users` 表
-    material_name VARCHAR(100),                    -- 資材名稱
+    fertilizer_material_name VARCHAR(100),                    -- 資材名稱
     manufacturer VARCHAR(100),                              -- 廠商
     supplier VARCHAR(100),                                  -- 供應商
     packaging_unit VARCHAR(100), -- 包裝單位□包 □瓶 □罐 □其他_______
@@ -196,16 +196,16 @@ CREATE TABLE form08 (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE -- 外鍵，關聯 `users` 表
 );
 --  資料示例form08（肥料入出庫紀錄）
-INSERT INTO form08 (user_id, material_name, manufacturer, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
+INSERT INTO form08 (user_id, fertilizer_material_name, manufacturer, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
 VALUES 
     (1, 'ooxx資材', '某某廠商', '某某供應商', '包', '10公斤', '2025-02-05', 100.00, 10.00, 90.00, '無');
 -- 查詢肥料入出庫紀錄
-SELECT f.id, f.material_name, f.manufacturer, f.supplier, f.packaging_unit, f.packaging_volume, 
+SELECT f.id, f.fertilizer_material_name, f.manufacturer, f.supplier, f.packaging_unit, f.packaging_volume, 
        f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, f.notes, 
        u.username, u.farmer_name
 FROM form08 f
 JOIN users u ON f.user_id = u.id
-WHERE f.material_name = 'ooxx資材';
+WHERE f.fertilizer_material_name = 'ooxx資材';
 
 -- form09（有害生物防治或環境消毒資材施用紀錄）
 CREATE TABLE form09 (
@@ -216,7 +216,7 @@ CREATE TABLE form09 (
     field_code VARCHAR(50),                            -- 田區代號
     crop VARCHAR(100),                                -- 作物名稱
     pest_target VARCHAR(100),                         -- 防治對象（如：蟲）
-    material_code_or_name VARCHAR(100),               -- 資材代碼或名稱
+    pest_control_material_name VARCHAR(100),               -- 資材代碼或名稱
     water_volume DECIMAL(10, 2),                      -- 用水量（公升）
     chemical_usage DECIMAL(10, 2),                    -- 藥劑使用量（公斤、公升）
     dilution_factor DECIMAL(10, 2),                   -- 稀釋倍數
@@ -230,7 +230,7 @@ CREATE TABLE form09 (
     FOREIGN KEY (lands_id) REFERENCES lands(id) ON DELETE CASCADE
 );
 -- 資料示例 form09（有害生物防治或環境消毒資材施用紀錄）
-INSERT INTO form09 (user_id, lands_id, date_used, field_code, crop, pest_target, material_code_or_name, water_volume, chemical_usage, dilution_factor, safety_harvest_period, operator_method, operator, notes)
+INSERT INTO form09 (user_id, lands_id, date_used, field_code, crop, pest_target, pest_control_material_name, water_volume, chemical_usage, dilution_factor, safety_harvest_period, operator_method, operator, notes)
 VALUES 
     (1, 1, '2025-02-05', 'F000-0000', '高麗菜', '蟲', 'M000-0000', 10.00, 0.5, 2.4, 14, '噴灑', '王小明', '無');
 
@@ -262,7 +262,7 @@ WHERE f.pest_control_material_code = 'M000-0000';
 CREATE TABLE form11 (
     id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                             -- 關聯 `users` 表
-    material_name VARCHAR(255),              -- 資材名稱
+    pest_control_material_name VARCHAR(255),              -- 資材名稱
     dosage_form VARCHAR(100),                        -- 劑型
     brand_name VARCHAR(100),                         -- 商品名(廠牌)
     supplier VARCHAR(100),                           -- 供應商
@@ -279,16 +279,16 @@ CREATE TABLE form11 (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE  -- 外鍵，關聯 `users` 表
 );
 -- 資料示例form11（有害生物防治或環境消毒資材入出庫紀錄）
-INSERT INTO form11 (user_id, material_name, dosage_form, brand_name, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
+INSERT INTO form11 (user_id, pest_control_material_name, dosage_form, brand_name, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
 VALUES 
     (1, 'ooxx資材', '顆粒型', '某某廠', '供應商A', '包', 10.0, '2025-02-05', 20.0, 10.0, 10.0, '無');
 -- 查詢有害生物防治或環境消毒資材入出庫紀錄
-SELECT f.id, f.material_name, f.dosage_form, f.brand_name, f.supplier, f.packaging_unit, 
+SELECT f.id, f.pest_control_material_name, f.dosage_form, f.brand_name, f.supplier, f.packaging_unit, 
        f.packaging_volume, f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, 
        u.username, u.farmer_name, f.notes
 FROM form11 f
 JOIN users u ON f.user_id = u.id
-WHERE f.material_name = 'ooxx資材';
+WHERE f.pest_control_material_name = 'ooxx資材';
 
 -- form12（其他資材使用紀錄）
 CREATE TABLE form12 (
@@ -298,7 +298,7 @@ CREATE TABLE form12 (
     date_used DATE NULL,                          -- 使用日期
     field_code VARCHAR(100),                 -- 田區代號
     crop VARCHAR(100),                       -- 作物名稱
-    material_code_or_name VARCHAR(255),      -- 資材代碼或資材名稱
+    other_material_name VARCHAR(255),      -- 資材代碼或資材名稱
     usage_amount DECIMAL(10, 2),             -- 使用量
     operator VARCHAR(100),                   -- 操作人員
     notes TEXT,                                       -- 備註
@@ -309,7 +309,7 @@ CREATE TABLE form12 (
 );
 
 -- 資料示例form12（其他資材使用紀錄）
-INSERT INTO form12 (user_id, lands_id, date_used, field_code, crop, material_code_or_name, usage_amount, operator, notes)
+INSERT INTO form12 (user_id, lands_id, date_used, field_code, crop, other_material_name, usage_amount, operator, notes)
 VALUES 
     (1, 1, '2025-02-05', 'F000-0000', '高麗菜', 'M000-0000/ooxx資材', 10.0, '王小明', '間作及敷蓋稻草');
 
@@ -338,7 +338,7 @@ WHERE f.other_material_name = 'ooxx資材';
 CREATE TABLE form14 (
     id INT AUTO_INCREMENT PRIMARY KEY,               -- 編號，自動遞增
     user_id INT NOT NULL,                             -- 關聯 `users` 表
-    material_name VARCHAR(255),              -- 資材名稱
+    other_material_name VARCHAR(255),              -- 資材名稱
     manufacturer VARCHAR(255),                        -- 廠商
     supplier VARCHAR(255),                            -- 供應商
     packaging_unit VARCHAR(100),             -- 包裝單位
@@ -354,15 +354,15 @@ CREATE TABLE form14 (
 );
 
 -- 資料示例
-INSERT INTO form14 (user_id, material_name, manufacturer, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
+INSERT INTO form14 (user_id, other_material_name, manufacturer, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
 VALUES 
     (1, 'ooxx資材', '廠商', '供應商', '包', '10公斤', '2025-02-05', 10.00, 5.00, 5.00, '無');
  
 -- 查詢與 `users` 表關聯的其他資材入出庫紀錄
-SELECT f.id, f.material_name, f.manufacturer, f.supplier, f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, u.username, u.farmer_name, f.notes
+SELECT f.id, f.other_material_name, f.manufacturer, f.supplier, f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, u.username, u.farmer_name, f.notes
 FROM form14 f
 JOIN users u ON f.user_id = u.id
-WHERE f.material_name = 'ooxx資材';
+WHERE f.other_material_name = 'ooxx資材';
 
 -- form15（場地設施之保養、維修及清潔管理紀錄）
 CREATE TABLE form15 (

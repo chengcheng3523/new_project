@@ -18,7 +18,7 @@ const Page08 = () => {
   const [formData, setFormData] = useState({
     id: null,
     user_id: userId, 
-    material_name: '',
+    fertilizer_material_name: '',
     manufacturer: '',
     supplier : '',
     date: '',
@@ -46,7 +46,7 @@ const Page08 = () => {
         const transformedData = response.data.map(item => ({
           id: item.id, // 使用 land_parcel_number 作为唯一标识符
           user_id: item.user_id,
-          material_name: item.material_name,
+          fertilizer_material_name: item.fertilizer_material_name,
           manufacturer: item.manufacturer,
           supplier: item.supplier,
           date: item.date,
@@ -144,7 +144,7 @@ const Page08 = () => {
         // 新增資料
         response = await axios.post('http://127.0.0.1:5000/api/form08', {
           user_id: userId,
-          material_name: formData.material_name,
+          fertilizer_material_name: formData.fertilizer_material_name,
           manufacturer: formData.manufacturer,
           supplier: formData.supplier,
           date: formData.date,
@@ -160,7 +160,7 @@ const Page08 = () => {
       setFormData({
         id: null,
         user_id: userId,
-        material_name: '',
+        fertilizer_material_name: '',
         manufacturer: '',
         supplier: '',
         date: '',
@@ -214,7 +214,7 @@ const Page08 = () => {
     setFormData({
       id: record.id,
       user_id: record.user_id,
-      material_name: record.material_name || '',
+      fertilizer_material_name: record.fertilizer_material_name || '',
       manufacturer: record.manufacturer || '',
       supplier: record.supplier || '',
       date: record.date || '',
@@ -237,8 +237,8 @@ const Page08 = () => {
         <h4>表 8.肥料入出庫紀錄</h4>
         <FormField
           label="資材名稱"
-          name="material_name"
-          value={formData.material_name}
+          name="fertilizer_material_name"
+          value={formData.fertilizer_material_name}
           onChange={handleChange}
         />
         <FormField
@@ -369,7 +369,7 @@ const Page08 = () => {
           {data.map((record) => (
             <tr key={record.id || record.FieldCode}>
               <td>{record.id}</td>
-              <td>{record.material_name}</td>
+              <td>{record.fertilizer_material_name}</td>
               <td>{record.manufacturer || '-'}</td>
               <td>{record.supplier || '-'}</td>
               <td>{record.packaging_unit || '-'}</td>

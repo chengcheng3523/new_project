@@ -20,7 +20,7 @@ const Page12 = () => {
     date_used: '',
     field_code: '',
     crop: '', 
-    material_code_or_name: '',
+    other_material_name: '',
     usage_amount: '', 
     operator: '', 
     notes: '',
@@ -64,7 +64,7 @@ const Page12 = () => {
           date_used: item.date_used,
           field_code: item.field_code,
           crop: item.crop, 
-          material_code_or_name: item.material_code_or_name,
+          other_material_name: item.other_material_name,
           usage_amount: item.usage_amount, 
           operator: item.operator, 
           notes: item.notes,
@@ -130,7 +130,7 @@ const Page12 = () => {
           date_used: formData.date_used,
           field_code: formData.field_code,
           crop: formData.crop, 
-          material_code_or_name: formData.material_code_or_name,
+          other_material_name: formData.other_material_name,
           usage_amount: formData.usage_amount, 
           operator: formData.operator, 
           notes: formData.notes,
@@ -143,7 +143,7 @@ const Page12 = () => {
         date_used: '',
         field_code: '',
         crop: '', 
-        material_code_or_name: '',
+        other_material_name: '',
         usage_amount: '', 
         operator: '', 
         notes: '',
@@ -184,7 +184,7 @@ const Page12 = () => {
       date_used: record.date_used,
       field_code: record.field_code,
       crop: record.crop, 
-      material_code_or_name: record.material_code_or_name,
+      other_material_name: record.other_material_name,
       usage_amount: record.usage_amount, 
       operator: record.operator, 
       notes: record.notes,
@@ -237,8 +237,8 @@ const Page12 = () => {
 
         <FormField
           label="資材代碼或資材名稱"
-          name="material_code_or_name"
-          value={formData.material_code_or_name}
+          name="other_material_name"
+          value={formData.other_material_name}
           onChange={handleChange}
           disabled={loading}
         />
@@ -291,7 +291,7 @@ const Page12 = () => {
               <td>{record.date_used}</td>
               <td>{record.field_code}</td>
               <td>{record.crop}</td> 
-              <td>{record.material_code_or_name}</td>
+              <td>{record.other_material_name}</td>
               <td>{record.usage_amount}</td> 
               <td>{record.operator}</td> 
               <td>{record.notes}</td>

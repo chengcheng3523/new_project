@@ -18,7 +18,7 @@ const Page11 = () => {
   const [formData, setFormData] = useState({
     id: null,
     user_id: userId, 
-    material_name: '', 
+    pest_control_material_name: '', 
     dosage_form: '', // 新增：劑型
     brand_name: '', // 新增：商品名(廠牌)
     supplier : '',
@@ -47,7 +47,7 @@ const Page11 = () => {
         const transformedData = response.data.map(item => ({
           id: item.id, // 使用 land_parcel_number 作为唯一标识符
           user_id: item.user_id,
-          material_name: item.material_name,
+          pest_control_material_name: item.pest_control_material_name,
           dosage_form: item.dosage_form,
           brand_name: item.brand_name,
           supplier: item.supplier,
@@ -140,7 +140,7 @@ const Page11 = () => {
         // 新增資料
         response = await axios.post('http://127.0.0.1:5000/api/form11', {
           user_id: userId,
-          material_name: formData.material_name,
+          pest_control_material_name: formData.pest_control_material_name,
           dosage_form: formData.dosage_form,
           brand_name: formData.brand_name,
           supplier: formData.supplier,
@@ -157,7 +157,7 @@ const Page11 = () => {
       setFormData({
         id: null,
         user_id: userId,
-        material_name: '',
+        pest_control_material_name: '',
         dosage_form: '',
         brand_name: '',
         supplier: '',
@@ -212,7 +212,7 @@ const Page11 = () => {
     setFormData({
       id: record.id,
       user_id: record.user_id,
-      material_name: record.material_name || '',
+      pest_control_material_name: record.pest_control_material_name || '',
       dosage_form: record.dosage_form || '',
       brand_name: record.brand_name || '',
       supplier: record.supplier || '',
@@ -236,8 +236,8 @@ const Page11 = () => {
         <h4>表 11.有害生物防治或環境消毒資材入出庫紀錄</h4>
         <FormField
           label="資材名稱"
-          name="material_name"
-          value={formData.material_name}
+          name="pest_control_material_name"
+          value={formData.pest_control_material_name}
           onChange={handleChange}
         />
         <FormField
@@ -375,7 +375,7 @@ const Page11 = () => {
           {data.map((record) => (
             <tr key={record.id || record.FieldCode}>
               <td>{record.id}</td>
-              <td>{record.material_name}</td>
+              <td>{record.pest_control_material_name}</td>
               <td>{record.dosage_form || '-'}</td>
               <td>{record.brand_name || '-'}</td>
               <td>{record.supplier || '-'}</td>

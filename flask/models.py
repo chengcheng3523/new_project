@@ -115,7 +115,7 @@ class Form06(db.Model):
     # 施肥別(基肥.追肥)
     fertilizer_type = db.Column(db.String(50), nullable=True)
     # 資材代碼或資材名稱
-    material_code_or_name = db.Column(db.String(100))
+    fertilizer_material_name = db.Column(db.String(100))
     # 肥料使用量
     fertilizer_amount = db.Column(db.Numeric(10, 2))
     # 稀釋倍數
@@ -143,7 +143,7 @@ class Form07(db.Model):
 class Form08(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
-    material_name = db.Column(db.String(100))             # 資材名稱
+    fertilizer_material_name = db.Column(db.String(100))             # 資材名稱
     manufacturer = db.Column(db.String(100), nullable=True)               # 廠商
     supplier = db.Column(db.String(100), nullable=True)                   # 供應商
     packaging_unit = db.Column(db.String(100))            # 包裝單位
@@ -165,7 +165,7 @@ class Form09(db.Model):
     field_code = db.Column(db.String(50))                       # 田區代號
     crop = db.Column(db.String(100))                            # 作物名稱
     pest_target = db.Column(db.String(100))                     # 防治對象
-    material_code_or_name = db.Column(db.String(100))          # 資材代碼或名稱
+    pest_control_material_name = db.Column(db.String(100))          # 資材代碼或名稱
     water_volume = db.Column(db.Numeric(10, 2))                 # 用水量（公升）
     chemical_usage = db.Column(db.Numeric(10, 2))               # 藥劑使用量（公斤、公升）
     dilution_factor = db.Column(db.Numeric(10, 2))              # 稀釋倍數
@@ -190,7 +190,7 @@ class Form10(db.Model):
 class Form11(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 編號，自動遞增
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
-    material_name = db.Column(db.String(255))  # 資材名稱
+    pest_control_material_name = db.Column(db.String(255))  # 資材名稱
     dosage_form = db.Column(db.String(100), nullable=True)  # 劑型
     brand_name = db.Column(db.String(100), nullable=True)  # 商品名(廠牌)
     supplier = db.Column(db.String(100), nullable=True)  # 供應商
@@ -213,7 +213,7 @@ class Form12(db.Model):
     date_used = db.Column(db.Date)  # 使用日期
     field_code = db.Column(db.String(100))  # 田區代號
     crop = db.Column(db.String(100))  # 作物名稱
-    material_code_or_name = db.Column(db.String(255))  # 資材代碼或資材名稱
+    other_material_name = db.Column(db.String(255))  # 資材代碼或資材名稱
     usage_amount = db.Column(db.Numeric(10, 2))  # 使用量
     operator = db.Column(db.String(100))  # 操作人員
     notes = db.Column(db.Text, nullable=True)  # 備註  
@@ -236,7 +236,7 @@ class Form13(db.Model):
 class Form14(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 編號
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
-    material_name = db.Column(db.String(255))  # 資材名稱
+    other_material_name = db.Column(db.String(255))  # 資材名稱
     manufacturer = db.Column(db.String(255), nullable=True)  # 廠商
     supplier = db.Column(db.String(255), nullable=True)  # 供應商
     packaging_unit = db.Column(db.String(100))  # 包裝單位

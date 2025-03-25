@@ -21,7 +21,7 @@ const Page06 = () => {
     field_code: '',
     crop: '',
     fertilizer_type: '',
-    material_code_or_name: '',
+    fertilizer_material_name: '',
     fertilizer_amount: '',
     dilution_factor: '',
     operator: '',
@@ -68,7 +68,7 @@ const Page06 = () => {
           field_code: item.field_code,
           crop: item.crop,
           fertilizer_type: item.fertilizer_type,
-          material_code_or_name: item.material_code_or_name,
+          fertilizer_material_name: item.fertilizer_material_name,
           fertilizer_amount: item.fertilizer_amount,
           dilution_factor: item.dilution_factor,
           operator: item.operator,
@@ -137,7 +137,7 @@ const Page06 = () => {
           field_code: formData.field_code,
           crop: formData.crop,
           fertilizer_type: formData.fertilizer_type,
-          material_code_or_name: formData.material_code_or_name,
+          fertilizer_material_name: formData.fertilizer_material_name,
           fertilizer_amount: formData.fertilizer_amount,
           dilution_factor: formData.dilution_factor,
           operator: formData.operator,
@@ -153,7 +153,7 @@ const Page06 = () => {
         field_code: '',
         crop: '',
         fertilizer_type: '',
-        material_code_or_name: '',
+        fertilizer_material_name: '',
         fertilizer_amount: '',
         dilution_factor: '',
         operator: '',
@@ -197,7 +197,7 @@ const Page06 = () => {
       field_code: record.field_code,
       crop: record.crop,
       fertilizer_type: record.fertilizer_type,
-      material_code_or_name: record.material_code_or_name,
+      fertilizer_material_name: record.fertilizer_material_name,
       fertilizer_amount: record.fertilizer_amount,
       dilution_factor: record.dilution_factor,
       operator: record.operator,
@@ -260,8 +260,8 @@ const Page06 = () => {
         />
         <FormField
           label="資材代碼或資材名稱"
-          name="material_code_or_name"
-          value={formData.material_code_or_name}
+          name="fertilizer_material_name"
+          value={formData.fertilizer_material_name}
           onChange={handleChange}
           disabled={loading}
         />
@@ -332,7 +332,7 @@ const Page06 = () => {
               <td>{record.field_code}</td>
               <td>{record.crop}</td>
               <td>{record.fertilizer_type}</td>
-              <td>{record.material_code_or_name}</td>
+              <td>{record.fertilizer_material_name}</td>
               <td>{record.fertilizer_amount}</td>
               <td>{record.dilution_factor}</td>
               <td>{record.operator}</td>
