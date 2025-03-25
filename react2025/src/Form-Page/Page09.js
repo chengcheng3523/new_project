@@ -34,6 +34,7 @@ const Page09 = () => {
 
   const [validFieldCodes, setvalidFieldCodes] = useState([]);  // 儲存有效的 field_code
   const [validcrops, setvalidcrops] = useState([]);  // 儲存有效的 crop
+  const [pestcontrolOptions, setpestcontrolOptions] = useState([]);  // 儲存有效的資材名稱
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ const Page09 = () => {
     }
   }, []);
 
-
+  // 請求有效的 crop 
   const fetchValidCrops = useCallback(async () => {
     try {
       const response = await axios.get('http://127.0.0.1:5000/api/valid_crops');
@@ -57,6 +58,17 @@ const Page09 = () => {
     } catch (error) {
       console.error('無法獲取有效的 crop:', error);
       alert('無法載入有效的田區代號，請稍後再試！');
+    }
+  }, []);
+
+  // 請求所有有效的資材名稱
+  const fetchPestcontrolOptions = useCallback(async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:5000/api/pest-control-options');
+      setpestcontrolOptions(response.data);  // 設置有效的資材名稱
+    } catch (error) {
+      console.error('無法獲取有效的資材名稱:', error);
+      alert('無法載入有效的資材名稱，請稍後再試！');
     }
   }, []);
 
@@ -101,8 +113,9 @@ const Page09 = () => {
     }
     fetchValidFieldCodes(); // 組件加載時獲取有效的 field_code
     fetchValidCrops(); // 組件加載時獲取有效的 crop
+    fetchPestcontrolOptions(); // 組件加載時獲取有效的資材名稱
     fetchData(); // 組件加載時獲取數據
-  }, [fetchValidFieldCodes, fetchValidCrops, fetchData, navigate, userId]);
+  }, [fetchValidFieldCodes, fetchPestcontrolOptions, fetchValidCrops, fetchData, navigate, userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -119,8 +132,6 @@ const Page09 = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-
 
   try {
     let response;
@@ -143,10 +154,10 @@ const Page09 = () => {
           crop: formData.crop,
           pest_target: formData.pest_target,
           pest_control_material_name: formData.pest_control_material_name,
-          water_volume: formData.water_volume,
-          chemical_usage: formData.chemical_usage,
-          dilution_factor: formData.dilution_factor,
-          safety_harvest_period: formData.safety_harvest_period,
+          water_volume: formData.water_volume ? parseFloat(formData.water_volume) : null,
+          chemical_usage: formData.chemical_usage ? parseFloat(formData.chemical_usage) : null,
+          dilution_factor: formData.dilution_factor ? parseFloat(formData.dilution_factor) : null,
+          safety_harvest_period: formData.safety_harvest_period ? parseInt(formData.safety_harvest_period, 10) : null,
           operator_method: formData.operator_method,
           operator: formData.operator,
           notes: formData.notes,
@@ -270,13 +281,23 @@ const Page09 = () => {
         onChange={handleChange}
         
       />
-      <FormField
-        label="資材代碼或名稱"
-        name="pest_control_material_name"
-        value={formData.pest_control_material_name}
-        onChange={handleChange}
-        
-      />
+
+        {/* 資材名稱下拉選單 */}
+        <FieldSelect
+          name="pest_control_material_name"
+          type="select"
+          value={formData.pest_control_material_name}
+          onChange={handleChange}
+          label="資材代碼或名稱"
+        >
+          <option value="">選擇資材名稱</option>
+          {pestcontrolOptions.map((option) => (
+            <option key={option.code} value={option.name}>
+              {option.name}
+            </option>
+          ))}
+        </FieldSelect>
+
       <FormField
         label="用水量(公升)"
         name="water_volume"

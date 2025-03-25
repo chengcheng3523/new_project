@@ -28,6 +28,7 @@ const Page12 = () => {
   
   const [validFieldCodes, setvalidFieldCodes] = useState([]);  // 儲存有效的 field_code
   const [validcrops, setvalidcrops] = useState([]);  // 儲存有效的 crop
+  const [otherOptions, setotherOptions] = useState([]);  // 儲存有效的資材名稱
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ const Page12 = () => {
     }
   }, []);
 
+  // 請求有效的 crop 
   const fetchValidCrops = useCallback(async () => {
     try {
       const response = await axios.get('http://127.0.0.1:5000/api/valid_crops');
@@ -50,6 +52,17 @@ const Page12 = () => {
     } catch (error) {
       console.error('無法獲取有效的 crop:', error);
       alert('無法載入有效的田區代號，請稍後再試！');
+    }
+  }, []);
+  
+  // 請求所有有效的資材名稱
+  const fetchOtherOptions = useCallback(async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:5000/api/other-options');
+      setotherOptions(response.data);  // 設置有效的資材名稱
+    } catch (error) {
+      console.error('無法獲取有效的資材名稱:', error);
+      alert('無法載入有效的資材名稱，請稍後再試！');
     }
   }, []);
 
@@ -90,8 +103,9 @@ const Page12 = () => {
     }
     fetchValidFieldCodes(); // 組件加載時獲取有效的 field_code
     fetchValidCrops(); // 組件加載時獲取有效的 crop
+    fetchOtherOptions(); // 組件加載時獲取有效的資材名稱
     fetchData(); // 組件加載時獲取數據
-  }, [fetchValidFieldCodes, fetchValidCrops, fetchData, navigate, userId]);
+  }, [fetchValidFieldCodes, fetchOtherOptions, fetchValidCrops, fetchData, navigate, userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -108,9 +122,6 @@ const Page12 = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-
-
 
   try {
     let response;
@@ -235,13 +246,22 @@ const Page12 = () => {
           ))}
         </FieldSelect>
 
-        <FormField
-          label="資材代碼或資材名稱"
+        {/* 資材名稱下拉選單 */}
+        <FieldSelect
           name="other_material_name"
+          type="select"
           value={formData.other_material_name}
           onChange={handleChange}
-          disabled={loading}
-        />
+          label="資材代碼或資材名稱"
+        >
+          <option value="">選擇資材名稱</option>
+          {otherOptions.map((option) => (
+            <option key={option.code} value={option.name}>
+              {option.name}
+            </option>
+          ))}
+        </FieldSelect>
+
         <FormField
           label="使用量"
           name="usage_amount"

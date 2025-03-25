@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthContext from '../components/auth/AuthContext';
 import FormField from '../components/common/FormField';
 import SelectField from '../components/common/SelectField';
+import FieldSelect from '../components/common/FieldSelect';
 import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
 import { useNavigate } from 'react-router-dom';
@@ -34,9 +35,21 @@ const Page08 = () => {
     notes: '',
   });
 
+  const [fertilizerOptions, setFertilizerOptions] = useState([]);  // 儲存有效的資材名稱
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // 請求所有有效的資材名稱
+  const fetchFertilizerOptions = useCallback(async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:5000/api/fertilizer-options');
+      setFertilizerOptions(response.data);  // 設置有效的資材名稱
+    } catch (error) {
+      console.error('無法獲取有效的資材名稱:', error);
+      alert('無法載入有效的資材名稱，請稍後再試！');
+    }
+  }, []);
 
   const fetchData = useCallback(async () => {
     try {
@@ -75,9 +88,10 @@ const Page08 = () => {
         navigate('/login'); // 重定向到登入頁面
         return;
       }
+      fetchFertilizerOptions(); // 組件加載時獲取有效的資材名稱
       setFormData(prev => ({ ...prev, user_id: userId })); // 動態更新 user_id 
       fetchData(); // 組件加載時獲取數據
-    }, [fetchData, navigate, userId]);
+    }, [fetchData, fetchFertilizerOptions, navigate, userId]);
   
     const handleChange = (e) => {
       const { name, value } = e.target;
@@ -235,12 +249,23 @@ const Page08 = () => {
       <Clearfix height="100px" />
       <Form onSubmit={handleSubmit}>
         <h4>表 8.肥料入出庫紀錄</h4>
-        <FormField
-          label="資材名稱"
+
+        {/* 資材名稱下拉選單 */}
+        <FieldSelect
           name="fertilizer_material_name"
+          type="select"
           value={formData.fertilizer_material_name}
           onChange={handleChange}
-        />
+          label="資材名稱"
+        >
+          <option value="">選擇資材名稱</option>
+          {fertilizerOptions.map((option) => (
+            <option key={option.code} value={option.name}>
+              {option.name}
+            </option>
+          ))}
+        </FieldSelect>
+
         <FormField
           label="廠商"
           name="manufacturer"

@@ -256,6 +256,7 @@ const Page03 = () => {
           onChange={handleChange}
           
           options={[
+            { value: '', label: '選擇作業內容', disabled: true }, // 這是預設的 placeholder
             { value: '(1-1) 整地', label: '(1-1) 整地' },
             { value: '(1-2) 作畦', label: '(1-2) 作畦' },
             { value: '(1-3) 配置灌溉/澆水管線', label: '(1-3) 配置灌溉/澆水管線' },

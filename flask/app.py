@@ -747,131 +747,32 @@ def get_fertilizer_options():
     return jsonify(options)
 
 # 藥
+@app.route('/api/pest-control-options', methods=['GET'])
+def get_pest_control_options():
+    results = db.session.query(Form10.pest_control_material_code, Form10.pest_control_material_name).distinct().all()
+
+    options = [
+        {
+            "code": result.pest_control_material_code,
+            "name": result.pest_control_material_name
+        }
+        for result in results
+    ]
+    return jsonify(options)
 
 # 其他
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@app.route('/api/other-options', methods=['GET'])
+def get_other_options():
+    results = db.session.query(Form13.other_material_code, Form13.other_material_name).distinct().all()
+
+    options = [
+        {
+            "code": result.other_material_code,
+            "name": result.other_material_name
+        }
+        for result in results
+    ]
+    return jsonify(options)
 
 # ----------------------------------------------------------------------------------------------
 # 肥料施用
@@ -1534,6 +1435,7 @@ def add_form12():
     try:
         new_form = Form12(
             user_id=user_id,
+            lands_id=lands_id,  # 確保 lands_id 有正確的值
             date_used=date_used,
             field_code=field_code,
             crop=crop,

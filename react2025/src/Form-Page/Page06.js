@@ -31,6 +31,7 @@ const Page06 = () => {
   
   const [validFieldCodes, setvalidFieldCodes] = useState([]);  // 儲存有效的 field_code
   const [validcrops, setvalidcrops] = useState([]);  // 儲存有效的 crop
+  const [fertilizerOptions, setFertilizerOptions] = useState([]);  // 儲存有效的資材名稱
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -45,7 +46,8 @@ const Page06 = () => {
       alert('無法載入有效的田區代號，請稍後再試！');
     }
   }, []);
-
+  
+  // 請求有效的 crop 
   const fetchValidCrops = useCallback(async () => {
     try {
       const response = await axios.get('http://127.0.0.1:5000/api/valid_crops');
@@ -56,13 +58,24 @@ const Page06 = () => {
     }
   }, []);
 
+  // 請求所有有效的資材名稱
+  const fetchFertilizerOptions = useCallback(async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:5000/api/fertilizer-options');
+      setFertilizerOptions(response.data);  // 設置有效的資材名稱
+    } catch (error) {
+      console.error('無法獲取有效的資材名稱:', error);
+      alert('無法載入有效的資材名稱，請稍後再試！');
+    }
+  }, []);
+
   const fetchData = useCallback(async () => {
     try {
       const response = await axios.get('http://127.0.0.1:5000/api/form06');
       console.log('原始數據:', response.data); // 打印原始數據確認結構
       if (Array.isArray(response.data)) {
         const transformedData = response.data.map(item => ({
-          id: item.id, // 使用 land_parcel_number 作为唯一标识符
+          id: item.id, 
           user_id: item.user_id,
           date_used: item.date_used,
           field_code: item.field_code,
@@ -96,8 +109,9 @@ const Page06 = () => {
     }
     fetchValidFieldCodes(); // 組件加載時獲取有效的 field_code
     fetchValidCrops(); // 組件加載時獲取有效的 crop
+    fetchFertilizerOptions(); // 組件加載時獲取有效的資材名稱
     fetchData(); // 組件加載時獲取數據
-  }, [fetchValidFieldCodes, fetchValidCrops, fetchData, navigate, userId]);
+  }, [fetchValidFieldCodes, fetchValidCrops, fetchFertilizerOptions, fetchData, navigate, userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -114,9 +128,6 @@ const Page06 = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-
-
 
   try {
     let response;
@@ -170,6 +181,7 @@ const Page06 = () => {
       setLoading(false);
     }
   };
+
   const handleDelete = async (id) => {
     if (!isAdmin) return;
     console.log('要刪除的 ID:', id); // 确认要删除的 ID
@@ -258,13 +270,23 @@ const Page06 = () => {
           onChange={handleChange}
           disabled={loading}
         />
-        <FormField
-          label="資材代碼或資材名稱"
+        
+        {/* 資材名稱下拉選單 */}
+        <FieldSelect
           name="fertilizer_material_name"
+          type="select"
           value={formData.fertilizer_material_name}
           onChange={handleChange}
-          disabled={loading}
-        />
+          label="資材代碼或資材名稱"
+        >
+          <option value="">選擇資材名稱</option>
+          {fertilizerOptions.map((option) => (
+            <option key={option.code} value={option.name}>
+              {option.name}
+            </option>
+          ))}
+        </FieldSelect>
+
         <FormField
           label="肥料使用量 (公斤/公升)"
           name="fertilizer_amount"
