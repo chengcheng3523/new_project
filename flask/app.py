@@ -329,7 +329,7 @@ def get_lands():
     return jsonify(lands)
 
 # ----------------------------------------------------------------------------------------
-# 選擇田區代號area_codes
+# 選擇-場區代號area_codes
 # 查詢所有有效的 number
 @app.route('/api/valid_area_codes', methods=['GET'])
 def get_valid_area_codes():
@@ -366,6 +366,16 @@ def get_valid_crops():
     except Exception as e:
         print(f"Error in /api/valid_crops: {e}")  # 紀錄錯誤訊息
         return jsonify({'error': str(e)}), 500
+
+# 透過選擇田區代號，顯示該田區的面積
+@app.route('/api/lands/<number>', methods=['GET'])
+def get_land_area(number):
+    land = db.session.query(Lands).filter_by(number=number).first()
+    if not land:
+        return jsonify({'error': 'Land not found'}), 404
+
+    return jsonify({'number': land.number, 'area': str(land.area)})
+
 
 # ----------------------------------------------------------------------------------------
 # 生產計畫

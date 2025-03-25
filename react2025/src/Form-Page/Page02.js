@@ -86,10 +86,12 @@ const Page02 = () => {
     if (!isAdmin && name === 'user_id') {
       return;
     }
-    setFormData({
-      ...formData,
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: value,
-    });
+      // 如果選擇「購買來源」，則清空 seed_source_other，反之則清空 seed_source
+      ...(name === 'seed_source' && value !== '購買來源' ? { seed_source_other: '' } : {}),
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -97,16 +99,16 @@ const Page02 = () => {
     setLoading(true);
 
 
-  // 合併「育苗(購入)種類」和「育苗(購入)種類 (購買來源)」
-  const seedling_purchase_type = formData.seedling_purchase_type === '購買來源' ? formData.seedling_purchase_type_other : formData.seedling_purchase_type;
- 
+  // 合併「種子(苗)來源」和「種子(苗)來源 (購買來源)」
+  const seed_source = formData.seed_source === '購買來源' ? formData.seed_source_other : formData.seed_source;
+
   try {
     let response;
     if (formData.id) {
       if (isAdmin) {
         response = await axios.put(`http://127.0.0.1:5000/api/form02/${formData.id}`, {
           ...formData,
-          seedling_purchase_type, 
+          seed_source, 
         });
       } else {
         alert('您沒有權限更新資料！');
@@ -119,9 +121,9 @@ const Page02 = () => {
           user_id: userId,
           crop: formData.crop,
           crop_variety: formData.crop_variety,
-          seed_source: formData.seed_source,
+          seedling_purchase_type: formData.seedling_purchase_type,
           seedling_purchase_date: formData.seedling_purchase_date,
-          seedling_purchase_type ,
+          seed_source ,
           notes: formData.notes,
         });
       }
@@ -169,14 +171,16 @@ const Page02 = () => {
   const handleEdit = (record) => {
     if (!isAdmin) return; // 如果不是管理員，則返回
 
-    const isOtherUnit = !['自行育苗'].includes(record.seedling_purchase_type);
+    const isOtherUnit = !['自行育苗'].includes(record.seed_source);
     setFormData({
       id: record.id,
       crop: record.crop,
       crop_variety: record.crop_variety,
-      seed_source: record.seed_source,
-      seedling_purchase_type: isOtherUnit ? '購買來源' : record.seedling_purchase_type || '',
-      seedling_purchase_type_other: isOtherUnit ? record.seedling_purchase_type : '',
+
+      seedling_purchase_type: record.seedling_purchase_type,
+      seed_source: isOtherUnit ? '購買來源' : record.seed_source || '',
+      seed_source_other: isOtherUnit ? record.seed_source : '',
+
       seedling_purchase_date: record.seedling_purchase_date, 
       notes: record.notes,
     });
@@ -212,13 +216,26 @@ const Page02 = () => {
           onChange={handleChange}
           disabled={loading}
         />
-        <FormField
+
+        <SelectField
           label="種子(苗)來源"
           name="seed_source"
           value={formData.seed_source}
           onChange={handleChange}
-          disabled={loading}
+          options={[
+            { value: '自行育苗', label: '自行育苗' },
+            { value: '購買來源', label: '購買來源' },
+          ]}
         />
+        {formData.seed_source === '購買來源' && (
+          <FormField
+            label="種子(苗)來源 (購買來源)"
+            name="seed_source_other" // 修正 name，避免覆蓋 seed_source
+            value={formData.seed_source_other} // 綁定正確的值
+            onChange={handleChange}
+          />
+        )}
+
         <FormField
           label="育苗(購入)日期"
           name="seedling_purchase_date"
@@ -235,20 +252,12 @@ const Page02 = () => {
           onChange={handleChange}
           
           options={[
-            { value: '自行育苗', label: '自行育苗' },
-            { value: '購買來源', label: '購買來源' },
+            { value: '種子', label: '種子' },
+            { value: '種苗', label: '種苗' },
+            { value: '繁殖體', label: '繁殖體' },
           ]}
         />
-        {formData.seedling_purchase_type === '購買來源' && (
-          <FormField
-            label="育苗(購入)種類 (購買來源)"
-            name="seedling_purchase_type_other"
-            value={formData.seedling_purchase_type_other}
-            onChange={handleChange}
             
-          />
-        )}
-
         <FormField
           label="備註"
           name="notes"
@@ -282,7 +291,7 @@ const Page02 = () => {
               <td>{record.id}</td>
               <td>{record.crop}</td>
               <td>{record.crop_variety}</td>
-              <td>{record.seed_source}</td>
+              <td>{record.seed_source || '-'}</td>
               <td>{moment(record.seedling_purchase_date).format('YYYY-MM-DD')}</td> 
               <td>{record.seedling_purchase_type || '-'}</td>
               <td>{record.notes}</td>

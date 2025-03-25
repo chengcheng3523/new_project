@@ -39,6 +39,23 @@ const Page002 = () => {
     }
   }, []);
 
+  // 請求田區面積
+  const fetchLandArea = useCallback(async (areaCode) => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:5000/api/lands/${areaCode}`);
+      if (response.data && response.data.area) {
+        setFormData(prevFormData => ({
+          ...prevFormData,
+          area_size: response.data.area
+        }));
+      }
+    } catch (error) {
+      console.error('無法獲取田區面積:', error);
+      alert('無法載入田區面積，請稍後再試！');
+    }
+  }, []);
+
+
   const fetchData = useCallback(async () => {
     try {
       const response = await axios.get('http://127.0.0.1:5000/api/form002');
@@ -85,6 +102,10 @@ const Page002 = () => {
       ...formData,
       [name]: value,
     });
+    // 當選擇田區代號時，自動帶入面積
+    if (name === 'area_code') {
+      fetchLandArea(value);
+    }
   };
 
   const handleSubmit = async (e) => {
