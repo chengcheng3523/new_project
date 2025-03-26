@@ -351,6 +351,7 @@ const Page08 = () => {
           name="usage_quantity"
           value={formData.usage_quantity}
           onChange={handleChange}
+          readOnly // ✅ 這樣 `Input` 會正確接收 readOnly
         />
         <FormField
           label="剩餘量"

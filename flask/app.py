@@ -215,34 +215,6 @@ def login():
     return jsonify(error='帳號或密碼錯誤'), 401
 
 # ----------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # 農地資訊
 
 # 新增農地資訊 API
@@ -489,42 +461,6 @@ def get_all_form002():
         for result in results
     ]
     return jsonify(forms)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # ----------------------------------------------------------------------------------------------
 # 種子(苗)登記
 
@@ -799,8 +735,8 @@ def add_form06():
     crop = data.get('crop')
     fertilizer_type = data.get('fertilizer_type')
     fertilizer_material_name = data.get('fertilizer_material_name')
-    fertilizer_amount = data.get('fertilizer_amount') if data.get('fertilizer_amount') not in ['', 'None', None] else None
-    dilution_factor = data.get('dilution_factor') if data.get('dilution_factor') not in ['', 'None', None] else None
+    fertilizer_amount = float(data.get('fertilizer_amount')) if data.get('fertilizer_amount') not in ['', 'None', None] else None
+    dilution_factor = float(data.get('dilution_factor')) if data.get('dilution_factor') not in ['', 'None', None] else None
     operator = data.get('operator')
     process = data.get('process')
     notes = data.get('notes')
@@ -831,7 +767,18 @@ def add_form06():
             notes=notes
         )
 
-        db.session.add(new_form)
+        # 自動新增一筆 form08 記錄
+        new_form08 = Form08(
+            user_id=user_id,
+            fertilizer_material_name=fertilizer_material_name,
+            date=date_used,
+            usage_quantity=fertilizer_amount,
+            remaining_quantity=(0 - fertilizer_amount),  # 假設初始剩餘量為 0
+            notes='自動新增，對應 form06'
+        )
+
+        db.session.add(new_form08)
+        # db.session.add(new_form)
         db.session.commit()
         return jsonify({'status': '肥料施用新增成功', 'form_id': new_form.id}), 201
     except Exception as e:
@@ -842,7 +789,7 @@ def add_form06():
 @app.route('/api/form06/<int:id>', methods=['PUT'])
 def update_form06(id):
     data = request.get_json()
-    form = Form06.query.get(id)
+
     print("收到的更新數據:", data)
     
     form = Form06.query.get(id)
@@ -852,12 +799,12 @@ def update_form06(id):
     # 获取 field_code，如果没有传递就使用原来的 field_code
     field_code = data.get('field_code', form.field_code)
 
-    # 如果 field_code 更新了，检查是否存在对应的农地
+    # 如果 field_code 更新了，检查是否存在對應的農地
     if field_code != form.field_code:
         lands = Lands.query.filter_by(number=field_code).first()
         if not lands:
             return jsonify({'error': '無效的田區代號'}), 400
-        form.lands_id = lands.id  # 更新关联的 lands_id
+        form.lands_id = lands.id  # 更新關聯的 lands_id
 
     form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
     form.field_code = field_code
@@ -872,6 +819,18 @@ def update_form06(id):
 
     try:
         db.session.commit()
+
+        # 自動新增一筆 form08 記錄
+        new_form08 = Form08(
+            user_id=form.user_id,
+            fertilizer_material_name=form.fertilizer_material_name,
+            date=form.date_used,
+            usage_quantity=form.fertilizer_amount,
+            remaining_quantity=(0 - form.fertilizer_amount),  # 假設初始剩餘量為 0
+            notes='自動新增，對應 form06 更新'
+        )
+        db.session.add(new_form08)
+
         return jsonify({'message': '肥料施用更新成功'}), 200
     except Exception as e:
         print(f"Error occurred while updating form06: {str(e)}")
@@ -2362,6 +2321,26 @@ def get_all_form22():
 
 # ----------------------------------------------------------------------------------------------
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ----------------------------------------------------------------------------------------------
 # 在應用程式啟動時測試資料庫連線
 if __name__ == '__main__':
     test_db_connection()
