@@ -743,11 +743,9 @@ def add_form06():
 
     # 使用 `number` 查找 `lands_id`
     lands = Lands.query.filter_by(number=field_code).first()
-    
     if not lands:
         print(f"❌ 錯誤: 找不到 field_code={field_code} 對應的 lands_id")  # ← 新增錯誤提示
         return jsonify({'error': f'找不到 field_code={field_code} 對應的農地'}), 400
-    
     lands_id = lands.id  # 取得 lands_id
     print(f"✅ 成功找到 lands_id={lands_id} 對應的 field_code={field_code}")
 
@@ -767,18 +765,7 @@ def add_form06():
             notes=notes
         )
 
-        # 自動新增一筆 form08 記錄
-        new_form08 = Form08(
-            user_id=user_id,
-            fertilizer_material_name=fertilizer_material_name,
-            date=date_used,
-            usage_quantity=fertilizer_amount,
-            remaining_quantity=(0 - fertilizer_amount),  # 假設初始剩餘量為 0
-            notes='自動新增，對應 form06'
-        )
-
-        db.session.add(new_form08)
-        # db.session.add(new_form)
+        db.session.add(new_form)
         db.session.commit()
         return jsonify({'status': '肥料施用新增成功', 'form_id': new_form.id}), 201
     except Exception as e:
