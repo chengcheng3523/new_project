@@ -750,6 +750,7 @@ def add_form06():
     print(f"✅ 成功找到 lands_id={lands_id} 對應的 field_code={field_code}")
 
     try:
+        # 新增肥料施用記錄
         new_form = Form06(
             user_id=user_id,
             lands_id=lands_id,  # 自動關聯 lands_id
@@ -765,9 +766,38 @@ def add_form06():
             notes=notes
         )
 
+        # 查找該肥料的最新庫存記錄
+        latest_inventory = Form08.query.filter_by(
+            user_id=user_id,
+            fertilizer_material_name=fertilizer_material_name
+        ).order_by(Form08.date.desc()).first()
+
+        if latest_inventory:
+            # 計算新的剩餘量
+            new_remaining = float(latest_inventory.remaining_quantity) - (fertilizer_amount if fertilizer_amount else 0)
+            
+            # 新增一筆 form08 記錄
+            new_form08 = Form08(
+                user_id=user_id,
+                fertilizer_material_name=fertilizer_material_name,
+                date=date_used,
+                usage_quantity=fertilizer_amount,
+                remaining_quantity=new_remaining,
+                notes=f'自動新增，對應 form06 使用記錄，稀釋倍數: {dilution_factor if dilution_factor else "無"}'
+            )
+            db.session.add(new_form08)
+
         db.session.add(new_form)
         db.session.commit()
-        return jsonify({'status': '肥料施用新增成功', 'form_id': new_form.id}), 201
+
+        # 返回成功訊息和剩餘量資訊
+        response_data = {
+            'status': '肥料施用新增成功',
+            'form_id': new_form.id,
+            'remaining_quantity': float(latest_inventory.remaining_quantity) if latest_inventory else None
+        }
+        return jsonify(response_data), 201
+    
     except Exception as e:
         print(f"Error occurred while adding form06: {str(e)}")
         return jsonify({'error': str(e)}), 500
