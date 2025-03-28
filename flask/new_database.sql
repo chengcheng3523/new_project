@@ -27,12 +27,13 @@ VALUES
     ('farmer1', '原始密碼', 'hashed_password', '農場 A', '張三', '02-12345678', '02-87654321', '0912-345678', '住址', 'farmer1@example.com', 5.5, 'notes'),
     ('farmer2', '原始密碼', 'hashed_password', '農場 B', '張三', '02-12345678', '02-87654321', '0912-345678', '台北市XX路', 'farmer1@example.com', 5.5, 'notes'),
     ('newuser', 'password123', '加密後的密碼', 'New User Unit', 'New User', '987654321', '987654321', '987654321', 'New User Address', 'newuser@example.com', 0, 'New user notes'),
-    ('user', '123456', '加密後的密碼', 'User Unit', 'User', '123456789', '123456789', '123456789', 'User Address', 'user@example.com', 0, 'User notes');
+    ('user', '123456', '加密後的密碼', 'User Unit', 'User', '123456789', '123456789', '123456789', 'User Address', 'user@example.com', 0, 'User notes'),
+    ('user6', '123456', '加密後的密碼', 'User6 Unit', 'UserName6', '666666666', '666666666', '666666666', 'User6 Address', 'user6@example.com', 6, 'User6 notes');
 
 -- 更新資料庫中的密碼哈希
 UPDATE users SET password = 'scrypt:32768:8:1$GecnsTV9ESdKmZ6l$87571fe224e1a108335d3061c51aca78e66d1a4d7f3a42cf3bcbdee24a6cb38bb08f3c36d411cbb4b0a173639f5ef7b77d3e1810497db66c43586e52c40afc85' WHERE username = 'newuser';
 UPDATE users SET password = 'scrypt:32768:8:1$GecnsTV9ESdKmZ6l$87571fe224e1a108335d3061c51aca78e66d1a4d7f3a42cf3bcbdee24a6cb38bb08f3c36d411cbb4b0a173639f5ef7b77d3e1810497db66c43586e52c40afc85' WHERE username = 'user';
-
+UPDATE users SET password = 'scrypt:32768:8:1$6B3c9m06vRO2bXe1$70c4b11ee85f801e1023fac7498acddac6e278fdac2d1e211969847749cf8c30fe2d1d83793ac154f29e9b72b5019f853a27616ad7559ff54dc585435042473f' WHERE username = 'user6';
 -- lands（農地資訊）
 CREATE TABLE lands (
     id                 INT AUTO_INCREMENT PRIMARY KEY,  -- 唯一編號
@@ -50,10 +51,11 @@ CREATE TABLE lands (
 INSERT INTO lands (user_id, number, lands_number, area, crop, notes)
 VALUES
     (1, '農地編號', '農地地籍號碼', 1.2, '種植作物', '備註'),
-    (2, 'LP001', '123456-7890', 1.2, '小白菜', '土壤肥沃，適合蔬菜種植'),
-    (1, 'LP002', '123456-7891', 2.5, '玉米', '土壤較乾燥，適合玉米種植'),
-    (1, 'LP003', '123456-7892', 1.0, '高麗菜', '備註'),
-    (1, 'LP004', '123456-7893', 1.0, '小黃瓜', '備註');
+    (2, 'LP002', '222222-2222', 2.2, '小白菜', '土壤肥沃，適合蔬菜種植'),
+    (3, 'LP003', '333333-3333', 3.3, '玉米', '土壤較乾燥，適合玉米種植'),
+    (4, 'LP004', '444444-4444', 4.4, '高麗菜', '備註'),
+    (5, 'LP005', '555555-5555', 5.5, '萵苣', '備註'),
+    (6, 'LP006', '666666-6666', 6.6, '小黃瓜', '備註');
 
 -- form002（生產計畫）
 CREATE TABLE form002 (
@@ -75,9 +77,11 @@ CREATE TABLE form002 (
 INSERT INTO form002 (user_id, lands_id, area_code, area_size, month, crop_info, notes)
 VALUES 
     (1, 1, '農地編號', 2.5, '1月', '種植作物種類、產期、預估產量（公斤）', '備註'),
-    (1, 2, 'LP001', 2.5, '3月', '小白菜/1000', '間作及敷蓋稻草'),
-    (1, 3, 'LP002', 1.8, '6月', '玉米/500', '施有機肥'),
-    (2, 3, 'LP002', 3.2, '9月', '水稻/2000', '水源充足');
+    (2, 2, 'LP002', 2.2, '2月', '小白菜/1000', '間作及敷蓋稻草'),
+    (3, 3, 'LP003', 3.3, '3月', '玉米/500', '施有機肥'),
+    (4, 4, 'LP004', 4.4, '4月', '高麗菜/2000', '水源充足'),
+    (5, 5, 'LP005', 5.5, '5月', '萵苣/1500', '水源充足'),
+    (6, 6, 'LP006', 6.6, '6月', '小黃瓜/1800', '水源充足');
 
 -- form02（種子(苗)登記表）
 CREATE TABLE form02 (
@@ -99,10 +103,12 @@ CREATE TABLE form02 (
 -- 資料示例form02（種子(苗)登記表）
 INSERT INTO form02 (user_id, lands_id, crop, crop_variety, seed_source, seedling_purchase_date, seedling_purchase_type, notes)
 VALUES 
-    (1,  1, '高麗菜', '高麗菜', '自行育苗', '2025-02-01', '種苗', '間作及敷蓋稻草'),
-    (2,  1,'高麗菜', '高麗菜', '自行育苗', '2025-02-01', '種苗', '間作及敷蓋稻草'),
-    (2,  1,'高麗菜', '高麗菜', '購買來源：XYZ公司', '2025-03-15', '種子', '施有機肥'),
-    (1,  1, '高麗菜', '高麗菜', '購買來源：XYZ公司', '2025-03-15', '種子', '施有機肥');
+    (1,  1, '栽培作物', '栽培品種', '種子(苗)來源', '2025-02-01', '育苗(購入)種類', '備註'),
+    (2,  2, '小白菜', '小白菜', '自行育苗', '2025-02-01', '種苗', '間作及敷蓋稻草'),
+    (3,  3, '玉米', '玉米', '購買來源：XYZ公司', '2025-03-15', '種子', '施有機肥'),
+    (4,  4, '高麗菜', '高麗菜', '購買來源：XYZ公司', '2025-03-15', '繁殖體', '施有機肥'),
+    (5,  5, '萵苣', '萵苣', '購買來源：XYZ公司', '2025-03-15', '種子', '施有機肥'),
+    (6,  6, '小黃瓜', '小黃瓜', '購買來源：XYZ公司', '2025-03-15', '種苗', '施有機肥');
 
 
 
@@ -125,9 +131,12 @@ CREATE TABLE form03 (
 -- 資料示例form03（栽培工作紀錄）
 INSERT INTO form03 (user_id, lands_id, operation_date, field_code, crop, crop_content, notes)
 VALUES 
-    (1, 1, '2025-02-01', 'F000-0000', '高麗菜', '1-1 整地, 4-2 灌溉', '間作及敷蓋稻草'),
-    (1, 2, '2025-02-05', 'F000-0001', '高麗菜', '2-1 介質消毒, 5-2 追肥', '使用有機肥料'),
-    (2, 3, '2025-03-15', 'F000-0002', '小黃瓜', '4-3 培土, 6-6 除草', '增加水源');
+    (1, 1, '2025-02-01', '田區代號', '作物', '作物內容（工作代碼及描述）', '備註'),
+    (2, 2, '2025-02-05', 'F000-0001', '小白菜', '2-1 介質消毒', '使用有機肥料'),
+    (3, 3, '2025-03-15', 'F000-0002', '玉米', '4-3 培土', '增加水源'),
+    (4, 4, '2025-03-15', 'F000-0003', '高麗菜', '3-2 播種', '間作及敷蓋稻草'),
+    (5, 5, '2025-03-15', 'F000-0004', '萵苣', '5-1 澆水', '施有機肥'),
+    (6, 6, '2025-03-15', 'F000-0005', '小黃瓜', '6-1 播種', '使用有機肥料');
 
 
 -- form06（肥料施用紀錄）
@@ -154,7 +163,8 @@ CREATE TABLE form06 (
 INSERT INTO form06 (user_id, lands_id, date_used, field_code, crop, fertilizer_type, fertilizer_material_name, fertilizer_amount, dilution_factor, operator, process, notes)
 VALUES 
     (1, 1, '2025-02-01', 'F000-0000', '高麗菜', '基肥', 'M000-0000', 10.00, NULL, '王小明', '間作及敷蓋稻草', '注意施肥均勻'),
-    (1, 2, '2025-03-15', 'F000-0001', '小白菜', '追肥', 'ooxx資材', 15.00, 0.5, '李小華', '進行追肥', '施肥後進行灌溉');
+    (2, 2, '2025-03-15', 'F000-0001', '小白菜', '追肥', 'ooxx資材', 15.00, 0.5, '李小華', '進行追肥', '施肥後進行灌溉'),
+    (6, 6, '2025-03-15', '肥料資材代碼', '小黃瓜', '追肥', '肥料資材名稱', 15.00, 0.5, '李小華', '進行追肥', '施肥後進行灌溉');
 
 
 -- form07（肥料資材與代碼對照表）
@@ -173,8 +183,11 @@ CREATE TABLE form07 (
 
 -- 插入資料範例
 INSERT INTO form07 (user_id, fertilizer_material_code, fertilizer_material_name, notes)
-VALUES (1, 'M000-0000', 'ooxx資材', '備註'),
-       (1, 'M000-0001', 'yyzz資材', '適合高濃度施用');
+VALUES  
+    (1, 'M000-0001', 'ooxx資材', '備註'),
+    (2, 'M000-0002', 'yyzz資材', '適合高濃度施用'),
+    (3, '肥料資材代碼', '肥料資材名稱', '適合低濃度施用');
+
 
 
 -- form08（肥料入出庫紀錄）
@@ -198,7 +211,9 @@ CREATE TABLE form08 (
 --  資料示例form08（肥料入出庫紀錄）
 INSERT INTO form08 (user_id, fertilizer_material_name, manufacturer, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
 VALUES 
-    (1, 'ooxx資材', '某某廠商', '某某供應商', '包', '10公斤', '2025-02-05', 100.00, 10.00, 90.00, '無');
+    (1, 'ooxx資材', '某某廠商', '某某供應商', '包', '10公斤', '2025-02-05', 100.00, 10.00, 90.00, '無'),
+    (2, 'yyzz資材', '某某廠商', '某某供應商', '瓶', '5公升', '2025-02-05', 50.00, 5.00, 45.00, '無'),
+    (3, '肥料資材名稱', '廠商', '供應商', '包', '10公斤', '2025-02-05', 1000.00, 0.00, 1000.00, '無');
 -- 查詢肥料入出庫紀錄
 SELECT f.id, f.fertilizer_material_name, f.manufacturer, f.supplier, f.packaging_unit, f.packaging_volume, 
        f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, f.notes, 

@@ -729,13 +729,14 @@ def add_form06():
     data = request.get_json()
     print("收到的請求數據:", data)
     
+    # 新增 Form06 欄位
     user_id = data.get('user_id')
     date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
     field_code = data.get('field_code')
     crop = data.get('crop')
     fertilizer_type = data.get('fertilizer_type')
     fertilizer_material_name = data.get('fertilizer_material_name')
-    fertilizer_amount = float(data.get('fertilizer_amount')) if data.get('fertilizer_amount') not in ['', 'None', None] else None
+    fertilizer_amount = float(data.get('fertilizer_amount', 0)) if data.get('fertilizer_amount') not in ['', 'None', None] else 0
     dilution_factor = float(data.get('dilution_factor')) if data.get('dilution_factor') not in ['', 'None', None] else None
     operator = data.get('operator')
     process = data.get('process')
@@ -750,6 +751,7 @@ def add_form06():
     print(f"✅ 成功找到 lands_id={lands_id} 對應的 field_code={field_code}")
 
     try:
+        print("✅ 開始新增 Form06...")
         # 新增肥料施用記錄
         new_form = Form06(
             user_id=user_id,
@@ -765,90 +767,134 @@ def add_form06():
             process=process,
             notes=notes
         )
+        print(f"✅ Form06 內容: {new_form.__dict__}")  # Debug
 
-        # 查找該肥料的最新庫存記錄
-        latest_inventory = Form08.query.filter_by(
-            user_id=user_id,
-            fertilizer_material_name=fertilizer_material_name
-        ).order_by(Form08.date.desc()).first()
-
-        if latest_inventory:
-            # 計算新的剩餘量
-            new_remaining = float(latest_inventory.remaining_quantity) - (fertilizer_amount if fertilizer_amount else 0)
-            
-            # 新增一筆 form08 記錄
-            new_form08 = Form08(
-                user_id=user_id,
-                fertilizer_material_name=fertilizer_material_name,
-                date=date_used,
-                usage_quantity=fertilizer_amount,
-                remaining_quantity=new_remaining,
-                notes=f'自動新增，對應 form06 使用記錄，稀釋倍數: {dilution_factor if dilution_factor else "無"}'
-            )
-            db.session.add(new_form08)
-
+        # 先新增 Form06
         db.session.add(new_form)
-        db.session.commit()
+        db.session.commit()  # 先提交，確保 `new_form.id` 可用
+        print(f"✅ 成功提交 Form06，ID: {new_form.id}")
 
-        # 返回成功訊息和剩餘量資訊
-        response_data = {
+        # 查找該肥料的最新庫存記錄 remaining_quantity
+        latest_stock = db.session.query(Form08.remaining_quantity).filter(
+            Form08.fertilizer_material_name == fertilizer_material_name
+        ).order_by(Form08.date.desc()).first()
+        print(f"✅ 最新庫存查詢結果: {latest_stock}")
+
+        # 計算新的剩餘量
+        if latest_stock and latest_stock.remaining_quantity is not None:
+            previous_remaining = latest_stock.remaining_quantity  # 取最新的剩餘量
+        else:
+            previous_remaining = 100000.00  # 若無記錄，則使用初始庫存
+
+        fertilizer_amount = float(fertilizer_amount) if fertilizer_amount else 0
+        new_remaining = previous_remaining - fertilizer_amount
+
+        print(f"🔍 上次剩餘量: {previous_remaining}, 施用量: {fertilizer_amount}, 新的剩餘量: {new_remaining}")
+        if latest_stock:
+            previous_remaining = float(latest_stock.remaining_quantity) if latest_stock.remaining_quantity else 0
+        else:
+            print(f"⚠️ 沒有找到 {fertilizer_material_name} 的庫存記錄，初始化為 0")
+            previous_remaining = 0  # 沒有庫存則初始化
+
+        fertilizer_amount = float(fertilizer_amount) if fertilizer_amount else 0
+        new_remaining = previous_remaining - fertilizer_amount
+
+        print(f"🔍 上次剩餘量: {previous_remaining}, 施用量: {fertilizer_amount}, 新的剩餘量: {new_remaining}")
+
+
+        
+        # 新增一筆 Form08 (庫存同步)
+        new_form08 = Form08(
+            user_id=user_id,
+            fertilizer_material_name=fertilizer_material_name,
+            date=date_used,
+            usage_quantity=fertilizer_amount,
+            remaining_quantity=new_remaining,
+            notes=f'自動新增，對應 form06 使用記錄，稀釋倍數: {dilution_factor if dilution_factor else "無"}'
+        )
+        db.session.add(new_form08)
+        db.session.commit()
+        print(f"✅ 成功新增 Form08，剩餘量: {new_remaining}")
+
+        return jsonify({
             'status': '肥料施用新增成功',
             'form_id': new_form.id,
-            'remaining_quantity': float(latest_inventory.remaining_quantity) if latest_inventory else None
-        }
-        return jsonify(response_data), 201
+            'remaining_quantity': new_remaining
+        }), 201
     
     except Exception as e:
-        print(f"Error occurred while adding form06: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        db.session.rollback()  # 避免資料庫錯誤導致未完成的操作
+        print(f"❌ 錯誤: {str(e)}")
+        return jsonify({'error': str(e)}), 500  # ← 確保這裡有回傳 response
+
 
 # 更新肥料施用
 @app.route('/api/form06/<int:id>', methods=['PUT'])
 def update_form06(id):
     data = request.get_json()
-
     print("收到的更新數據:", data)
     
-    form = Form06.query.get(id)
-    if not form:
-        return jsonify({'error': '肥料施用未找到'}), 404
-    
-    # 获取 field_code，如果没有传递就使用原来的 field_code
-    field_code = data.get('field_code', form.field_code)
-
-    # 如果 field_code 更新了，检查是否存在對應的農地
-    if field_code != form.field_code:
-        lands = Lands.query.filter_by(number=field_code).first()
-        if not lands:
-            return jsonify({'error': '無效的田區代號'}), 400
-        form.lands_id = lands.id  # 更新關聯的 lands_id
-
-    form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
-    form.field_code = field_code
-    form.crop = data['crop']
-    form.fertilizer_type = data['fertilizer_type']
-    form.fertilizer_material_name = data['fertilizer_material_name']
-    form.fertilizer_amount = data['fertilizer_amount'] if data.get('fertilizer_amount') not in ['', 'None', None] else None
-    form.dilution_factor = data['dilution_factor'] if data.get('dilution_factor') not in ['', 'None', None] else None
-    form.operator = data['operator']
-    form.process = data['process']
-    form.notes = data.get('notes')
-
     try:
-        db.session.commit()
+        # 查找要更新的 Form06 記錄
+        form06 = Form06.query.get(id)
+        if not form06:
+            return jsonify({'error': '肥料施用未找到'}), 404
+        
+        # 获取 field_code，如果没有传递就使用原来的 field_code
+        field_code = data.get('field_code', form06.field_code)
 
-        # 自動新增一筆 form08 記錄
+        # 如果 field_code 更新了，检查是否存在對應的農地
+        if field_code != form06.field_code:
+            lands = Lands.query.filter_by(number=field_code).first()
+            if not lands:
+                return jsonify({'error': '無效的田區代號'}), 400
+            form06.lands_id = lands.id  # 更新關聯的 lands_id
+
+        # 保存舊的使用量，用於計算庫存變化
+        old_usage = float(form06.fertilizer_amount) if form06.fertilizer_amount else 0
+        new_usage = float(data.get('fertilizer_amount', 0)) if data.get('fertilizer_amount') not in ['', 'None', None] else 0
+
+        # 更新 Form06 欄位資料
+        form06.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
+        form06.field_code = field_code
+        form06.crop = data['crop']
+        form06.fertilizer_type = data['fertilizer_type']
+        form06.fertilizer_material_name = data['fertilizer_material_name']
+        form06.fertilizer_amount = new_usage
+        form06.dilution_factor = float(data['dilution_factor']) if data.get('dilution_factor') not in ['', 'None', None] else None
+        form06.operator = data['operator']
+        form06.process = data['process']
+        form06.notes = data.get('notes')
+
+        # 先查找該肥料的最新庫存記錄
+        latest_inventory = Form08.query.filter_by(
+            user_id=form06.user_id,
+            fertilizer_material_name=form06.fertilizer_material_name
+        ).order_by(Form08.date.desc()).first()
+
+        if latest_inventory:
+            # 計算新的剩餘量 (更新前 + 原來用量 - 新的用量)
+            new_remaining = float(latest_inventory.remaining_quantity) + form06.fertilizer_amount - float(data.get('fertilizer_amount', form06.fertilizer_amount))
+        else:
+            print(f"⚠️ 警告: 沒有找到 {form06.fertilizer_material_name} 的庫存記錄，將初始化庫存記錄")
+            new_remaining = 0  # 如果沒有找到，則假設庫存初始為 0
+
+        # 更新 Form08 (庫存同步)
         new_form08 = Form08(
-            user_id=form.user_id,
-            fertilizer_material_name=form.fertilizer_material_name,
-            date=form.date_used,
-            usage_quantity=form.fertilizer_amount,
-            remaining_quantity=(0 - form.fertilizer_amount),  # 假設初始剩餘量為 0
-            notes='自動新增，對應 form06 更新'
+            user_id=form06.user_id,
+            fertilizer_material_name=form06.fertilizer_material_name,
+            date=form06.date_used,
+            usage_quantity=form06.fertilizer_amount,
+            remaining_quantity=new_remaining,
+            notes=f'自動更新，對應 form06 記錄，稀釋倍數: {form06.dilution_factor if form06.dilution_factor else "無"}'
         )
         db.session.add(new_form08)
 
-        return jsonify({'message': '肥料施用更新成功'}), 200
+        # 提交變更
+        db.session.commit()
+
+        return jsonify({'status': '肥料施用紀錄更新成功', 'form_id': form06.id, 'remaining_quantity': new_remaining}), 200
+
     except Exception as e:
         print(f"Error occurred while updating form06: {str(e)}")
         return jsonify({'error': str(e)}), 500
@@ -936,7 +982,7 @@ def update_form07(id):
     form.fertilizer_material_name = data['fertilizer_material_name']
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '肥料資材與代碼更新成功'})
+    return jsonify({'message': '肥料資材與代碼更新成功'}), 200
 
 # 刪除肥料資材與代碼
 @app.route('/api/form07/<int:id>', methods=['DELETE'])
@@ -1031,7 +1077,7 @@ def update_form08(id):
     form.remaining_quantity = data['remaining_quantity'] if data.get('remaining_quantity') not in ['', 'None', None] else None
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '肥料入出庫更新成功'})
+    return jsonify({'message': '肥料入出庫更新成功'}), 200
 
 # 刪除肥料入出庫
 @app.route('/api/form08/<int:id>', methods=['DELETE'])
@@ -1163,7 +1209,7 @@ def update_form09(id):
 
     try:
         db.session.commit()
-        return jsonify({'message': '有害生物防治或環境消毒資材施用更新成功'})
+        return jsonify({'message': '有害生物防治或環境消毒資材施用更新成功'}), 200
     except Exception as e:
         print(f"Error occurred while updating form09: {str(e)}")
         return jsonify({'error': str(e)}), 500
@@ -1252,7 +1298,7 @@ def update_form10(id):
     form.pest_control_material_name = data['pest_control_material_name']
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '防治資材與代碼更新成功'})
+    return jsonify({'message': '防治資材與代碼更新成功'}), 200
 
 # 刪除防治資材與代碼
 @app.route('/api/form10/<int:id>', methods=['DELETE'])
@@ -1350,7 +1396,7 @@ def update_form11(id):
     form.remaining_quantity = data['remaining_quantity'] if data.get('remaining_quantity') not in ['', 'None', None] else None
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '有害生物防治或環境消毒資材入出庫更新成功'})
+    return jsonify({'message': '有害生物防治或環境消毒資材入出庫更新成功'}), 200
 
 # 刪除有害生物防治或環境消毒資材入出庫
 @app.route('/api/form11/<int:id>', methods=['DELETE'])
@@ -1552,7 +1598,7 @@ def update_form13(id):
     form.other_material_name = data['other_material_name']
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '其他資材與代碼更新成功'})
+    return jsonify({'message': '其他資材與代碼更新成功'}), 200
 
 # 刪除其他資材與代碼
 @app.route('/api/form13/<int:id>', methods=['DELETE'])
@@ -1647,7 +1693,7 @@ def update_form14(id):
     form.remaining_quantity = data['remaining_quantity'] if data.get('remaining_quantity') not in ['', 'None', None] else None
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '其他資材入出庫紀錄更新成功'})
+    return jsonify({'message': '其他資材入出庫紀錄更新成功'}), 200
 
 # 刪除其他資材入出庫紀錄
 @app.route('/api/form14/<int:id>', methods=['DELETE'])
@@ -1734,7 +1780,7 @@ def update_form15(id):
     form.recorder = data['recorder']
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '場地設施之保養、維修及清潔管理紀錄更新成功'})
+    return jsonify({'message': '場地設施之保養、維修及清潔管理紀錄更新成功'}), 200
 
 # 刪除場地設施之保養、維修及清潔管理紀錄
 @app.route('/api/form15/<int:id>', methods=['DELETE'])
@@ -1816,7 +1862,7 @@ def update_form16(id):
     form.recorder = data['recorder']
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '器具/機械/設備之保養、維修、校正及清潔管理紀錄更新成功'})
+    return jsonify({'message': '器具/機械/設備之保養、維修、校正及清潔管理紀錄更新成功'}), 200
 
 # 刪除器具/機械/設備之保養、維修、校正及清潔管理紀錄
 @app.route('/api/form16/<int:id>', methods=['DELETE'])
@@ -1935,7 +1981,7 @@ def update_form17(id):
     form.verification_status = data['verification_status'] 
     form.notes = data.get('notes')
     db.session.commit()
-    return jsonify({'message': '採收及採後處理紀錄更新成功'})
+    return jsonify({'message': '採收及採後處理紀錄更新成功'}), 200
 
 # 刪除採收及採後處理紀錄
 @app.route('/api/form17/<int:id>', methods=['DELETE'])
@@ -2034,7 +2080,7 @@ def update_form18(id):
     form.dry_weight = data['dry_weight'] if data.get('dry_weight') not in ['', 'None', None] else None
     form.remarks = data.get('remarks')
     db.session.commit()
-    return jsonify({'message': '乾燥作業紀錄更新成功'})
+    return jsonify({'message': '乾燥作業紀錄更新成功'}), 200
 
 # 刪除乾燥作業紀錄
 @app.route('/api/form18/<int:id>', methods=['DELETE'])
@@ -2134,7 +2180,7 @@ def update_form19(id):
     form.label_void_quantity = data['label_void_quantity']
     form.verification_status = data['verification_status']
     db.session.commit()
-    return jsonify({'message': '包裝及出貨紀錄更新成功'})
+    return jsonify({'message': '包裝及出貨紀錄更新成功'}), 200
 
 # 刪除包裝及出貨紀錄
 @app.route('/api/form19/<int:id>', methods=['DELETE'])
@@ -2215,7 +2261,7 @@ def update_form20(id):
     form.jobdate = datetime.strptime(data['jobdate'], '%Y-%m-%d') if data.get('jobdate') not in ['', 'None', None] else None
     form.operator_name = data['operator_name']
     db.session.commit()
-    return jsonify({'message': '作業人員衛生及健康狀態檢查紀錄更新成功'})
+    return jsonify({'message': '作業人員衛生及健康狀態檢查紀錄更新成功'}), 200
 
 # 刪除作業人員衛生及健康狀態檢查紀錄
 @app.route('/api/form20/<int:id>', methods=['DELETE'])
@@ -2300,7 +2346,7 @@ def update_form22(id):
     form.processor_name = data['processor_name']
     form.processor_date = datetime.strptime(data['processor_date'], '%Y-%m-%d') if data.get('processor_date') not in ['', 'None', None] else None
     db.session.commit()
-    return jsonify({'message': '客戶抱怨/回饋紀錄更新成功'})
+    return jsonify({'message': '客戶抱怨/回饋紀錄更新成功'}), 200
 
 # 刪除客戶抱怨/回饋紀錄
 @app.route('/api/form22/<int:id>', methods=['DELETE'])

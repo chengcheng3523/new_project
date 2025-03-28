@@ -346,20 +346,7 @@ const Page08 = () => {
           value={formData.purchase_quantity}
           onChange={handleChange}
         />
-        <FormField
-          label="使用量"
-          name="usage_quantity"
-          value={formData.usage_quantity}
-          onChange={handleChange}
-          readOnly // ✅ 這樣 `Input` 會正確接收 readOnly
-        />
-        <FormField
-          label="剩餘量"
-          name="remaining_quantity"
-          value={formData.remaining_quantity}
-          onChange={handleChange}
-          // disabled // 禁用手動輸入，改為自動計算
-        />
+
         <FormField
           label="備註"
           name="notes"
@@ -427,9 +414,3 @@ const Page08 = () => {
 
 export default Page08;
 
-
-// 表單問題一，【包裝容量】在資料庫可填入的是 數字 ，後面需要加上 單位 作法，包裝容量分離數字和單位，並且單位有選項是【其他】，需要填入 (單位) 字串 
-// 表單問題二，使用量和剩餘量的數字應該是要小於購入量，如何設定?
-// 表單問題三，自動計算剩餘量，如何設定?
-// 表單問題四，修改時，選項並未返回表單，這是錯誤的，如何修正?
-// 表單問題五，需要確認【包裝單位】在資料庫可選【其他】需填入 (單位) 字串?並且在修改時需要可返回選項和輸入框與其他相同，需要調整
