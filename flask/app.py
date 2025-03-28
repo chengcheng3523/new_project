@@ -5,6 +5,7 @@ from flask_cors import CORS
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token
+import re
 
 app = Flask(__name__)   # 創建 Flask 應用程式實例
 
@@ -1052,6 +1053,23 @@ def add_form08():
     remaining_quantity = data.get('remaining_quantity') if data.get('remaining_quantity') not in ['', 'None', None] else None
     notes = data.get('notes')
 
+    # 去除單位，只提取數字部分
+    def extract_number(value):
+        match = re.match(r"(\d+(\.\d+)?)", value)  # 匹配數字（可包含小數點）
+        return float(match.group(1)) if match else 0.0
+
+    try:
+        # 提取包裝容量、購入量和使用量的數字部分
+        packaging_volume = extract_number(packaging_volume) if packaging_volume else 0.0
+        purchase_quantity = extract_number(purchase_quantity) if purchase_quantity else 0.0
+        usage_quantity = extract_number(usage_quantity) if usage_quantity else 0.0
+
+        # 計算剩餘量 = 包裝容量 * 購入量 - 使用量
+        remaining_quantity = packaging_volume * purchase_quantity - usage_quantity
+    except ValueError:
+        return jsonify({'error': '數據格式錯誤，請提供有效的數字'}), 400
+
+    
     try:
         new_form = Form08(
             user_id=user_id,

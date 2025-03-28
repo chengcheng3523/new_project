@@ -275,49 +275,6 @@ const Page08 = () => {
         </FieldSelect>
 
         <FormField
-          label="廠商"
-          name="manufacturer"
-          value={formData.manufacturer}
-          onChange={handleChange}
-        />
-        <FormField
-          label="供應商"
-          name="supplier"
-          value={formData.supplier}
-          onChange={handleChange}
-        />
-        <SelectField
-          label="包裝單位"
-          name="packaging_unit"
-          value={formData.packaging_unit}
-          onChange={handleChange}
-          
-          options={[
-            { label: '包', value: '包' },
-            { label: '瓶', value: '瓶' },
-            { label: '罐', value: '罐' },
-            { label: '其他', value: '其他' },
-          ]}
-
-        />
-        {formData.packaging_unit === '其他' && (
-          <FormField
-            label="包裝單位 (其他)"
-            name="packaging_unit_other"
-            value={formData.packaging_unit_other}
-            onChange={handleChange}
-            
-          />
-        )}
-        <FormField
-          id="packaging_volume"
-          name="packaging_volume"
-          value={formData.packaging_volume}
-          onChange={handleChange}
-          label="包裝容量:"
-        />
-        
-        <FormField
           id="date"
           name="date"
           type="date"
