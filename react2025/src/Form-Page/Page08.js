@@ -24,10 +24,6 @@ const Page08 = () => {
     supplier : '',
     date: '',
     packaging_unit : '',
-    packaging_unit_other: '', // 新增：當選擇「其他」時的單位輸入
-    volumeValue: '',          // 新增：包裝容量的數字部分
-    volumeUnit: '',           // 新增：包裝容量的單位部分
-    volumeUnit_other: '',     // 新增：當選擇「其他」時的單位輸入
     packaging_volume : '',
     purchase_quantity : '',
     usage_quantity : '',
@@ -36,6 +32,7 @@ const Page08 = () => {
   });
 
   const [fertilizerOptions, setFertilizerOptions] = useState([]);  // 儲存有效的資材名稱
+  const [packagingUnits, setPackagingUnits] = useState([]);  // 儲存包裝單位選項
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -48,6 +45,26 @@ const Page08 = () => {
     } catch (error) {
       console.error('無法獲取有效的資材名稱:', error);
       alert('無法載入有效的資材名稱，請稍後再試！');
+    }
+  }, []);
+
+
+  // 根據選擇的資材名稱查詢資料
+  const fetchMaterialDetails = useCallback(async (fertilizerMaterialName) => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:5000/api/form07/material/${fertilizerMaterialName}`);
+      if (response.data) {
+        const { manufacturer, supplier, packaging_unit, packaging_volume } = response.data;
+        setFormData(prev => ({
+          ...prev,
+          manufacturer,
+          supplier,
+          packaging_unit,
+          packaging_volume,
+        }));
+      }
+    } catch (error) {
+      console.error('無法查詢肥料資材詳細資料:', error);
     }
   }, []);
 
@@ -93,6 +110,19 @@ const Page08 = () => {
       fetchData(); // 組件加載時獲取數據
     }, [fetchData, fetchFertilizerOptions, navigate, userId]);
   
+    // 當選擇肥料資材名稱時，自動填充相關欄位
+    useEffect(() => {
+      if (!userId) {
+        alert('請先登入！');
+        navigate('/login'); // 重定向到登入頁面
+        return;
+      }
+      if (formData.fertilizer_material_name) {
+        fetchMaterialDetails(formData.fertilizer_material_name);
+      }
+    }, [formData.fertilizer_material_name, fetchMaterialDetails]);
+
+
     const handleChange = (e) => {
       const { name, value } = e.target;
       if (!isAdmin && name === 'user_id') return;
@@ -106,11 +136,6 @@ const Page08 = () => {
         newFormData.remaining_quantity = (purchase - usage).toFixed(2);  // 自動更新剩餘量
       }
 
-      // 自動更新包裝容量
-      if (name === 'volumeValue' || name === 'volumeUnit' || name === 'volumeUnit_other') {
-        const packagingVolume = `${newFormData.volumeValue} ${newFormData.volumeUnit === '其他' ? newFormData.volumeUnit_other : newFormData.volumeUnit}`;
-        newFormData.packaging_volume = packagingVolume;
-      }
 
       setFormData(newFormData);
     };
@@ -135,10 +160,6 @@ const Page08 = () => {
       return;
     }
 
-  // 合併包裝容量
-  // const packaging_volume = `${formData.volumeValue} ${formData.volumeUnit}`;
-  const packaging_unit = formData.packaging_unit === '其他' ? formData.packaging_unit_other : formData.packaging_unit;
-  const packaging_volume = `${formData.volumeValue} ${formData.volumeUnit === '其他' ? formData.volumeUnit_other : formData.volumeUnit}`;
 
   try {
     let response;
@@ -146,8 +167,6 @@ const Page08 = () => {
       if (isAdmin) {
         response = await axios.put(`http://127.0.0.1:5000/api/form08/${formData.id}`, {
           ...formData,
-          packaging_volume,
-          packaging_unit,
         });
       } else {
         alert('您沒有權限更新資料！');
@@ -162,8 +181,8 @@ const Page08 = () => {
           manufacturer: formData.manufacturer,
           supplier: formData.supplier,
           date: formData.date,
-          packaging_unit,
-          packaging_volume, 
+          packaging_unit: formData.packaging_unit,
+          packaging_volume: formData.packaging_volume,
           purchase_quantity: formData.purchase_quantity,
           usage_quantity: formData.usage_quantity,
           remaining_quantity: formData.remaining_quantity,
@@ -179,10 +198,7 @@ const Page08 = () => {
         supplier: '',
         date: '',
         packaging_unit: '',
-        packaging_unit_other: '',
-        volumeValue: '',
-        volumeUnit: '',
-        volumeUnit_other: '',
+        packaging_volume: '',
         purchase_quantity: '',
         usage_quantity: '',
         remaining_quantity: '',
@@ -220,11 +236,6 @@ const Page08 = () => {
   const handleEdit = (record) => {
     if (!isAdmin) return; // 如果不是管理員，則返回
     
-    // 分解 packaging_volume 為數字和單位
-    const [volumeValue, volumeUnit] = record.packaging_volume ? record.packaging_volume.split(' ') : ['', ''];
-    const isOtherPackagingUnit = !['包', '瓶', '罐'].includes(record.packaging_unit);
-    const isOtherVolumeUnit = !['公克', '公斤', '毫升', '公升'].includes(volumeUnit);
-  
     setFormData({
       id: record.id,
       user_id: record.user_id,
@@ -232,11 +243,8 @@ const Page08 = () => {
       manufacturer: record.manufacturer || '',
       supplier: record.supplier || '',
       date: record.date || '',
-      packaging_unit: isOtherPackagingUnit ? '其他' : record.packaging_unit || '',
-      packaging_unit_other: isOtherPackagingUnit ? record.packaging_unit : '',
-      volumeValue: volumeValue || '',
-      volumeUnit: isOtherVolumeUnit ? '其他' : volumeUnit || '',
-      volumeUnit_other: isOtherVolumeUnit ? volumeUnit : '',
+      packaging_unit: record.packaging_unit || '',
+      packaging_volume: record.packaging_volume || '',
       purchase_quantity: record.purchase_quantity || '',
       usage_quantity: record.usage_quantity || '',
       remaining_quantity: record.remaining_quantity || '',
@@ -302,36 +310,13 @@ const Page08 = () => {
           />
         )}
         <FormField
-          label="包裝容量 (數字)"
-          name="volumeValue"
-          type="number"
-          value={formData.volumeValue}
+          id="packaging_volume"
+          name="packaging_volume"
+          value={formData.packaging_volume}
           onChange={handleChange}
-          
+          label="包裝容量:"
         />
-        <SelectField
-          label="包裝容量 (單位)"
-          name="volumeUnit"
-          value={formData.volumeUnit}
-          onChange={handleChange}
-          
-          options={[
-            { label: '公克', value: '公克' },
-            { label: '公斤', value: '公斤' },
-            { label: '毫升', value: '毫升' },
-            { label: '公升', value: '公升' },
-            { label: '其他', value: '其他' },
-          ]}
-        />
-        {formData.volumeUnit === '其他' && (
-          <FormField
-          label="包裝容量 (其他)"
-          name="volumeUnit_other"
-          value={formData.volumeUnit_other}
-          onChange={handleChange}
-          
-        />
-      )}
+        
         <FormField
           id="date"
           name="date"

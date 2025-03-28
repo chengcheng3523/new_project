@@ -135,6 +135,10 @@ class Form07(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     fertilizer_material_code = db.Column(db.String(50))# 肥料資材代碼
     fertilizer_material_name = db.Column(db.String(50))# 肥料資材名稱
+    manufacturer = db.Column(db.String(50), nullable=True)# 廠商
+    supplier = db.Column(db.String(50), nullable=True)# 供應商
+    packaging_unit = db.Column(db.String(50))# 包裝單位
+    packaging_volume = db.Column(db.String(50), nullable=True)# 包裝容量
     notes = db.Column(db.Text, nullable=True)    # 備註
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

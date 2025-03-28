@@ -173,6 +173,10 @@ CREATE TABLE form07 (
     user_id INT NOT NULL,                                  -- 關聯 `users` 表
     fertilizer_material_code VARCHAR(20) UNIQUE,          -- 肥料資材代碼
     fertilizer_material_name VARCHAR(100),         -- 肥料資材名稱
+    manufacturer VARCHAR(100),                              -- 廠商
+    supplier VARCHAR(100),                                  -- 供應商
+    packaging_unit VARCHAR(100), -- 包裝單位□包 □瓶 □罐 □其他_______
+    packaging_volume VARCHAR(50),                  -- 包裝容量，前面是數字，後面試單位選項（如：公克、公斤、毫升、公升等）
     notes TEXT,                                            -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
@@ -182,11 +186,12 @@ CREATE TABLE form07 (
 );
 
 -- 插入資料範例
-INSERT INTO form07 (user_id, fertilizer_material_code, fertilizer_material_name, notes)
+INSERT INTO form07 (user_id, fertilizer_material_code, fertilizer_material_name, manufacturer, supplier, packaging_unit, packaging_volume, notes)
 VALUES  
-    (1, 'M000-0001', 'ooxx資材', '備註'),
-    (2, 'M000-0002', 'yyzz資材', '適合高濃度施用'),
-    (3, '肥料資材代碼', '肥料資材名稱', '適合低濃度施用');
+    (1, 'M000-0001', 'ooxx資材', '廠商', '供應商', '包', '10公斤', '備註'),
+    (2, 'M000-0002', 'yyzz資材', '廠商', '供應商', '包', '10公斤', '適合高濃度施用'),
+    (3, '肥料資材代碼', '肥料資材名稱', '廠商', '供應商', '包', '10公斤', '適合低濃度施用'),
+    (4, 'M000-0004', '肥料資材名稱4', '廠商', '供應商', '包', '10公斤', '無');
 
 
 

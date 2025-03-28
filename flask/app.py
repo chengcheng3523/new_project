@@ -953,6 +953,10 @@ def add_form07():
     user_id = data.get('user_id')
     fertilizer_material_code = data.get('fertilizer_material_code')
     fertilizer_material_name = data.get('fertilizer_material_name')
+    manufacturer = data.get('manufacturer')
+    supplier = data.get('supplier')
+    packaging_unit = data.get('packaging_unit')
+    packaging_volume = data.get('packaging_volume')
     notes = data.get('notes')
     
     try:
@@ -960,6 +964,10 @@ def add_form07():
             user_id=user_id,
             fertilizer_material_code=fertilizer_material_code,
             fertilizer_material_name=fertilizer_material_name,
+            manufacturer=manufacturer,
+            supplier=supplier,
+            packaging_unit=packaging_unit,
+            packaging_volume=packaging_volume,
             notes=notes
         )
 
@@ -980,6 +988,10 @@ def update_form07(id):
     
     form.fertilizer_material_code = data['fertilizer_material_code']
     form.fertilizer_material_name = data['fertilizer_material_name']
+    form.manufacturer = data['manufacturer']
+    form.supplier = data['supplier']
+    form.packaging_unit = data['packaging_unit']
+    form.packaging_volume = data['packaging_volume']
     form.notes = data.get('notes')
     db.session.commit()
     return jsonify({'message': '肥料資材與代碼更新成功'}), 200
@@ -1008,6 +1020,10 @@ def get_all_form07():
             "farmer_name": result.farmer_name,
             "fertilizer_material_code": result.Form07.fertilizer_material_code,
             "fertilizer_material_name": result.Form07.fertilizer_material_name,
+            "manufacturer": result.Form07.manufacturer,
+            "supplier": result.Form07.supplier,
+            "packaging_unit": result.Form07.packaging_unit,
+            "packaging_volume": result.Form07.packaging_volume,
             "notes": result.Form07.notes
         }
         for result in results
@@ -2383,8 +2399,21 @@ def get_all_form22():
     return jsonify(forms)
 
 # ----------------------------------------------------------------------------------------------
-
-
+# 根據肥料資材名稱查詢相應資料
+@app.route('/api/form07/material/<string:fertilizer_material_name>', methods=['GET'])
+def get_material_details(fertilizer_material_name):
+    form = Form07.query.filter_by(fertilizer_material_name=fertilizer_material_name).first()
+    if not form:
+        return jsonify({'error': '未找到該肥料資材名稱'}), 404
+    
+    # 回傳相關的欄位資料
+    material_details = {
+        "manufacturer": form.manufacturer or '',
+        "supplier": form.supplier or '',
+        "packaging_unit": form.packaging_unit or '',
+        "packaging_volume": form.packaging_volume or ''
+    }
+    return jsonify(material_details)
 
 
 
