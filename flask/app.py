@@ -6,6 +6,8 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token
 import re
+from decimal import Decimal  # 確保引入 Decimal 類型
+from datetime import datetime
 
 app = Flask(__name__)   # 創建 Flask 應用程式實例
 
@@ -348,6 +350,47 @@ def get_land_area(number):
         return jsonify({'error': 'Land not found'}), 404
 
     return jsonify({'number': land.number, 'area': str(land.area)})
+# ----------------------------------------------------------------------------------------
+# 計算剩餘量的函數
+
+# 肥料
+def calculate_remaining_quantity(fertilizer_material_name, fertilizer_amount):
+    """
+    根據肥料名稱和施用量計算剩餘量。
+    
+    :param fertilizer_material_name: 肥料名 稱
+    :param fertilizer_amount: 施用量
+    :return: 新的剩餘量、先前剩餘量、施用量
+    """
+    try:
+        # 查找該肥料的最新庫存記錄 Form08
+        latest_record = db.session.query(Form08.remaining_quantity).filter(
+                Form08.fertilizer_material_name == fertilizer_material_name
+        ).order_by(Form08.date.desc(), Form08.id.desc()).first()  # 按日期和ID排序，確保獲取最新記錄
+
+        if latest_record:
+            previous_remaining = Decimal(latest_record.remaining_quantity)  # 使用最新剩餘量
+            print(f"✅ 找到 {fertilizer_material_name} 的庫存記錄，剩餘量: {previous_remaining}")
+        else:
+            print(f"⚠️ 沒有找到 {fertilizer_material_name} 的庫存記錄，使用預設庫存500.00")
+            previous_remaining = Decimal('500.00')  # 若無記錄，則使用預設庫存
+
+        # 施用量轉換為 Decimal
+        fertilizer_amount = Decimal(fertilizer_amount) if fertilizer_amount else Decimal('0.00')
+
+        # 計算新的剩餘量
+        new_remaining = previous_remaining - fertilizer_amount
+        print(f"🔍 上次剩餘量: {previous_remaining}, 施用量: {fertilizer_amount}, 新的剩餘量: {new_remaining}")
+
+        return new_remaining, previous_remaining, fertilizer_amount
+    except Exception as e:
+        print(f"❌ 計算剩餘量時發生錯誤: {str(e)}")
+        raise
+
+# 藥
+
+
+# 其他
 
 
 # ----------------------------------------------------------------------------------------
@@ -439,7 +482,7 @@ def delete_form002(id):
     db.session.commit()
     return jsonify({'status': '生產計畫已刪除'}), 200
 
-
+# 查詢所有生產計劃
 @app.route('/api/form002', methods=['GET'])
 def get_all_form002(): 
     results = db.session.query(
@@ -652,7 +695,7 @@ def delete_form03(id):
     db.session.commit()
     return jsonify({'message': '栽培工作已刪除'}), 200
 
-# 查詢所有使用者的栽培工作
+# 查詢所有的栽培工作
 @app.route('/api/form03', methods=['GET'])
 def get_all_form03():
     results = db.session.query(
@@ -676,6 +719,7 @@ def get_all_form03():
     ]
 
     return jsonify(forms)
+
 # ----------------------------------------------------------------------------------------------
 # 資材選單
 
@@ -730,7 +774,7 @@ def add_form06():
     data = request.get_json()
     print("收到的請求數據:", data)
     
-    # 新增 Form06 欄位
+    # 取得 Form06 欄位
     user_id = data.get('user_id')
     date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
     field_code = data.get('field_code')
@@ -752,11 +796,10 @@ def add_form06():
     print(f"✅ 成功找到 lands_id={lands_id} 對應的 field_code={field_code}")
 
     try:
-        print("✅ 開始新增 Form06...")
         # 新增肥料施用記錄
         new_form = Form06(
             user_id=user_id,
-            lands_id=lands_id,  # 自動關聯 lands_id
+            lands_id=lands_id,
             date_used=date_used,
             field_code=field_code,
             crop=crop,
@@ -768,47 +811,31 @@ def add_form06():
             process=process,
             notes=notes
         )
-        print(f"✅ Form06 內容: {new_form.__dict__}")  # Debug
+        print(f"Form06 : {new_form.__dict__}")  # Debug
 
         # 先新增 Form06
         db.session.add(new_form)
         db.session.commit()  # 先提交，確保 `new_form.id` 可用
-        print(f"✅ 成功提交 Form06，ID: {new_form.id}")
+        print(f"Form06，ID: {new_form.id}")
 
-        # 查找該肥料的最新庫存記錄 remaining_quantity
-        latest_stock = db.session.query(Form08.remaining_quantity).filter(
-            Form08.fertilizer_material_name == fertilizer_material_name
-        ).order_by(Form08.date.desc()).first()
-        print(f"✅ 最新庫存查詢結果: {latest_stock}")
+        # 呼叫計算庫存剩餘量的函數
+        new_remaining, previous_remaining, fertilizer_amount = calculate_remaining_quantity(fertilizer_material_name, fertilizer_amount)
 
-        # 計算新的剩餘量
-        if latest_stock and latest_stock.remaining_quantity is not None:
-            previous_remaining = latest_stock.remaining_quantity  # 取最新的剩餘量
-        else:
-            previous_remaining = 100000.00  # 若無記錄，則使用初始庫存
-
-        fertilizer_amount = float(fertilizer_amount) if fertilizer_amount else 0
-        new_remaining = previous_remaining - fertilizer_amount
-
-        print(f"🔍 上次剩餘量: {previous_remaining}, 施用量: {fertilizer_amount}, 新的剩餘量: {new_remaining}")
-        if latest_stock:
-            previous_remaining = float(latest_stock.remaining_quantity) if latest_stock.remaining_quantity else 0
-        else:
-            print(f"⚠️ 沒有找到 {fertilizer_material_name} 的庫存記錄，初始化為 0")
-            previous_remaining = 0  # 沒有庫存則初始化
-
-        fertilizer_amount = float(fertilizer_amount) if fertilizer_amount else 0
-        new_remaining = previous_remaining - fertilizer_amount
-
-        print(f"🔍 上次剩餘量: {previous_remaining}, 施用量: {fertilizer_amount}, 新的剩餘量: {new_remaining}")
-
-
+        # 查找 Form07 資料來獲取肥料的相關資訊
+        form07 = Form07.query.filter_by(fertilizer_material_name=fertilizer_material_name).first()
+        if not form07:
+            print(f"❌ 錯誤: 找不到對應的 Form07 記錄")
+            return jsonify({'error': '找不到對應的肥料資料'}), 400
         
         # 新增一筆 Form08 (庫存同步)
         new_form08 = Form08(
             user_id=user_id,
             fertilizer_material_name=fertilizer_material_name,
-            date=date_used,
+            manufacturer=form07.manufacturer,  
+            supplier=form07.supplier,  
+            packaging_volume=form07.packaging_volume,  
+            packaging_unit=form07.packaging_unit,  
+            date=datetime.now(),
             usage_quantity=fertilizer_amount,
             remaining_quantity=new_remaining,
             notes=f'自動新增，對應 form06 使用記錄，稀釋倍數: {dilution_factor if dilution_factor else "無"}'
@@ -816,6 +843,9 @@ def add_form06():
         db.session.add(new_form08)
         db.session.commit()
         print(f"✅ 成功新增 Form08，剩餘量: {new_remaining}")
+
+        all_records = db.session.query(Form08).filter(Form08.fertilizer_material_name == fertilizer_material_name).order_by(Form08.date.desc(), Form08.id.desc()).all()
+        print(f"所有記錄: {[(r.date, r.remaining_quantity) for r in all_records]}")
 
         return jsonify({
             'status': '肥料施用新增成功',
@@ -826,7 +856,7 @@ def add_form06():
     except Exception as e:
         db.session.rollback()  # 避免資料庫錯誤導致未完成的操作
         print(f"❌ 錯誤: {str(e)}")
-        return jsonify({'error': str(e)}), 500  # ← 確保這裡有回傳 response
+        return jsonify({'error': str(e)}), 500
 
 
 # 更新肥料施用
