@@ -354,7 +354,7 @@ def get_land_area(number):
 # 計算剩餘量的函數
 
 # 肥料
-def calculate_remaining_quantity(fertilizer_material_name, fertilizer_amount):
+def fertilizer_remaining_quantity(fertilizer_material_name, fertilizer_amount):
     """
     根據肥料名稱和施用量計算剩餘量。
     
@@ -819,7 +819,7 @@ def add_form06():
         print(f"Form06，ID: {new_form.id}")
 
         # 呼叫計算庫存剩餘量的函數
-        new_remaining, previous_remaining, fertilizer_amount = calculate_remaining_quantity(fertilizer_material_name, fertilizer_amount)
+        new_remaining, previous_remaining, fertilizer_amount = fertilizer_remaining_quantity(fertilizer_material_name, fertilizer_amount)
 
         # 查找 Form07 資料來獲取肥料的相關資訊
         form07 = Form07.query.filter_by(fertilizer_material_name=fertilizer_material_name).first()
@@ -866,68 +866,52 @@ def update_form06(id):
     print("收到的更新數據:", data)
     
     try:
-        # 查找要更新的 Form06 記錄
+        # 查詢對應的 Form06 記錄
         form06 = Form06.query.get(id)
         if not form06:
+            print(f"❌ 錯誤: 找不到 ID={id} 的肥料施用記錄")
             return jsonify({'error': '肥料施用未找到'}), 404
         
-        # 获取 field_code，如果没有传递就使用原来的 field_code
-        field_code = data.get('field_code', form06.field_code)
-
-        # 如果 field_code 更新了，检查是否存在對應的農地
-        if field_code != form06.field_code:
-            lands = Lands.query.filter_by(number=field_code).first()
-            if not lands:
-                return jsonify({'error': '無效的田區代號'}), 400
-            form06.lands_id = lands.id  # 更新關聯的 lands_id
-
-        # 保存舊的使用量，用於計算庫存變化
-        old_usage = float(form06.fertilizer_amount) if form06.fertilizer_amount else 0
-        new_usage = float(data.get('fertilizer_amount', 0)) if data.get('fertilizer_amount') not in ['', 'None', None] else 0
+        # 备份原来的肥料使用量
+        original_fertilizer_amount = Decimal(form06.fertilizer_amount)  # 转换为 Decimal
 
         # 更新 Form06 欄位資料
-        form06.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
-        form06.field_code = field_code
-        form06.crop = data['crop']
-        form06.fertilizer_type = data['fertilizer_type']
-        form06.fertilizer_material_name = data['fertilizer_material_name']
-        form06.fertilizer_amount = new_usage
-        form06.dilution_factor = float(data['dilution_factor']) if data.get('dilution_factor') not in ['', 'None', None] else None
-        form06.operator = data['operator']
-        form06.process = data['process']
-        form06.notes = data.get('notes')
+        form06.date_used = datetime.strptime(data.get('date_used'), '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else form06.date_used
+        form06.field_code = data.get('field_code', form06.field_code)
+        form06.crop = data.get('crop', form06.crop)
+        form06.fertilizer_type = data.get('fertilizer_type', form06.fertilizer_type)
+        form06.fertilizer_material_name = data.get('fertilizer_material_name', form06.fertilizer_material_name)
+        form06.fertilizer_amount = Decimal(data.get('fertilizer_amount', form06.fertilizer_amount)) if data.get('fertilizer_amount') not in ['', 'None', None] else form06.fertilizer_amount  # 转换为 Decimal
+        form06.dilution_factor = Decimal(data.get('dilution_factor', form06.dilution_factor)) if data.get('dilution_factor') not in ['', 'None', None] else form06.dilution_factor
+        form06.operator = data.get('operator', form06.operator)
+        form06.process = data.get('process', form06.process)
+        form06.notes = data.get('notes', form06.notes)
 
-        # 先查找該肥料的最新庫存記錄
-        latest_inventory = Form08.query.filter_by(
-            user_id=form06.user_id,
-            fertilizer_material_name=form06.fertilizer_material_name
-        ).order_by(Form08.date.desc()).first()
-
-        if latest_inventory:
-            # 計算新的剩餘量 (更新前 + 原來用量 - 新的用量)
-            new_remaining = float(latest_inventory.remaining_quantity) + form06.fertilizer_amount - float(data.get('fertilizer_amount', form06.fertilizer_amount))
-        else:
-            print(f"⚠️ 警告: 沒有找到 {form06.fertilizer_material_name} 的庫存記錄，將初始化庫存記錄")
-            new_remaining = 0  # 如果沒有找到，則假設庫存初始為 0
-
-        # 更新 Form08 (庫存同步)
-        new_form08 = Form08(
-            user_id=form06.user_id,
-            fertilizer_material_name=form06.fertilizer_material_name,
-            date=form06.date_used,
-            usage_quantity=form06.fertilizer_amount,
-            remaining_quantity=new_remaining,
-            notes=f'自動更新，對應 form06 記錄，稀釋倍數: {form06.dilution_factor if form06.dilution_factor else "無"}'
-        )
-        db.session.add(new_form08)
-
-        # 提交變更
+        # 儲存更新
         db.session.commit()
 
-        return jsonify({'status': '肥料施用紀錄更新成功', 'form_id': form06.id, 'remaining_quantity': new_remaining}), 200
+        # 更新庫存 (Form08)
+        new_remaining, previous_remaining, _ = fertilizer_remaining_quantity(form06.fertilizer_material_name, form06.fertilizer_amount)
+
+        # 更新對應的 Form08 記錄
+        form08 = Form08.query.filter_by(
+            fertilizer_material_name=form06.fertilizer_material_name,
+            user_id=form06.user_id
+        ).order_by(Form08.date.desc()).first()
+
+        if form08:
+            form08.remaining_quantity = new_remaining
+            form08.usage_quantity = form06.fertilizer_amount
+            db.session.commit()
+            print(f"✅ 更新 Form08，新的剩餘量: {new_remaining}")
+        else:
+            print(f"❌ 找不到對應的庫存記錄，無法更新庫存")
+
+        return jsonify({'status': '肥料施用記錄已更新', 'remaining_quantity': new_remaining}), 200
 
     except Exception as e:
-        print(f"Error occurred while updating form06: {str(e)}")
+        db.session.rollback()  # 回滾資料庫
+        print(f"❌ 更新錯誤: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 # 刪除肥料施用
