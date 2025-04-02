@@ -355,13 +355,6 @@ def get_land_area(number):
 
 # 肥料
 def fertilizer_remaining_quantity(fertilizer_material_name, fertilizer_amount):
-    """
-    根據肥料名稱和施用量計算剩餘量。
-    
-    :param fertilizer_material_name: 肥料名 稱
-    :param fertilizer_amount: 施用量
-    :return: 新的剩餘量、先前剩餘量、施用量
-    """
     try:
         # 查詢該肥料的最新庫存記錄 Form08
         latest_record = db.session.query(Form08.remaining_quantity).filter(
@@ -388,7 +381,31 @@ def fertilizer_remaining_quantity(fertilizer_material_name, fertilizer_amount):
         raise
 
 # 藥
+def pest_control_remaining_quantity(pest_control_material_name, chemical_usage):
+    try:
+        # 查詢該藥品的最新庫存記錄 Form09
+        latest_record = db.session.query(Form09.remaining_quantity).filter(
+                Form09.pest_control_material_name == pest_control_material_name
+        ).order_by(Form09.date.desc(), Form09.id.desc()).first()  # 按日期和ID排序，確保獲取最新記錄
 
+        if latest_record:
+            previous_remaining = Decimal(latest_record.remaining_quantity)  # 使用最新剩餘量
+            print(f"✅ 找到 {pest_control_material_name} 的庫存記錄，剩餘量: {previous_remaining}")
+        else:
+            print(f"⚠️ 沒有找到 {pest_control_material_name} 的庫存記錄，使用預設庫存500.00")
+            previous_remaining = Decimal('500.00')  # 若無記錄，則使用預設庫存
+
+        # 施用量轉換為 Decimal
+        chemical_usage = Decimal(chemical_usage) if chemical_usage else Decimal('0.00')
+
+        # 計算新的剩餘量
+        new_remaining = previous_remaining - chemical_usage
+        print(f"🔍 上次剩餘量: {previous_remaining}, 施用量: {chemical_usage}, 新的剩餘量: {new_remaining}")
+
+        return new_remaining, previous_remaining, chemical_usage
+    except Exception as e:
+        print(f"❌ 計算剩餘量時發生錯誤: {str(e)}")
+        raise
 
 # 其他
 
@@ -1172,7 +1189,7 @@ def update_form08(id):
         # **提取數字部分進行計算**
         numeric_packaging_volume = extract_number(form08.packaging_volume)
 
-        # **这里修正 `purchase_quantity` 和 `usage_quantity` 的更新**
+        # 這裡改成 purchase_quantity和 usage_quantity 的更新
         form08.purchase_quantity = extract_number(data.get('purchase_quantity', form08.purchase_quantity))
         form08.usage_quantity = extract_number(data.get('usage_quantity', form08.usage_quantity))
 
@@ -1270,7 +1287,7 @@ def add_form09():
     try:
         new_form = Form09(
             user_id=user_id,
-            lands_id=lands_id,  # 自動關聯 lands_id
+            lands_id=lands_id,
             date_used=date_used,
             field_code=field_code,
             crop=crop,
@@ -1284,12 +1301,49 @@ def add_form09():
             operator=operator,
             notes=notes
         )
-
+        print(f"Form09 : {new_form.__dict__}")  # Debug
+        # 先新增 Form09
         db.session.add(new_form)
+        db.session.commit()  # 先提交，確保 `new_form.id` 可用
+        print(f"Form09: {new_form.id}")
+
+        # 呼叫計算庫存剩餘量的函數
+        new_remaining, previous_remaining, chemical_usage = pest_control_remaining_quantity(pest_control_material_name, chemical_usage)
+
+        # 查詢 Form10 資料來獲取防治的相關資訊
+        form10 = Form10.query.filter_by(pest_control_material_name=pest_control_material_name).first()
+        if not form10:
+            print(f"❌ 錯誤: 找不到對應的 Form10 記錄")
+            return jsonify({'error': '找不到對應的肥料資料'}), 400
+
+        # 新增一筆 Form11 (庫存同步)
+        new_form11 = Form11(
+            user_id=user_id,
+            pest_control_material_name=pest_control_material_name,
+            dosage_form=form10.dosage_form,
+            brand_name=form10.brand_name,
+            supplier=form10.supplier, 
+            date=datetime.now(),
+            usage_quantity=chemical_usage,
+            remaining_quantity=new_remaining,
+            notes=f'自動新增，對應 form09 使用記錄，稀釋倍數: {dilution_factor if dilution_factor else "無"}'
+        )
+        db.session.add(new_form11)
         db.session.commit()
-        return jsonify({'status': '有害生物防治或環境消毒資材施用新增成功', 'form_id': new_form.id}), 201
+        print(f"✅ 成功新增 Form11，剩餘量: {new_remaining}")
+
+        all_records = db.session.query(Form11).filter(Form11.pest_control_material_name == pest_control_material_name).order_by(Form11.date.desc(), Form11.id.desc()).all()
+        print(f"所有記錄: {[(r.date, r.remaining_quantity) for r in all_records]}")
+
+        return jsonify({
+            'status': '有害生物防治或環境消毒資材施用新增成功',
+            'form_id': new_form.id,
+            'remaining_quantity': new_remaining
+        }), 201
+
     except Exception as e:
-        print(f"Error occurred while adding form09: {str(e)}")
+        db.session.rollback()  # 避免資料庫錯誤導致未完成的操作
+        print(f"❌ 錯誤 Error occurred while adding form09: {str(e)}")
         return jsonify({'error': str(e)}), 500
     
 # 更新有害生物防治或環境消毒資材施用
@@ -1298,37 +1352,67 @@ def update_form09(id):
     data = request.get_json()
     print("收到的更新數據:", data)
 
-    form = Form09.query.get(id)
-    if not form:
+    form09 = Form09.query.get(id)
+    if not form09:
+        print(f"❌ 錯誤: 找不到 ID={id} 的有害生物防治或環境消毒資材施用記錄")
         return jsonify({'error': '有害生物防治或環境消毒資材施用未找到'}), 404
     
     # 获取 field_code，如果没有传递就使用原来的 field_code
-    field_code = data.get('field_code', form.field_code)
+    field_code = data.get('field_code', form09.field_code)
 
     # 如果 field_code 更新了，检查是否存在对应的农地
-    if field_code != form.field_code:
+    if field_code != form09.field_code:
         lands = Lands.query.filter_by(number=field_code).first()
         if not lands:
             return jsonify({'error': '無效的田區代號'}), 400
-        form.lands_id = lands.id  # 更新关联的 lands_id
+        form09.lands_id = lands.id  # 更新关联的 lands_id
 
-    form.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
-    form.field_code = field_code
-    form.crop = data['crop']
-    form.pest_target = data['pest_target']
-    form.pest_control_material_name = data['pest_control_material_name']
-    form.water_volume = data['water_volume'] if data.get('water_volume') not in ['', 'None', None] else None
-    form.chemical_usage = data['chemical_usage'] if data.get('chemical_usage') not in ['', 'None', None] else None
-    form.dilution_factor = data['dilution_factor'] if data.get('dilution_factor') not in ['', 'None', None] else None
-    form.safety_harvest_period = data['safety_harvest_period']
-    form.operator_method = data['operator_method']
-    form.operator = data['operator']
-    form.notes = data.get('notes')
+    form09.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
+    form09.field_code = field_code
+    form09.crop = data['crop']
+    form09.pest_target = data['pest_target']# 防治對象
+    form09.pest_control_material_name = data['pest_control_material_name']  # 資材代碼或名稱
+    form09.water_volume = data['water_volume'] if data.get('water_volume') not in ['', 'None', None] else None          # 用水量（公升）
+    # form09.chemical_usage = data['chemical_usage'] if data.get('chemical_usage') not in ['', 'None', None] else None       # 藥劑使用量（公斤、公升）
+    # form09.dilution_factor = data['dilution_factor'] if data.get('dilution_factor') not in ['', 'None', None] else None      # 稀釋倍數
+    form09.safety_harvest_period = data['safety_harvest_period']# 安全採收期（天）
+    form09.operator_method = data['operator_method']  # 操作方式
+    form09.operator = data['operator'] # 操作人員
+    form09.notes = data.get('notes')
 
     try:
+        # 確保數據類型一致
+        old_chemical_usage = Decimal(form09.chemical_usage)  # 取得舊的使用量
+        new_chemical_usage = Decimal(data.get('chemical_usage', '0'))  # 取得新的使用量
+        change_amount = new_chemical_usage - old_chemical_usage  # 計算變更量
+
+        # 更新 Form09
+        form09.chemical_usage = new_chemical_usage  # 更新為新的使用量
+        form09.dilution_factor = Decimal(data.get('dilution_factor', '1.00')) if data.get('dilution_factor') else form09.dilution_factor  # 稀釋倍數
         db.session.commit()
-        return jsonify({'message': '有害生物防治或環境消毒資材施用更新成功'}), 200
+        print(f"✅ 更新 Form09: {form09.id}，使用量: {old_chemical_usage} -> {new_chemical_usage}")
+
+        # 查詢最新的 Form11 (庫存)按 date 和 id 由新到舊排序
+        form11 = Form11.query.filter_by(pest_control_material_name=form09.pest_control_material_name).order_by(Form11.date.desc(), Form11.id.desc()).first()
+        if not form11:
+            return jsonify({'error': '找不到對應的有害生物防治或環境消毒資材庫存紀錄'}), 400
+        
+        # 更新有害生物防治或環境消毒資材庫存 (Form11)
+        form11.usage_quantity += change_amount
+        form11.remaining_quantity -= change_amount
+        form11.notes += f" | 更新使用量: {old_chemical_usage} -> {new_chemical_usage} 更新稀釋倍數: {form09.dilution_factor}"
+
+        db.session.commit()
+        
+        return jsonify({
+            'message': '有害生物防治或環境消毒資材施用更新成功',
+            'form_id': form09.id,
+            'new_chemical_usage': str(new_chemical_usage),  # 返回字串，避免 JSON 無法序列化 Decimal
+            'updated_remaining_quantity': str(form11.remaining_quantity)
+            }), 200
+    
     except Exception as e:
+        db.session.rollback()    # 錯誤時回滾變更 (rollback())
         print(f"Error occurred while updating form09: {str(e)}")
         return jsonify({'error': str(e)}), 500
     
@@ -1471,7 +1555,28 @@ def add_form11():
     remaining_quantity = data.get('remaining_quantity') if data.get('remaining_quantity') not in ['', 'None', None] else None
     notes = data.get('notes')
 
+    # 去除單位，只提取數字部分
+    def extract_number(value):
+        if value is None:
+            return Decimal("0.0")  # 避免 None 造成錯誤
+        match = re.match(r"(\d+(\.\d+)?)", value)  # 匹配數字（可包含小數點）
+        return float(match.group(1)) if match else 0.0
+
     try:
+        # 提取包裝容量、購入量和使用量的數字部分
+        purchase_quantity = extract_number(purchase_quantity) if purchase_quantity else 0.0
+        usage_quantity = extract_number(usage_quantity) if usage_quantity else 0.0
+
+
+        # **確保數據合理**
+        if purchase_quantity < 0 or usage_quantity < 0:
+            return jsonify({'error': '購入量和使用量不能為負數'}), 400
+
+        # **計算剩餘量**
+        numeric_packaging_volume = extract_number(packaging_volume)  # 提取數字部分計算
+        remaining_quantity = purchase_quantity * numeric_packaging_volume  - usage_quantity
+        remaining_quantity = max(remaining_quantity, Decimal("0.0"))  # 避免負數
+
         new_form = Form11(
             user_id=user_id,
             pest_control_material_name=pest_control_material_name,
@@ -1497,24 +1602,61 @@ def add_form11():
 # 更新有害生物防治或環境消毒資材入出庫
 @app.route('/api/form11/<int:id>', methods=['PUT'])
 def update_form11(id):
+
     data = request.get_json()
-    form = Form11.query.get(id)
-    if not form:
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    form11 = Form11.query.get(id)
+    if not form11:
         return jsonify({'error': '有害生物防治或環境消毒資材入出庫未找到'}), 404
     
-    form.pest_control_material_name = data['pest_control_material_name']
-    form.dosage_form = data['dosage_form']
-    form.brand_name = data['brand_name']
-    form.supplier = data['supplier']
-    form.packaging_unit = data['packaging_unit']
-    form.packaging_volume = data['packaging_volume']
-    form.date = datetime.strptime(data['date'], '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
-    form.purchase_quantity = data['purchase_quantity'] if data.get('purchase_quantity') not in ['', 'None', None] else None
-    form.usage_quantity = data['usage_quantity'] if data.get('usage_quantity') not in ['', 'None', None] else None
-    form.remaining_quantity = data['remaining_quantity'] if data.get('remaining_quantity') not in ['', 'None', None] else None
-    form.notes = data.get('notes')
-    db.session.commit()
-    return jsonify({'message': '有害生物防治或環境消毒資材入出庫更新成功'}), 200
+    # **提取數字部分**
+    def extract_number(value):
+        if value is None:
+            return Decimal("0.0")  # 避免 None 造成錯誤
+        match = re.search(r"(\d+(\.\d+)?)", str(value))  # 匹配數字（可包含小數點）
+        return Decimal(match.group(1)) if match else Decimal("0.0")
+    
+    try:
+        # **保留原始數據**
+        form11.pest_control_material_name = data['pest_control_material_name']
+        form11.dosage_form = data['dosage_form']
+        form11.brand_name = data['brand_name']
+        form11.supplier = data['supplier']
+        form11.packaging_unit = data['packaging_unit']
+        form11.packaging_volume = data['packaging_volume']
+        form11.date = datetime.strptime(data['date'], '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
+
+        
+        # **提取數字部分進行計算**
+        numeric_packaging_volume = extract_number(form11.packaging_volume)
+        
+        # 這裡改成 purchase_quantity和 usage_quantity 的更新
+        form11.purchase_quantity = extract_number(data.get('purchase_quantity', form11.purchase_quantity))
+        form11.usage_quantity = extract_number(data.get('usage_quantity', form11.usage_quantity))
+
+        # **確保數據合理**
+        if form11.purchase_quantity < 0 or form11.usage_quantity < 0:
+            return jsonify({'error': '購入量和使用量不能為負數'}), 400
+
+        # **計算剩餘量**
+        form11.remaining_quantity = form11.purchase_quantity * numeric_packaging_volume - form11.usage_quantity
+        form11.remaining_quantity = max(form11.remaining_quantity, Decimal("0.0"))  # 避免負數
+
+        db.session.commit()
+        db.session.commit()
+        return jsonify({
+            'status': '有害生物防治或環境消毒資材入出庫更新成功',
+            'form_id': form11.id,
+            'updated_purchase_quantity': str(form11.purchase_quantity),  # ✅ 确保返回正确的购买量
+            'updated_remaining_quantity': str(form11.remaining_quantity),
+            'packaging_volume': form11.packaging_volume  # **回傳完整格式**
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()  # **出錯時回滾**
+        return jsonify({'error': str(e)}), 500
 
 # 刪除有害生物防治或環境消毒資材入出庫
 @app.route('/api/form11/<int:id>', methods=['DELETE'])
@@ -1770,7 +1912,28 @@ def add_form14():
     remaining_quantity = data.get('remaining_quantity') if data.get('remaining_quantity') not in ['', 'None', None] else None
     notes = data.get('notes')
 
+    # 去除單位，只提取數字部分
+    def extract_number(value):
+        if value is None:
+            return Decimal("0.0")  # 避免 None 造成錯誤
+        match = re.match(r"(\d+(\.\d+)?)", value)  # 匹配數字（可包含小數點）
+        return float(match.group(1)) if match else 0.0
+
     try:
+        # 提取包裝容量、購入量和使用量的數字部分
+        purchase_quantity = extract_number(purchase_quantity) if purchase_quantity else 0.0
+        usage_quantity = extract_number(usage_quantity) if usage_quantity else 0.0
+
+
+        # **確保數據合理**
+        if purchase_quantity < 0 or usage_quantity < 0:
+            return jsonify({'error': '購入量和使用量不能為負數'}), 400
+
+        # **計算剩餘量**
+        numeric_packaging_volume = extract_number(packaging_volume)  # 提取數字部分計算
+        remaining_quantity = purchase_quantity * numeric_packaging_volume  - usage_quantity
+        remaining_quantity = max(remaining_quantity, Decimal("0.0"))  # 避免負數
+
         new_form = Form14(
             user_id=user_id,
             other_material_name=other_material_name,
@@ -1788,6 +1951,7 @@ def add_form14():
         db.session.add(new_form)
         db.session.commit()
         return jsonify({'status': '其他資材入出庫紀錄新增成功', 'form_id': new_form.id}), 201
+    
     except Exception as e:
         print(f"Error occurred while adding form14: {str(e)}")
         return jsonify({'error': str(e)}), 500
@@ -1795,23 +1959,59 @@ def add_form14():
 # 更新其他資材入出庫紀錄
 @app.route('/api/form14/<int:id>', methods=['PUT'])
 def update_form14(id):
+
     data = request.get_json()
-    form = Form14.query.get(id)
-    if not form:
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
+    
+    form14 = Form14.query.get(id)
+    if not form14:
         return jsonify({'error': '其他資材入出庫紀錄未找到'}), 404
     
-    form.other_material_name = data['other_material_name']
-    form.manufacturer = data['manufacturer']
-    form.supplier = data['supplier']
-    form.packaging_unit = data['packaging_unit']
-    form.packaging_volume = data['packaging_volume']
-    form.date = datetime.strptime(data['date'], '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
-    form.purchase_quantity = data['purchase_quantity'] if data.get('purchase_quantity') not in ['', 'None', None] else None
-    form.usage_quantity = data['usage_quantity'] if data.get('usage_quantity') not in ['', 'None', None] else None
-    form.remaining_quantity = data['remaining_quantity'] if data.get('remaining_quantity') not in ['', 'None', None] else None
-    form.notes = data.get('notes')
-    db.session.commit()
-    return jsonify({'message': '其他資材入出庫紀錄更新成功'}), 200
+    # **提取數字部分**
+    def extract_number(value):
+        if value is None:
+            return Decimal("0.0")  # 避免 None 造成錯誤
+        match = re.search(r"(\d+(\.\d+)?)", str(value))  # 匹配數字（可包含小數點）
+        return Decimal(match.group(1)) if match else Decimal("0.0")
+    
+    try:
+        # **保留原始數據**
+        form14.other_material_name = data['other_material_name']
+        form14.manufacturer = data['manufacturer']
+        form14.supplier = data['supplier']
+        form14.packaging_unit = data['packaging_unit']
+        form14.packaging_volume = data['packaging_volume']
+        form14.date = datetime.strptime(data['date'], '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
+        form14.notes = data.get('notes')
+        
+        # **提取數字部分進行計算**
+        numeric_packaging_volume = extract_number(form14.packaging_volume)
+
+        # 這裡改成 purchase_quantity和 usage_quantity 的更新
+        form14.purchase_quantity = extract_number(data.get('purchase_quantity', form14.purchase_quantity))
+        form14.usage_quantity = extract_number(data.get('usage_quantity', form14.usage_quantity))
+
+        # **確保數據合理**
+        if form14.purchase_quantity < 0 or form14.usage_quantity < 0:
+            return jsonify({'error': '購入量和使用量不能為負數'}), 400
+
+        # **計算剩餘量**
+        form14.remaining_quantity = form14.purchase_quantity * numeric_packaging_volume - form14.usage_quantity
+        form14.remaining_quantity = max(form14.remaining_quantity, Decimal("0.0"))  # 避免負數
+
+        db.session.commit()
+        return jsonify({
+            'status': '其他資材入出庫紀錄更新成功',
+            'form_id': form14.id,
+            'updated_purchase_quantity': str(form14.purchase_quantity),  # ✅ 确保返回正确的购买量
+            'updated_remaining_quantity': str(form14.remaining_quantity),
+            'packaging_volume': form14.packaging_volume  # **回傳完整格式**
+        }), 200
+    
+    except Exception as e:
+        db.session.rollback()  # **出錯時回滾**
+        return jsonify({'error': str(e)}), 500
 
 # 刪除其他資材入出庫紀錄
 @app.route('/api/form14/<int:id>', methods=['DELETE'])
