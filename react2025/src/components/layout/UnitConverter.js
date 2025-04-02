@@ -167,12 +167,12 @@ const UnitConverter = () => {
         <label>
           單位類別：
           <select value={unitType} onChange={(e) => setUnitType(e.target.value)}>
-  <option value="length">長度</option>
-  <option value="weight">重量</option>
-  <option value="temperature">溫度</option>
-  <option value="area">面積</option>
-  <option value="CC">容積</option>
-</select>
+            <option value="length">長度</option>
+            <option value="weight">重量</option>
+            <option value="temperature">溫度</option>
+            <option value="area">面積</option>
+            <option value="CC">容積</option>
+          </select>
 
         </label>
         <br />
@@ -193,7 +193,7 @@ const UnitConverter = () => {
           </select>
         </label>
         <br />
-        <button onClick={convertUnit}>換算</button>
+        <ButtonGrid onClick={convertUnit}>換算</ButtonGrid>
         <p>{unitResult}</p>
       </Section>
     </Container>
