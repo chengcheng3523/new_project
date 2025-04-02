@@ -17,6 +17,14 @@ const Section = styled.div`
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 `;
 
+
+const Select = styled.select`
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
+
 const Title = styled.h2`
   margin-top: 0;
 `;
@@ -153,49 +161,87 @@ const UnitConverter = () => {
       </Section>
 
       <Section>
-        <Title>單位換算</Title>
-        <label>
-          輸入數值：
-          <input
-            type="number"
-            value={unitInput}
-            onChange={(e) => setUnitInput(e.target.value)}
-            placeholder="輸入數值"
-          />
-        </label>
-        <br />
-        <label>
-          單位類別：
-          <select value={unitType} onChange={(e) => setUnitType(e.target.value)}>
-            <option value="length">長度</option>
-            <option value="weight">重量</option>
-            <option value="temperature">溫度</option>
-            <option value="area">面積</option>
-            <option value="CC">容積</option>
-          </select>
+  <Title>單位換算</Title>
 
-        </label>
-        <br />
-        <label>
-          從：
-          <select value={fromUnit} onChange={(e) => setFromUnit(e.target.value)}>
-            {unitOptions[unitType].map((unit) => (
-              <option key={unit} value={unit}>{unit}</option>
-            ))}
-          </select>
-        </label>
-        <label>
-          到：
-          <select value={toUnit} onChange={(e) => setToUnit(e.target.value)}>
-            {unitOptions[unitType].map((unit) => (
-              <option key={unit} value={unit}>{unit}</option>
-            ))}
-          </select>
-        </label>
-        <br />
-        <ButtonGrid onClick={convertUnit}>換算</ButtonGrid>
-        <p>{unitResult}</p>
-      </Section>
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <label>
+      輸入數值：
+      <input
+        type="number"
+        value={unitInput}
+        onChange={(e) => setUnitInput(e.target.value)}
+        placeholder="請輸入數值"
+        style={{
+          width: '15%',
+          padding: '8px',
+          borderRadius: '5px',
+          border: '1px solid #ccc'
+        }}
+      />
+    </label>
+
+    <label>
+      單位類別：
+      <Select
+        value={unitType}
+        onChange={(e) => setUnitType(e.target.value)}
+        style={{width: '15%', padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
+      >
+        <option value="length">長度</option>
+        <option value="weight">重量</option>
+        <option value="temperature">溫度</option>
+        <option value="area">面積</option>
+        <option value="CC">容積</option>
+      </Select>
+    </label>
+
+      <label style={{ flex: 1 }}>
+        從：
+        <select
+          value={fromUnit}
+          onChange={(e) => setFromUnit(e.target.value)}
+          style={{ width: '20%', padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
+        >
+          {unitOptions[unitType].map((unit) => (
+            <option key={unit} value={unit}>{unit}</option>
+          ))}
+        </select>
+      </label>
+
+      <label style={{ flex: 1 }}>
+        到：
+        <select
+          value={toUnit}
+          onChange={(e) => setToUnit(e.target.value)}
+          style={{ width: '20%', padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
+        >
+          {unitOptions[unitType].map((unit) => (
+            <option key={unit} value={unit}>{unit}</option>
+          ))}
+        </select>
+      </label>
+
+
+    <button
+      onClick={convertUnit}
+      style={{
+        width: '20%',
+        padding: '10px',
+        background: '#4CAF50',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '6px',
+        fontWeight: 'bold',
+        cursor: 'pointer'
+      }}
+    >
+      換算
+    </button>
+
+    <p style={{ fontWeight: 'bold', marginTop: '10px' }}>{unitResult}</p>
+  </div>
+</Section>
+
     </Container>
   );
 };
