@@ -46,11 +46,14 @@ const Button = styled.button`
 `;
 
 const unitOptions = {
-  length: ['公尺', '公里', '英尺', '英里'],
-  weight: ['公斤', '克', '磅', '盎司'],
-  temperature: ['攝氏', '華氏'],
-  area: ['平方公尺', '平方公里', '英畝']
+  length: ['公尺', '公里', '公分', '英吋', '英尺'],
+  weight: ['公斤', '克', '磅', '公噸', '台斤', '毫克'],
+  area: ['平方公尺', '平方公里', '英畝', '公畝', '公頃', '甲', '坪'],
+  temperature: ['攝氏', '華氏', '開爾文'],
+  CC: ['公升', '毫升']
 };
+
+
 
 const UnitConverter = () => {
   const [calcDisplay, setCalcDisplay] = useState('');
@@ -74,28 +77,53 @@ const UnitConverter = () => {
   };
 
   const calculate = async () => {
-    const res = await fetch('/api/calc', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ expression: calcDisplay })
-    });
-    const data = await res.json();
-    setCalcDisplay(data.result ?? '錯誤');
+    try {
+      const res = await fetch('http://localhost:5000/api/calc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ expression: calcDisplay })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setCalcDisplay(data.result ?? '錯誤');
+      } else {
+        setCalcDisplay('錯誤的運算式');
+      }
+    } catch (error) {
+      setCalcDisplay('錯誤');
+    }
   };
 
   const convertUnit = async () => {
-    if (!fromUnit || !toUnit) {
-      setUnitResult('請選擇要轉換的單位');
-      return;
-    }
+    try {
+      if (!fromUnit || !toUnit) {
+        setUnitResult('請選擇要轉換的單位');
+        return;
+      }
 
-    const res = await fetch('/api/convert', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ value: unitInput, from: fromUnit, to: toUnit, type: unitType })
-    });
-    const data = await res.json();
-    setUnitResult(data.error ? `錯誤：${data.error}` : `${unitInput} ${fromUnit} = ${data.result} ${toUnit}`);
+      const res = await fetch('http://localhost:5000/api/convert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          value: unitInput,
+          from: fromUnit,
+          to: toUnit,
+          type: unitType
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setUnitResult(data.error ? `錯誤：${data.error}` : `${unitInput} ${fromUnit} = ${data.result} ${toUnit}`);
+      } else {
+        setUnitResult('無法換算，請確認輸入與單位');
+      }
+    } catch (error) {
+      setUnitResult('換算錯誤，請稍後再試');
+    }
   };
 
   return (
@@ -128,17 +156,24 @@ const UnitConverter = () => {
         <Title>單位換算</Title>
         <label>
           輸入數值：
-          <input type="number" value={unitInput} onChange={(e) => setUnitInput(e.target.value)} placeholder="輸入數值" />
+          <input
+            type="number"
+            value={unitInput}
+            onChange={(e) => setUnitInput(e.target.value)}
+            placeholder="輸入數值"
+          />
         </label>
         <br />
         <label>
           單位類別：
           <select value={unitType} onChange={(e) => setUnitType(e.target.value)}>
-            <option value="length">長度</option>
-            <option value="weight">重量</option>
-            <option value="temperature">溫度</option>
-            <option value="area">面積</option>
-          </select>
+  <option value="length">長度</option>
+  <option value="weight">重量</option>
+  <option value="temperature">溫度</option>
+  <option value="area">面積</option>
+  <option value="CC">容積</option>
+</select>
+
         </label>
         <br />
         <label>
