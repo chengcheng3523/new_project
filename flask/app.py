@@ -105,7 +105,7 @@ def create_user_profile():
         if not user_id:
             return jsonify({'error': '缺少 user_id'}), 400
 
-        # 查找是否有該使用者
+        # 查詢是否有該使用者
         existing_user = users.query.get(user_id)
         if not existing_user:
             return jsonify({'error': '找不到對應的使用者'}), 404
@@ -363,7 +363,7 @@ def fertilizer_remaining_quantity(fertilizer_material_name, fertilizer_amount):
     :return: 新的剩餘量、先前剩餘量、施用量
     """
     try:
-        # 查找該肥料的最新庫存記錄 Form08
+        # 查詢該肥料的最新庫存記錄 Form08
         latest_record = db.session.query(Form08.remaining_quantity).filter(
                 Form08.fertilizer_material_name == fertilizer_material_name
         ).order_by(Form08.date.desc(), Form08.id.desc()).first()  # 按日期和ID排序，確保獲取最新記錄
@@ -409,7 +409,7 @@ def add_form002():
     crop_info = data.get('crop_info')
     notes = data.get('notes')
 
-    # 使用 `number` 查找 `lands_id`
+    # 使用 `number` 查詢 `lands_id`
     lands = Lands.query.filter_by(number=area_code).first()
     
     if not lands:
@@ -520,7 +520,7 @@ def add_form02():
     user_id = data.get('user_id')
     crop = data.get('crop')
 
-    # 根據 crop 查找對應的 lands_id
+    # 根據 crop 查詢對應的 lands_id
     lands = Lands.query.filter_by(crop=crop).first()
     if not lands:
         return jsonify({'error': f'找不到作物 "{crop}" 對應的農地'}), 400
@@ -621,7 +621,7 @@ def add_form03():
     crop_content = data.get('crop_content')
     notes = data.get('notes')
 
-    # 使用 `number` 查找 `lands_id`
+    # 使用 `number` 查詢 `lands_id`
     lands = Lands.query.filter_by(number=field_code).first()
     
     if not lands:
@@ -787,7 +787,7 @@ def add_form06():
     process = data.get('process')
     notes = data.get('notes')
 
-    # 使用 `number` 查找 `lands_id`
+    # 使用 `number` 查詢 `lands_id`
     lands = Lands.query.filter_by(number=field_code).first()
     if not lands:
         print(f"❌ 錯誤: 找不到 field_code={field_code} 對應的 lands_id")  # ← 新增錯誤提示
@@ -821,7 +821,7 @@ def add_form06():
         # 呼叫計算庫存剩餘量的函數
         new_remaining, previous_remaining, fertilizer_amount = fertilizer_remaining_quantity(fertilizer_material_name, fertilizer_amount)
 
-        # 查找 Form07 資料來獲取肥料的相關資訊
+        # 查詢 Form07 資料來獲取肥料的相關資訊
         form07 = Form07.query.filter_by(fertilizer_material_name=fertilizer_material_name).first()
         if not form07:
             print(f"❌ 錯誤: 找不到對應的 Form07 記錄")
@@ -865,53 +865,44 @@ def update_form06(id):
     data = request.get_json()
     print("收到的更新數據:", data)
     
+    # 查詢對應的 Form06 記錄
+    form06 = Form06.query.get(id)
+    if not form06:
+        print(f"❌ 錯誤: 找不到 ID={id} 的肥料施用記錄")
+        return jsonify({'error': '肥料施用未找到'}), 404
+
     try:
-        # 查詢對應的 Form06 記錄
-        form06 = Form06.query.get(id)
-        if not form06:
-            print(f"❌ 錯誤: 找不到 ID={id} 的肥料施用記錄")
-            return jsonify({'error': '肥料施用未找到'}), 404
-        
-        # 备份原来的肥料使用量
-        original_fertilizer_amount = Decimal(form06.fertilizer_amount)  # 转换为 Decimal
+        # 確保數據類型一致
+        old_fertilizer_amount = Decimal(form06.fertilizer_amount)  # 取得舊的使用量
+        new_fertilizer_amount = Decimal(data.get('fertilizer_amount', '0'))  # 取得新的使用量
+        change_amount = new_fertilizer_amount - old_fertilizer_amount  # 計算變更量
 
-        # 更新 Form06 欄位資料
-        form06.date_used = datetime.strptime(data.get('date_used'), '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else form06.date_used
-        form06.field_code = data.get('field_code', form06.field_code)
-        form06.crop = data.get('crop', form06.crop)
-        form06.fertilizer_type = data.get('fertilizer_type', form06.fertilizer_type)
-        form06.fertilizer_material_name = data.get('fertilizer_material_name', form06.fertilizer_material_name)
-        form06.fertilizer_amount = Decimal(data.get('fertilizer_amount', form06.fertilizer_amount)) if data.get('fertilizer_amount') not in ['', 'None', None] else form06.fertilizer_amount  # 转换为 Decimal
-        form06.dilution_factor = Decimal(data.get('dilution_factor', form06.dilution_factor)) if data.get('dilution_factor') not in ['', 'None', None] else form06.dilution_factor
-        form06.operator = data.get('operator', form06.operator)
-        form06.process = data.get('process', form06.process)
-        form06.notes = data.get('notes', form06.notes)
+        # 更新 Form06
+        form06.fertilizer_amount = new_fertilizer_amount  #更新為新的使用量
+        form06.dilution_factor = Decimal(data.get('dilution_factor', '1.00')) if data.get('dilution_factor') else form06.dilution_factor # 稀釋倍數
+        db.session.commit()
+        print(f"✅ 更新 Form06: {form06.id}，使用量: {old_fertilizer_amount} -> {new_fertilizer_amount}")
 
-        # 儲存更新
+        # 查詢最新的 Form08 (庫存)按 date 和 id 由新到舊排序
+        form08 = Form08.query.filter_by(fertilizer_material_name=form06.fertilizer_material_name).order_by(Form08.date.desc(), Form08.id.desc()).first()
+        if not form08:
+            return jsonify({'error': '找不到對應的肥料庫存紀錄'}), 400
+
+        # 更新肥料庫存 (Form08)
+        form08.usage_quantity += change_amount
+        form08.remaining_quantity -= change_amount
+
         db.session.commit()
 
-        # 更新庫存 (Form08)
-        new_remaining, previous_remaining, _ = fertilizer_remaining_quantity(form06.fertilizer_material_name, form06.fertilizer_amount)
-
-        # 更新對應的 Form08 記錄
-        form08 = Form08.query.filter_by(
-            fertilizer_material_name=form06.fertilizer_material_name,
-            user_id=form06.user_id
-        ).order_by(Form08.date.desc()).first()
-
-        if form08:
-            form08.remaining_quantity = new_remaining
-            form08.usage_quantity = form06.fertilizer_amount
-            db.session.commit()
-            print(f"✅ 更新 Form08，新的剩餘量: {new_remaining}")
-        else:
-            print(f"❌ 找不到對應的庫存記錄，無法更新庫存")
-
-        return jsonify({'status': '肥料施用記錄已更新', 'remaining_quantity': new_remaining}), 200
+        return jsonify({
+            'status': '肥料施用更新成功',
+            'form_id': form06.id,
+            'new_fertilizer_amount': str(new_fertilizer_amount),  # 返回字串，避免 JSON 無法序列化 Decimal
+            'updated_remaining_quantity': str(form08.remaining_quantity)
+        }), 200
 
     except Exception as e:
-        db.session.rollback()  # 回滾資料庫
-        print(f"❌ 更新錯誤: {str(e)}")
+        db.session.rollback()    # 錯誤時回滾變更 (rollback())
         return jsonify({'error': str(e)}), 500
 
 # 刪除肥料施用
@@ -997,19 +988,38 @@ def add_form07():
 @app.route('/api/form07/<int:id>', methods=['PUT'])
 def update_form07(id):
     data = request.get_json()
+
+    # 查詢 Form07 記錄
     form = Form07.query.get(id)
     if not form:
         return jsonify({'error': '肥料資材與代碼未找到'}), 404
     
+    old_fertilizer_material_name = form.fertilizer_material_name  # 原來的資材名稱
+    
     form.fertilizer_material_code = data['fertilizer_material_code']
     form.fertilizer_material_name = data['fertilizer_material_name']
-    form.manufacturer = data['manufacturer']
-    form.supplier = data['supplier']
-    form.packaging_unit = data['packaging_unit']
-    form.packaging_volume = data['packaging_volume']
+    form.manufacturer = data['manufacturer']            # 廠商
+    form.supplier = data['supplier']                    # 供應商
+    form.packaging_unit = data['packaging_unit']        # 包裝單位
+    form.packaging_volume = data['packaging_volume']    # 包裝容量
     form.notes = data.get('notes')
+
+    # 更新 Form08 中所有對應的肥料資材名稱
+    form08_records = Form08.query.filter_by(fertilizer_material_name=old_fertilizer_material_name).all()
+    for record in form08_records:
+        record.fertilizer_material_name = data['fertilizer_material_name']
+        record.manufacturer = data['manufacturer']  # 更新廠商
+        record.supplier = data['supplier']        # 更新供應商
+        record.packaging_unit = data['packaging_unit']  # 更新包裝單位
+        record.packaging_volume = data['packaging_volume']  # 更新包裝容量
+        
+    # 提交變更
     db.session.commit()
-    return jsonify({'message': '肥料資材與代碼更新成功'}), 200
+
+    return jsonify({
+        'message': '肥料資材與代碼更新成功',
+        'updated_form08_count': len(form08_records)  # 回傳更新的 Form08 紀錄數量
+    }), 200
 
 # 刪除肥料資材與代碼
 @app.route('/api/form07/<int:id>', methods=['DELETE'])
@@ -1069,29 +1079,33 @@ def add_form08():
 
     # 去除單位，只提取數字部分
     def extract_number(value):
+        if value is None:
+            return Decimal("0.0")  # 避免 None 造成錯誤
         match = re.match(r"(\d+(\.\d+)?)", value)  # 匹配數字（可包含小數點）
         return float(match.group(1)) if match else 0.0
 
     try:
         # 提取包裝容量、購入量和使用量的數字部分
-        packaging_volume = extract_number(packaging_volume) if packaging_volume else 0.0
         purchase_quantity = extract_number(purchase_quantity) if purchase_quantity else 0.0
         usage_quantity = extract_number(usage_quantity) if usage_quantity else 0.0
 
-        # 計算剩餘量 = 包裝容量 * 購入量 - 使用量
-        remaining_quantity = packaging_volume * purchase_quantity - usage_quantity
-    except ValueError:
-        return jsonify({'error': '數據格式錯誤，請提供有效的數字'}), 400
 
-    
-    try:
+        # **確保數據合理**
+        if purchase_quantity < 0 or usage_quantity < 0:
+            return jsonify({'error': '購入量和使用量不能為負數'}), 400
+
+        # **計算剩餘量**
+        numeric_packaging_volume = extract_number(packaging_volume)  # 提取數字部分計算
+        remaining_quantity = purchase_quantity * numeric_packaging_volume  - usage_quantity
+        remaining_quantity = max(remaining_quantity, Decimal("0.0"))  # 避免負數
+
         new_form = Form08(
             user_id=user_id,
             fertilizer_material_name=fertilizer_material_name,
             manufacturer=manufacturer,
             supplier=supplier,
             packaging_unit=packaging_unit,
-            packaging_volume=packaging_volume,
+            packaging_volume=packaging_volume,  # **保留原始值（含單位）**
             date=date,
             purchase_quantity=purchase_quantity,
             usage_quantity=usage_quantity,
@@ -1102,6 +1116,7 @@ def add_form08():
         db.session.add(new_form)
         db.session.commit()
         return jsonify({'status': '肥料入出庫新增成功', 'form_id': new_form.id}), 201
+    
     except Exception as e:
         print(f"Error occurred while adding form08: {str(e)}")
         return jsonify({'error': str(e)}), 500
@@ -1109,23 +1124,58 @@ def add_form08():
 # 更新肥料入出庫
 @app.route('/api/form08/<int:id>', methods=['PUT'])
 def update_form08(id):
+
     data = request.get_json()
-    form = Form08.query.get(id)
-    if not form:
-        return jsonify({'error': '肥料入出庫未找到'}), 404
+    if not data:
+        return jsonify({'error': '請提供 JSON 數據'}), 400
     
-    form.fertilizer_material_name = data['fertilizer_material_name']
-    form.manufacturer = data['manufacturer']
-    form.supplier = data['supplier']
-    form.packaging_unit = data['packaging_unit']
-    form.packaging_volume = data['packaging_volume']
-    form.date = datetime.strptime(data['date'], '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None 
-    form.purchase_quantity = data['purchase_quantity'] if data.get('purchase_quantity') not in ['', 'None', None] else None
-    form.usage_quantity = data['usage_quantity'] if data.get('usage_quantity') not in ['', 'None', None] else None
-    form.remaining_quantity = data['remaining_quantity'] if data.get('remaining_quantity') not in ['', 'None', None] else None
-    form.notes = data.get('notes')
-    db.session.commit()
-    return jsonify({'message': '肥料入出庫更新成功'}), 200
+    form08 = Form08.query.get(id)
+    if not form08:
+        return jsonify({'error': '找不到該入出庫紀錄'}), 404
+    
+    # **提取數字部分**
+    def extract_number(value):
+        if value is None:
+            return Decimal("0.0")  # 避免 None 造成錯誤
+        match = re.search(r"(\d+(\.\d+)?)", str(value))  # 匹配數字（可包含小數點）
+        return Decimal(match.group(1)) if match else Decimal("0.0")
+    
+    try:
+        # **保留原始數據**
+        form08.fertilizer_material_name = data.get('fertilizer_material_name', form08.fertilizer_material_name)
+        form08.manufacturer = data.get('manufacturer', form08.manufacturer)
+        form08.supplier = data.get('supplier', form08.supplier)
+        form08.packaging_unit = data.get('packaging_unit', form08.packaging_unit)
+        form08.packaging_volume = data.get('packaging_volume', form08.packaging_volume)  # **保留完整字串**
+        form08.notes = data.get('notes', form08.notes)
+
+        # **提取數字部分進行計算**
+        numeric_packaging_volume = extract_number(form08.packaging_volume)
+
+        # **这里修正 `purchase_quantity` 和 `usage_quantity` 的更新**
+        form08.purchase_quantity = extract_number(data.get('purchase_quantity', form08.purchase_quantity))
+        form08.usage_quantity = extract_number(data.get('usage_quantity', form08.usage_quantity))
+
+        # **確保數據合理**
+        if form08.purchase_quantity < 0 or form08.usage_quantity < 0:
+            return jsonify({'error': '購入量和使用量不能為負數'}), 400
+
+        # **計算剩餘量**
+        form08.remaining_quantity = form08.purchase_quantity * numeric_packaging_volume - form08.usage_quantity
+        form08.remaining_quantity = max(form08.remaining_quantity, Decimal("0.0"))  # 避免負數
+
+        db.session.commit()
+        return jsonify({
+            'status': '肥料入出庫更新成功',
+            'form_id': form08.id,
+            'updated_purchase_quantity': str(form08.purchase_quantity),  # ✅ 确保返回正确的购买量
+            'updated_remaining_quantity': str(form08.remaining_quantity),
+            'packaging_volume': form08.packaging_volume  # **回傳完整格式**
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()  # **出錯時回滾**
+        return jsonify({'error': str(e)}), 500
 
 # 刪除肥料入出庫
 @app.route('/api/form08/<int:id>', methods=['DELETE'])
@@ -1187,7 +1237,7 @@ def add_form09():
     operator = data.get('operator')
     notes = data.get('notes')
 
-      # 使用 `number` 查找 `lands_id`
+      # 使用 `number` 查詢 `lands_id`
     lands = Lands.query.filter_by(number=field_code).first()
     
     if not lands:
@@ -1502,7 +1552,7 @@ def add_form12():
     operator = data.get('operator')
     notes = data.get('notes')
 
-    # 使用 `number` 查找 `lands_id`
+    # 使用 `number` 查詢 `lands_id`
     lands = Lands.query.filter_by(number=field_code).first()
     
     if not lands:
@@ -1965,7 +2015,7 @@ def add_form17():
     verification_status = data.get('verification_status') 
     notes = data.get('notes')
 
-    # 使用 `number` 查找 `lands_id`
+    # 使用 `number` 查詢 `lands_id`
     lands = Lands.query.filter_by(number=field_code).first()
     
     if not lands:
