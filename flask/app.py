@@ -2911,18 +2911,17 @@ def get_material_other(other_material_name):
     }
     return jsonify(material_other)
 # ----------------------------------------------------------------------------------------------
-
-@app.route('apicalc', methods=['POST'])
-def calculate()
+@app.route('/api/calc', methods=['POST'])
+def calculate():
     data = request.get_json()
-    try
+    try:
         result = eval(data['expression'])
-        return jsonify({'result' result})
-    except
-        return jsonify({'error' '錯誤的運算式'}), 400
+        return jsonify({'result': result})
+    except:
+        return jsonify({'error': '錯誤的運算式'}), 400
 
-@app.route('apiconvert', methods=['POST'])
-def convert_unit()
+@app.route('/api/convert', methods=['POST'])
+def convert_unit():
     data = request.get_json()
     value = float(data['value'])
     from_unit = data['from']
@@ -2930,46 +2929,47 @@ def convert_unit()
     unit_type = data['type']
 
     conversions = {
-    'length' {
-        '公尺' 1, '公里' 1000, '公分' 0.01, '英吋' 0.0254, '英尺' 0.3048
+    'length': {
+        '公尺': 1, '公里': 1000, '公分': 0.01, '英吋': 0.0254, '英尺': 0.3048
     },
-    'weight' {
-        '公斤' 1, '克' 0.001, '磅' 0.453592, '公噸'1000,'台斤'0.6,'毫克'0.000001
+    'weight': {
+        '公斤': 1, '克': 0.001, '磅': 0.453592, '公噸':1000,'台斤':0.6,'毫克':0.000001
     },
-    'area' {
-        '平方公尺' 1,
-        '平方公里' 1000000,
-        '英畝' 4046.86,
-        '公畝' 100,
-        '公頃' 10000,
-        '甲' 9699.2,
-        '坪'3.3059
+    'area': {
+        '平方公尺': 1,
+        '平方公里': 1000000,
+        '英畝': 4046.86,
+        '公畝': 100,
+        '公頃': 10000,
+        '甲': 9699.2,
+        '坪':3.3059
     },
-    'CC'{
-        '公升'1,'毫升'0.001
+    'CC':{
+        '公升':1,'毫升':0.001
     },
-    'temperature' None
+    'temperature': None
 }
 
 
-    if not from_unit or not to_unit or unit_type not in conversions
-        return jsonify({'error' '請選擇正確的單位'}), 400
+    if not from_unit or not to_unit or unit_type not in conversions:
+        return jsonify({'error': '請選擇正確的單位'}), 400
 
-    if unit_type == 'temperature'
-        def convert_temp(v, f, t)
-            if f == t return v
-            if f == '攝氏'
-                return v  95 + 32 if t == '華氏' else v + 273.15
-            if f == '華氏'
-                return (v - 32)  59 if t == '攝氏' else (v - 32)  59 + 273.15
-            if f == '開爾文'
-                return v - 273.15 if t == '攝氏' else (v - 273.15)  95 + 32
+    if unit_type == 'temperature':
+        def convert_temp(v, f, t):
+            if f == t: return v
+            if f == '攝氏':
+                return v * 9/5 + 32 if t == '華氏' else v + 273.15
+            if f == '華氏':
+                return (v - 32) * 5/9 if t == '攝氏' else (v - 32) * 5/9 + 273.15
+            if f == '開爾文':
+                return v - 273.15 if t == '攝氏' else (v - 273.15) * 9/5 + 32
         result = convert_temp(value, from_unit, to_unit)
-    else
-        base = value  conversions[unit_type][from_unit]
-        result = base  conversions[unit_type][to_unit]
+    else:
+        base = value * conversions[unit_type][from_unit]
+        result = base / conversions[unit_type][to_unit]
 
-    return jsonify({'result' round(result, 4)})
+    return jsonify({'result': round(result, 4)})
+
 # ----------------------------------------------------------------------------------------------
 # 在應用程式啟動時測試資料庫連線
 if __name__ == '__main__':
