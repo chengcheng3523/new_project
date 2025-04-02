@@ -4,6 +4,7 @@ import Clearfix from '../components/common/Clearfix';
 import styled from 'styled-components';
 import TitleCard from '../components/product/TitleCard.js';
 import AuthContext from '../components/auth/AuthContext.js';
+import UnitConverter from '../components/layout/UnitConverter';
 
 import Lands from '../Form-Page/Lands';
 import Page001 from '../Form-Page/Page001';
@@ -169,28 +170,20 @@ const HomePage =()=> {
           <TitleCard title="採收及採後處理" />
         </ProductContainer>
 
-
         <ProductContainer onClick={() => handleCardClick('Page22')}>
           <TitleCard title="客戶抱怨/回饋" />
         </ProductContainer>
-
-
-
-
-
-
-
-
-
-
-
       </ProductCollectionContainer>
 
+      <UnitConverter />
+      
       <div>
         {selectedForm}
       </div>
 
+
      </DefaultLayout>
+
     );
 };
 export default HomePage;
