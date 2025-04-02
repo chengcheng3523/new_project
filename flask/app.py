@@ -870,6 +870,25 @@ def update_form06(id):
     if not form06:
         print(f"❌ 錯誤: 找不到 ID={id} 的肥料施用記錄")
         return jsonify({'error': '肥料施用未找到'}), 404
+    
+    # 获取 field_code，如果没有传递就使用原来的 field_code
+    field_code = data.get('field_code', form06.field_code)
+
+    # 如果 field_code 更新了，检查是否存在对应的农地
+    if field_code != form06.field_code:
+        lands = Lands.query.filter_by(number=field_code).first()
+        if not lands:
+            return jsonify({'error': '無效的田區代號'}), 400
+        form06.lands_id = lands.id  # 更新关联的 lands_id
+    
+    form06.date_used = datetime.strptime(data['date_used'], '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
+    form06.field_code = field_code
+    form06.crop = data['crop']
+    form06.fertilizer_type = data['fertilizer_type']
+    form06.fertilizer_material_name = data['fertilizer_material_name']
+    form06.operator = data.get('operator')
+    form06.process = data.get('process')
+    form06.notes = data.get('notes')
 
     try:
         # 確保數據類型一致
@@ -2484,35 +2503,51 @@ def get_all_form22():
 # ----------------------------------------------------------------------------------------------
 # 根據肥料資材名稱查詢相應資料
 @app.route('/api/form07/material/<string:fertilizer_material_name>', methods=['GET'])
-def get_material_details(fertilizer_material_name):
+def get_material_fertilizer(fertilizer_material_name):
     form = Form07.query.filter_by(fertilizer_material_name=fertilizer_material_name).first()
     if not form:
         return jsonify({'error': '未找到該肥料資材名稱'}), 404
     
     # 回傳相關的欄位資料
-    material_details = {
+    material_fertilizer = {
         "manufacturer": form.manufacturer or '',
         "supplier": form.supplier or '',
         "packaging_unit": form.packaging_unit or '',
         "packaging_volume": form.packaging_volume or ''
     }
-    return jsonify(material_details)
+    return jsonify(material_fertilizer)
 
+# 根據 藥 資材名稱查詢相應資料
+@app.route('/api/form10/material/<string:pest_control_material_name>', methods=['GET'])
+def get_material_pest(pest_control_material_name):
+    form = Form10.query.filter_by(pest_control_material_name=pest_control_material_name).first()
+    if not form:
+        return jsonify({'error': '未找到該其他資材名稱'}), 404
+    
+    # 回傳相關的欄位資料
+    material_pest = {
+        "manufacturer": form.manufacturer or '',
+        "supplier": form.supplier or '',
+        "packaging_unit": form.packaging_unit or '',
+        "packaging_volume": form.packaging_volume or ''
+    }
+    return jsonify(material_pest)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# 根據其他資材名稱查詢相應資料
+@app.route('/api/form13/material/<string:other_material_name>', methods=['GET'])
+def get_material_other(other_material_name):
+    form = Form13.query.filter_by(other_material_name=other_material_name).first()
+    if not form:
+        return jsonify({'error': '未找到該其他資材名稱'}), 404
+    
+    # 回傳相關的欄位資料
+    material_other = {
+        "manufacturer": form.manufacturer or '',
+        "supplier": form.supplier or '',
+        "packaging_unit": form.packaging_unit or '',
+        "packaging_volume": form.packaging_volume or ''
+    }
+    return jsonify(material_other)
 
 
 # ----------------------------------------------------------------------------------------------

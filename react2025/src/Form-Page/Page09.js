@@ -200,7 +200,7 @@ const Page09 = () => {
     try {
       const response = await axios.delete(`http://127.0.0.1:5000/api/form09/${id}`);
       console.log('删除成功:', response.data);
-      fetchData(); // 刷新数据
+      fetchData(); // 刷新數據
       alert('成功刪除資料！');
     } catch (error) {
       console.error('刪除請求失敗:', error.response ? error.response.data : error.message);

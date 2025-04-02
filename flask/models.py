@@ -176,6 +176,11 @@ class Form10(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
     pest_control_material_code = db.Column(db.String(100))  # 防治資材代碼
     pest_control_material_name = db.Column(db.String(100))  # 防治資材名稱
+    dosage_form = db.Column(db.String(100), nullable=True)  # 劑型
+    brand_name = db.Column(db.String(100), nullable=True)  # 商品名(廠牌)
+    supplier = db.Column(db.String(100), nullable=True)  # 供應商
+    packaging_unit = db.Column(db.String(100))  # 包裝單位
+    packaging_volume = db.Column(db.Numeric(10, 2), nullable=True)  # 包裝容量
     notes = db.Column(db.Text, nullable=True)  # 備註
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 建立時間
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 更新時間
@@ -221,6 +226,10 @@ class Form13(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 關聯 `users` 表
     other_material_code = db.Column(db.String(50))  # 其他資材代碼
     other_material_name = db.Column(db.String(255))  # 其他資材名稱
+    manufacturer = db.Column(db.String(255), nullable=True)  # 廠商
+    supplier = db.Column(db.String(255), nullable=True)  # 供應商
+    packaging_unit = db.Column(db.String(100))  # 包裝單位
+    packaging_volume = db.Column(db.String(50), nullable=True)  # 包裝容量
     notes = db.Column(db.Text, nullable=True)  # 備註
     
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 建立時間

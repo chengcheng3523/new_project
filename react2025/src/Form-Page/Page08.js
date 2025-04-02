@@ -5,13 +5,11 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthContext from '../components/auth/AuthContext';
 import FormField from '../components/common/FormField';
-import SelectField from '../components/common/SelectField';
 import FieldSelect from '../components/common/FieldSelect';
 import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
-
 
 const Page08 = () => {
   const { role, userId } = useContext(AuthContext);
@@ -32,7 +30,6 @@ const Page08 = () => {
   });
 
   const [fertilizerOptions, setFertilizerOptions] = useState([]);  // 儲存有效的資材名稱
-  const [packagingUnits, setPackagingUnits] = useState([]);  // 儲存包裝單位選項
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -48,9 +45,8 @@ const Page08 = () => {
     }
   }, []);
 
-
   // 根據選擇的資材名稱查詢資料
-  const fetchMaterialDetails = useCallback(async (fertilizerMaterialName) => {
+  const fetchMaterialFertilizer = useCallback(async (fertilizerMaterialName) => {
     try {
       const response = await axios.get(`http://127.0.0.1:5000/api/form07/material/${fertilizerMaterialName}`);
       if (response.data) {
@@ -74,7 +70,7 @@ const Page08 = () => {
       console.log('原始數據:', response.data); // 打印原始數據確認結構
       if (Array.isArray(response.data)) {
         const transformedData = response.data.map(item => ({
-          id: item.id, // 使用 land_parcel_number 作为唯一标识符
+          id: item.id, 
           user_id: item.user_id,
           fertilizer_material_name: item.fertilizer_material_name,
           manufacturer: item.manufacturer,
@@ -108,21 +104,12 @@ const Page08 = () => {
       fetchFertilizerOptions(); // 組件加載時獲取有效的資材名稱
       setFormData(prev => ({ ...prev, user_id: userId })); // 動態更新 user_id 
       fetchData(); // 組件加載時獲取數據
-    }, [fetchData, fetchFertilizerOptions, navigate, userId]);
-  
-    // 當選擇肥料資材名稱時，自動填充相關欄位
-    useEffect(() => {
-      if (!userId) {
-        alert('請先登入！');
-        navigate('/login'); // 重定向到登入頁面
-        return;
-      }
+
       if (formData.fertilizer_material_name) {
-        fetchMaterialDetails(formData.fertilizer_material_name);
+        fetchMaterialFertilizer(formData.fertilizer_material_name);
       }
-    }, [formData.fertilizer_material_name, fetchMaterialDetails]);
-
-
+    }, [fetchData, fetchFertilizerOptions, fetchMaterialFertilizer, navigate, userId, formData.fertilizer_material_name]);
+  
     const handleChange = (e) => {
       const { name, value } = e.target;
       if (!isAdmin && name === 'user_id') return;
@@ -136,7 +123,6 @@ const Page08 = () => {
         newFormData.remaining_quantity = (purchase - usage).toFixed(2);  // 自動更新剩餘量
       }
 
-
       setFormData(newFormData);
     };
   
@@ -144,22 +130,6 @@ const Page08 = () => {
       e.preventDefault();
       setLoading(true);
   
-
-    // 驗證使用量和剩餘量不超過購入量
-    const purchase = parseFloat(formData.purchase_quantity);
-    const usage = parseFloat(formData.usage_quantity) || 0;
-    const remaining = parseFloat(formData.remaining_quantity) || 0;
-    if (usage > purchase) {
-      alert('使用量不能大於購入量！');
-      setLoading(false);
-      return;
-    }
-    if (remaining > purchase) {
-      alert('剩餘量不能大於購入量！');
-      setLoading(false);
-      return;
-    }
-
 
   try {
     let response;

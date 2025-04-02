@@ -6,11 +6,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthContext from '../components/auth/AuthContext';
 import FormField from '../components/common/FormField';
 import SelectField from '../components/common/SelectField';
-import FieldSelect from '../components/common/FieldSelect';
 import Form from '../components/common/Form';
 import { Button, DeleteButton, EditButton } from '../components/common/Button';
 import { useNavigate } from 'react-router-dom';
-import moment from 'moment';
 
 const Page07 = () => {
   const { role, userId } = useContext(AuthContext);
@@ -74,7 +72,6 @@ const Page07 = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // 如果不是管理员并且字段是 user_id，则不更新该字段
     if (!isAdmin && name === 'user_id') {
       return;
     }
@@ -90,10 +87,8 @@ const Page07 = () => {
     setLoading(true);
 
   // 合併包裝容量
-  // const packaging_volume = `${formData.volumeValue} ${formData.volumeUnit}`;
   const packaging_unit = formData.packaging_unit === '其他' ? formData.packaging_unit_other : formData.packaging_unit;
   const packaging_volume = `${formData.volumeValue} ${formData.volumeUnit === '其他' ? formData.volumeUnit_other : formData.volumeUnit}`;
-
 
   try {
     let response;
@@ -159,7 +154,7 @@ const Page07 = () => {
     try {
       const response = await axios.delete(`http://127.0.0.1:5000/api/form07/${id}`);
       console.log('删除成功:', response.data);
-      fetchData(); // 刷新数据
+      fetchData(); // 刷新数據
       alert('成功刪除資料！');
     } catch (error) {
       console.error('刪除請求失敗:', error.response ? error.response.data : error.message);
@@ -214,8 +209,7 @@ const Page07 = () => {
           onChange={handleChange}
         />
 
-
-<FormField
+        <FormField
           label="廠商"
           name="manufacturer"
           value={formData.manufacturer}

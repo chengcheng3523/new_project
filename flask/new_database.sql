@@ -262,6 +262,11 @@ CREATE TABLE form10 (
     user_id INT NOT NULL,               -- 關聯 `users` 表
     pest_control_material_code VARCHAR(100),   -- 防治資材代碼
     pest_control_material_name VARCHAR(100),   -- 防治資材名稱
+    dosage_form VARCHAR(100),                        -- 劑型
+    brand_name VARCHAR(100),                         -- 商品名(廠牌)
+    supplier VARCHAR(100),                           -- 供應商
+    packaging_unit VARCHAR(100),             -- 包裝單位
+    packaging_volume VARCHAR(100),                  -- 包裝容量
     notes TEXT,                                              -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,          -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新時間
@@ -269,11 +274,12 @@ CREATE TABLE form10 (
 );
 
 -- 插入資料範例
-INSERT INTO form10 (user_id, pest_control_material_code, pest_control_material_name, notes)
-VALUES (1, 'M000-0000', 'ooxx資材', '用於防治蟲害，間作及敷蓋稻草');
+INSERT INTO form10 (user_id, pest_control_material_code, pest_control_material_name, dosage_form, brand_name, supplier, packaging_unit, packaging_volume, notes)
+VALUES (1, 'M000-0000', 'ooxx資材', '顆粒型', '某某廠', '供應商A', '包', 10.0, '用於防治蟲害，間作及敷蓋稻草');
 
 -- 查詢防治資材代碼及名稱
-SELECT u.username, u.farmer_name, f.pest_control_material_code, f.pest_control_material_name, f.notes
+SELECT u.username, u.farmer_name, f.pest_control_material_code, f.pest_control_material_name, f.dosage_form, f.brand_name, f.supplier, f.packaging_unit, 
+       f.packaging_volume, f.notes
 FROM form10 f
 JOIN users u ON f.user_id = u.id
 WHERE f.pest_control_material_code = 'M000-0000';
@@ -341,16 +347,20 @@ CREATE TABLE form13 (
     user_id INT NOT NULL,                            -- 關聯 `users` 表
     other_material_code VARCHAR(50),         -- 其他資材代碼
     other_material_name VARCHAR(255),        -- 其他資材名稱
+    manufacturer VARCHAR(255),                        -- 廠商
+    supplier VARCHAR(255),                            -- 供應商
+    packaging_unit VARCHAR(100),             -- 包裝單位
+    packaging_volume VARCHAR(50),                     -- 包裝容量 (例如：公克、公斤、毫升、公升、其他)
     notes TEXT,                                       -- 備註
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- 建立時間
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- 更新時間
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE  -- 外鍵，關聯 `users` 表
 );
 
-INSERT INTO form13 (user_id, other_material_code, other_material_name, notes)
+INSERT INTO form13 (user_id, other_material_code, other_material_name, manufacturer, supplier, packaging_unit, packaging_volume, notes)
 VALUES 
-    (1, 'M000-0000', 'ooxx資材', '間作及敷蓋稻草');
-SELECT f.other_material_code, f.other_material_name, f.notes, u.username, u.farmer_name
+    (1, 'M000-0000', 'ooxx資材', '廠商', '供應商', '包', '10 公斤', '間作及敷蓋稻草');
+SELECT f.other_material_code, f.other_material_name, f.manufacturer, f.supplier, f.notes, u.username, u.farmer_name
 FROM form13 f
 JOIN users u ON f.user_id = u.id
 WHERE f.other_material_name = 'ooxx資材';
