@@ -106,25 +106,15 @@ class Form06(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     lands_id = db.Column(db.Integer, db.ForeignKey('lands.id'), nullable=False)
-    # 使用日期
-    date_used = db.Column(db.Date)
-    # 田區代號
-    field_code  = db.Column(db.String(50))
-    # 作物
-    crop = db.Column(db.String(20))
-    # 施肥別(基肥.追肥)
-    fertilizer_type = db.Column(db.String(50), nullable=True)
-    # 資材代碼或資材名稱
-    fertilizer_material_name = db.Column(db.String(100))
-    # 肥料使用量
-    fertilizer_amount = db.Column(db.Numeric(10, 2))
-    # 稀釋倍數
-    dilution_factor = db.Column(db.Numeric(5, 2), nullable=True)
-    # 操作人員
-    operator = db.Column(db.String(100))
-    # 製作流程
-    process = db.Column(db.Text, nullable=True)
-    # 備註
+    date_used = db.Column(db.Date)              # 使用日期
+    field_code  = db.Column(db.String(50))      # 田區代號
+    crop = db.Column(db.String(20))             # 作物
+    fertilizer_type = db.Column(db.String(50), nullable=True)   # 施肥別(基肥.追肥)
+    fertilizer_material_name = db.Column(db.String(100))        # 資材代碼或資材名稱
+    fertilizer_amount = db.Column(db.Numeric(10, 2))            # 肥料使用量
+    dilution_factor = db.Column(db.Numeric(5, 2), nullable=True)# 稀釋倍數
+    operator = db.Column(db.String(100))                        # 操作人員
+    process = db.Column(db.Text, nullable=True)                 # 製作流程
     notes = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
