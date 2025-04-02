@@ -891,6 +891,7 @@ def update_form06(id):
         # 更新肥料庫存 (Form08)
         form08.usage_quantity += change_amount
         form08.remaining_quantity -= change_amount
+        form08.notes += f" | 更新使用量: {old_fertilizer_amount} -> {new_fertilizer_amount}更新稀釋倍數: {form06.dilution_factor}"
 
         db.session.commit()
 

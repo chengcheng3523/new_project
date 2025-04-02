@@ -188,10 +188,10 @@ CREATE TABLE form07 (
 -- 插入資料範例
 INSERT INTO form07 (user_id, fertilizer_material_code, fertilizer_material_name, manufacturer, supplier, packaging_unit, packaging_volume, notes)
 VALUES  
-    (1, 'M000-0001', 'ooxx資材名稱', 'ooxx廠商', 'ooxx供應商', '包', '1000公克', '備註'),
-    (2, 'M000-0002', 'yyzz資材名稱', 'yyzz廠商', 'yyzz供應商', '包', '5公斤', '適合高濃度施用'),
-    (3, '肥料資材代碼', '肥料資材名稱', '肥料廠商', '肥料供應商', '包', '1000毫升', '適合低濃度施用'),
-    (4, 'xxyy資材代碼', 'xxyy資材名稱', 'xxyy廠商', 'xxyy供應商', '包', '5公升', '無');
+    (1, 'M000-0001', 'ooxx資材名稱', 'ooxx廠商', 'ooxx供應商', '包', '1000 公克', '備註'),
+    (2, 'M000-0002', 'yyzz資材名稱', 'yyzz廠商', 'yyzz供應商', '包', '5 公斤', '適合高濃度施用'),
+    (3, '肥料資材代碼', '肥料資材名稱', '肥料廠商', '肥料供應商', '包', '1000 毫升', '適合低濃度施用'),
+    (4, 'xxyy資材代碼', 'xxyy資材名稱', 'xxyy廠商', 'xxyy供應商', '包', '5 公升', '無');
 
 
 
@@ -216,10 +216,10 @@ CREATE TABLE form08 (
 --  資料示例form08（肥料入出庫紀錄）
 INSERT INTO form08 (user_id, fertilizer_material_name, manufacturer, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
 VALUES 
-    (1, 'ooxx資材', '某某廠商', '某某供應商', '包', '1000公克', '2025-02-05', 1.00, 0.00, 1000.00, '無'),
-    (2, 'yyzz資材', '某某廠商', '某某供應商', '瓶', '5公斤', '2025-02-05', 10.00, 0.00, 50.00, '無'),
-    (3, '肥料資材名稱', '肥料廠商', '肥料供應商', '包', '1000毫升', '2025-02-05', 1.00, 0.00, 1000.00, '無'),
-    (4, 'xxyy資材名稱', 'xxyy廠商', 'xxyy供應商', '包', '5公升', '2025-02-05', 100.00, 0.00, 500.00, '無');
+    (1, 'ooxx資材', '某某廠商', '某某供應商', '包', '1000 公克', '2025-02-05', 1.00, 0.00, 1000.00, '無'),
+    (2, 'yyzz資材', '某某廠商', '某某供應商', '瓶', '5 公斤', '2025-02-05', 10.00, 0.00, 50.00, '無'),
+    (3, '肥料資材名稱', '肥料廠商', '肥料供應商', '包', '1000 毫升', '2025-02-05', 1.00, 0.00, 1000.00, '無'),
+    (4, 'xxyy資材名稱', 'xxyy廠商', 'xxyy供應商', '包', '5 公升', '2025-02-05', 100.00, 0.00, 500.00, '無');
 -- 查詢肥料入出庫紀錄
 SELECT f.id, f.fertilizer_material_name, f.manufacturer, f.supplier, f.packaging_unit, f.packaging_volume, 
        f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, f.notes, 
@@ -377,7 +377,7 @@ CREATE TABLE form14 (
 -- 資料示例
 INSERT INTO form14 (user_id, other_material_name, manufacturer, supplier, packaging_unit, packaging_volume, date, purchase_quantity, usage_quantity, remaining_quantity, notes)
 VALUES 
-    (1, 'ooxx資材', '廠商', '供應商', '包', '10公斤', '2025-02-05', 10.00, 5.00, 5.00, '無');
+    (1, 'ooxx資材', '廠商', '供應商', '包', '10 公斤', '2025-02-05', 10.00, 5.00, 5.00, '無');
  
 -- 查詢與 `users` 表關聯的其他資材入出庫紀錄
 SELECT f.id, f.other_material_name, f.manufacturer, f.supplier, f.date, f.purchase_quantity, f.usage_quantity, f.remaining_quantity, u.username, u.farmer_name, f.notes
