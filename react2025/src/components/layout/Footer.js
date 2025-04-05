@@ -2,9 +2,9 @@ import React from "react";
 import styled from "styled-components";
 import Container from "../common/Container";
 import { Link } from "react-router-dom";
-import CVSLogo from "../images/CVSLogo.png";
-import Remark from "../images/Remark.png";
-import QRCode from "../images/QRCode.png";
+// import CVSLogo from "../images/CVSLogo.png";
+// import Remark from "../images/Remark.png";
+// import QRCode from "../images/QRCode.png";
 
 const StyledFooter = styled.footer `
     background-color: #fbfbfb;
@@ -43,65 +43,24 @@ const Footer = ()=> {
         <Container>
         <Box>
             <FooterColumn>
-                <FooterColumnTitle>客服中心</FooterColumnTitle>
-                <Link to="#!">幫助中心</Link>
-                <Link to="#!">幫助中心</Link>
-                <Link to="#!">幫助中心</Link>
-                <Link to="#!">幫助中心</Link>
-                <Link to="#!">幫助中心</Link>
-                <Link to="#!">幫助中心</Link>
-                <Link to="#!">幫助中心</Link>
+                <FooterColumnTitle>聯絡我們</FooterColumnTitle>
+                <Link to="#!">地址:333桃園市龜山區萬壽路一段300號</Link>
             </FooterColumn>
             <FooterColumn>
-                <FooterColumnTitle>關於</FooterColumnTitle>
-                <Link to="#!">幫助中心</Link>
-                <Link to="#!">幫助中心</Link>
-                <Link to="#!">幫助中心</Link>
-                <Link to="#!">幫助中心</Link>
-                <Link to="#!">幫助中心</Link>
-                <Link to="#!">幫助中心</Link>
-                <Link to="#!">幫助中心</Link>
+                <FooterColumnTitle>連絡電話</FooterColumnTitle>
+                <Link to="#!">0912345678</Link>
             </FooterColumn>
             <FooterColumn>
-                <FooterColumnTitle>物流合作</FooterColumnTitle>
-                <img 
-                    src={CVSLogo} 
-                    alt="CVSLogo" 
-                    width="30px" 
-                    style={{ marginBottom:12 }}
-                />
-                  <FooterColumnTitle>24小時包裝減量標章</FooterColumnTitle>
-                  <img 
-                    src={Remark} 
-                    alt="CVSLogo" 
-                    width="30px" 
-                    style={{ marginBottom:12 }}
-                />
+                <FooterColumnTitle>專題題目</FooterColumnTitle>
+                <Link to="#!">農業溯源系統</Link>
             </FooterColumn>
             <FooterColumn>
-                <FooterColumnTitle>關注我們</FooterColumnTitle>
-                <Link to="#!">FB</Link>
-                <Link to="#!">IG</Link>
-                <Link to="#!">LINE</Link>
-                <Link to="#!">Blog</Link>
-                <Link to="#!">in</Link>
-                <Link to="#!">幫助中心</Link>
-                <Link to="#!">幫助中心</Link>
-            </FooterColumn>
-            <FooterColumn>
-            <FooterColumnTitle>下載</FooterColumnTitle>
-                <Box>
-                    <img 
-                    src={QRCode} 
-                    alt="QRCode" 
-                    width="30%" 
-                    style={{ marginBottom:12 }}
-                    />
-                    <div>
-                    <div>AppStore</div>
-                    <div>GooglePlat</div>
-                    </div>
-                </Box>
+                <FooterColumnTitle>成員</FooterColumnTitle>
+                <Link to="#!">謝益仁</Link>
+                <Link to="#!">陳吟甄</Link>
+                {/* <Link to="#!">LINE</Link> */}
+                {/* <Link to="#!"></Link>
+                <Link to="#!"></Link> */}
             </FooterColumn>
         </Box>
         </Container>

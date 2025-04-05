@@ -2,8 +2,8 @@ import React ,{ useContext }from "react";
 import styled from "styled-components";
 import Container from "../common/Container";
 import Logo from "../images/logo.png";
-import { Input } from "antd"; 
-import { ShoppingCartOutlined  } from "@ant-design/icons"; 
+// import { Input } from "antd"; 
+// import { ShoppingCartOutlined  } from "@ant-design/icons"; 
 import { Link } from "react-router-dom";
 import AuthContext from "../auth/AuthContext";
 
@@ -59,14 +59,11 @@ const Header = (className) => {
       <Container> 
         <StyledHeaderSection>
           <Navigetor>
-            <a href="#!">購物</a>
-            <a href="#!">下載</a>
-            <a href="#!">追蹤我們</a>
-            <a href="#!">部落格</a>
+            <Link to="/mall">首頁</Link>
           </Navigetor>
           <Toolbar>
-            <a href="#!">通知</a>
-            <a href="#!">幫助中心</a>
+            {/* <a href="#!">通知</a> */}
+            {/* <a href="#!">幫助中心</a> */}
             {/* <a href="#!">登入/註冊</a>*/}
             {isAuthenticated ? (
               <div style={{ display: "flex", alignItems: "center" }}>
@@ -91,15 +88,8 @@ const Header = (className) => {
           </Link>
           <Box>
             {/* <span>Search</span> */}
-            <Input.Search
-              style={{ marginRight: 8 }}
-              placeholder="搜尋"
-              onSearch={(value) => console.log(value)}
-              enterButton
-            />
-            <Link to="/cart">
-              <ShoppingCartOutlined style={{ fontSize: 28, color: "white" }} />
-            </Link>
+
+
           </Box>
         </StyledHeaderSection>
       </Container> {/* RWD */}

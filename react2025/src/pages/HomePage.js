@@ -98,7 +98,7 @@ const HomePage =()=> {
     } else if (title === 'Page16') {
       setSelectedForm(isAuthenticated ? <Page16 /> : <div>資料: Page16</div>);
     } else if (title === 'Page17') {
-      setSelectedForm(isAuthenticated ? <Page17 /> : <div>資料: Page17</div>);
+      setSelectedForm(isAuthenticated ? <Page17 /> : <Page17 />);
 
     } else if (title === 'Page22') {
       setSelectedForm(isAuthenticated ? <Page22 /> : <div>資料: Page22</div>);
