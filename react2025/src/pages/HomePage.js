@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import TitleCard from '../components/product/TitleCard.js';
 import AuthContext from '../components/auth/AuthContext.js';
 import UnitConverter from '../components/layout/UnitConverter';
+// import axios from 'axios';
 
 import Lands from '../Form-Page/Lands';
 import Page001 from '../Form-Page/Page001';
@@ -32,6 +33,18 @@ import Page17 from '../Form-Page/Page17';
 import Page22 from '../Form-Page/Page22';
 
 
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  th, td {
+    padding: 8px;
+    border: 1px solid #ddd;
+  }
+  th {
+    background-color: #f2f2f2;
+  }
+`;
 
 // ProductCollectionContainer 元件，用於包裝產品集合區域
 const ProductCollectionContainer = styled.div`
@@ -58,53 +71,113 @@ const ProductContainer = styled.div`
 const HomePage =()=> {
   // 使用 AuthContext 來取得登入狀態
   const{ isAuthenticated } = useContext(AuthContext);
-
+  // 使用 useState 來管理選擇的表單狀態
   const [selectedForm, setSelectedForm] = useState(null);
+  const [formData, setFormData] = useState(null); // 用來儲存從API獲得的資料
 
-  const handleCardClick = (title) => {
+
+// 這個函數用於向後端 API 請求資料
+
+const fetchFormData = async (formName) => {
+  try {
+    const response = await fetch(`http://127.0.0.1:5000/api/${formName}`);
+    const data = await response.json();
+    setFormData(data);  // 設定資料
+    return JSON.stringify(data);
+  } catch (error) {
+    console.error('API 請求失敗:', error);
+    return '資料加載失敗';
+  }
+};
+
+  // 動態渲染表格
+  const renderTable = () => {
+    if (!formData) return null;
+  
+    if (typeof formData === 'string') {
+      return <p>{formData}</p>;  // 顯示錯誤訊息
+    }
+
+  const headers = Object.keys(formData[0]);
+
+  // 假設我們根據某個欄位排序 formData，例如按 name 排序
+  const sortedData = [...formData].sort((a, b) => {
+    if (a.id < b.id) return -1;
+    if (a.id > b.id) return 1;
+    return 0;
+  });
+
+  return (
+    <Table>
+      <thead>
+        <tr>
+          {headers.map((header, index) => (
+            <th key={index}>{header}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {sortedData.map((row, index) => (
+          <tr key={index}>
+            {headers.map((header, headerIndex) => (
+              <td key={headerIndex}>{row[header]}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  );
+};
+
+  const handleCardClick = async (title) => {
+
+    let formData = null;
+    // 根據 title 來決定要載入的表單
     if (title === 'Page001') {
-      setSelectedForm(isAuthenticated ? <Page001 /> : <div>資料: Page001</div>);
+      setSelectedForm(isAuthenticated ? <Page001 /> : await fetchFormData('form001'));
 
     } else if (title === 'Lands') {
-      setSelectedForm(isAuthenticated ? <Lands /> : <div>資料: Lands</div>);
+      setSelectedForm(isAuthenticated ? <Lands /> : await fetchFormData('lands'));
     } else if (title === 'Page002') {
-      setSelectedForm(isAuthenticated ? <Page002 /> : <div>資料: Page002</div>);
+      setSelectedForm(isAuthenticated ? <Page002 /> : await fetchFormData('form002'));
     } else if (title === 'Page02') {
-      setSelectedForm(isAuthenticated ? <Page02 /> : <div>資料: Page02</div>);
+      setSelectedForm(isAuthenticated ? <Page02 /> : await fetchFormData('form02'));
     } else if (title === 'Page03') {
-      setSelectedForm(isAuthenticated ? <Page03 /> : <div>資料: Page03</div>);
+      setSelectedForm(isAuthenticated ? <Page03 /> : await fetchFormData('form03'));
 
     } else if (title === 'Page06') {
-      setSelectedForm(isAuthenticated ? <Page06 /> : <div>資料: Page06</div>);
+      setSelectedForm(isAuthenticated ? <Page06 /> : await fetchFormData('form06'));
     } else if (title === 'Page07') {
-      setSelectedForm(isAuthenticated ? <Page07 /> : <div>資料: Page07</div>);
+      setSelectedForm(isAuthenticated ? <Page07 /> : await fetchFormData('form07'));
     } else if (title === 'Page08') {
-      setSelectedForm(isAuthenticated ? <Page08 /> : <div>資料: Page08</div>);
+      setSelectedForm(isAuthenticated ? <Page08 /> : await fetchFormData('form08'));
     } else if (title === 'Page09') {
-      setSelectedForm(isAuthenticated ? <Page09 /> : <div>資料: Page09</div>);
+      setSelectedForm(isAuthenticated ? <Page09 /> : await fetchFormData('form09'));
     } else if (title === 'Page10') {
-      setSelectedForm(isAuthenticated ? <Page10 /> : <div>資料: Page10</div>);
+      setSelectedForm(isAuthenticated ? <Page10 /> : await fetchFormData('form10'));
 
     } else if (title === 'Page11') {
-      setSelectedForm(isAuthenticated ? <Page11 /> : <div>資料: Page11</div>);
+      setSelectedForm(isAuthenticated ? <Page11 /> : await fetchFormData('form11'));
     } else if (title === 'Page12') {
-      setSelectedForm(isAuthenticated ? <Page12 /> : <div>資料: Page12</div>);
+      setSelectedForm(isAuthenticated ? <Page12 /> : await fetchFormData('form12'));
     } else if (title === 'Page13') {
-      setSelectedForm(isAuthenticated ? <Page13 /> : <div>資料: Page13</div>);
+      setSelectedForm(isAuthenticated ? <Page13 /> : await fetchFormData('form13'));
     } else if (title === 'Page14') {
-      setSelectedForm(isAuthenticated ? <Page14 /> : <div>資料: Page14</div>);
+      setSelectedForm(isAuthenticated ? <Page14 /> : await fetchFormData('form14'));
     } else if (title === 'Page15') {
-      setSelectedForm(isAuthenticated ? <Page15 /> : <div>資料: Page15</div>);
+      setSelectedForm(isAuthenticated ? <Page15 /> : await fetchFormData('form15'));
     } else if (title === 'Page16') {
-      setSelectedForm(isAuthenticated ? <Page16 /> : <div>資料: Page16</div>);
+      setSelectedForm(isAuthenticated ? <Page16 /> : await fetchFormData('form16'));
     } else if (title === 'Page17') {
-      setSelectedForm(isAuthenticated ? <Page17 /> : <Page17 />);
+      setSelectedForm(isAuthenticated ? <Page17 /> : await fetchFormData('form17'));
 
     } else if (title === 'Page22') {
-      setSelectedForm(isAuthenticated ? <Page22 /> : <div>資料: Page22</div>);
+      setSelectedForm(isAuthenticated ? <Page22 /> : await fetchFormData('form22'));
 
     } else {
       setSelectedForm(null);
+  
+      setSelectedForm(formData); // 設定選中的表單內容
     }
   };
 
@@ -179,7 +252,10 @@ const HomePage =()=> {
       
       <div>
         {selectedForm}
+        {renderTable()} {/* 顯示動態生成的表格 */}
       </div>
+
+      
 
 
      </DefaultLayout>
