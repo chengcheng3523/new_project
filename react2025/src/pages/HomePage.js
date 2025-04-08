@@ -80,6 +80,7 @@ const HomePage =()=> {
 
 const fetchFormData = async (formName) => {
   try {
+    setFormData(null);  // 清空之前的資料
     const response = await fetch(`http://127.0.0.1:5000/api/${formName}`);
     const data = await response.json();
     setFormData(data);  // 設定資料
