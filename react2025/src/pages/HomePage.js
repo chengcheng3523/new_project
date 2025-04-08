@@ -74,12 +74,15 @@ const HomePage =()=> {
   // 使用 useState 來管理選擇的表單狀態
   const [selectedForm, setSelectedForm] = useState(null);
   const [formData, setFormData] = useState(null); // 用來儲存從API獲得的資料
+  // 用來管理加載狀態
+  const [isLoading, setIsLoading] = useState(false);
 
 
 // 這個函數用於向後端 API 請求資料
 
 const fetchFormData = async (formName) => {
   try {
+    setIsLoading(true); // 開始加載
     setFormData(null);  // 清空之前的資料
     const response = await fetch(`http://127.0.0.1:5000/api/${formName}`);
     const data = await response.json();
@@ -87,7 +90,11 @@ const fetchFormData = async (formName) => {
     return JSON.stringify(data);
   } catch (error) {
     console.error('API 請求失敗:', error);
-    return '資料加載失敗';
+    setFormData('資料加載失敗'); // 設定錯誤訊息
+    alert('需要登入後，才可以查看用戶資料'); // 提示用戶
+    return null; // 返回 null 以便後續處理
+  } finally {
+    setIsLoading(false); // 加載完成
   }
 };
 
@@ -135,7 +142,7 @@ const fetchFormData = async (formName) => {
     let formData = null;
     // 根據 title 來決定要載入的表單
     if (title === 'Page001') {
-      setSelectedForm(isAuthenticated ? <Page001 /> : await fetchFormData('form001'));
+      setSelectedForm(isAuthenticated ? <Page001 /> : await fetchFormData('users/get'));
 
     } else if (title === 'Lands') {
       setSelectedForm(isAuthenticated ? <Lands /> : await fetchFormData('lands'));
