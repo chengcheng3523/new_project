@@ -383,10 +383,10 @@ def fertilizer_remaining_quantity(fertilizer_material_name, fertilizer_amount):
 # 藥
 def pest_control_remaining_quantity(pest_control_material_name, chemical_usage):
     try:
-        # 查詢該藥品的最新庫存記錄 Form09
-        latest_record = db.session.query(Form09.remaining_quantity).filter(
-                Form09.pest_control_material_name == pest_control_material_name
-        ).order_by(Form09.date.desc(), Form09.id.desc()).first()  # 按日期和ID排序，確保獲取最新記錄
+        # 查詢該藥品的最新庫存記錄 Form11
+        latest_record = db.session.query(Form11.remaining_quantity).filter(
+                Form11.pest_control_material_name == pest_control_material_name
+        ).order_by(Form11.date.desc(), Form11.id.desc()).first()  # 按日期和ID排序，確保獲取最新記錄
 
         if latest_record:
             previous_remaining = Decimal(latest_record.remaining_quantity)  # 使用最新剩餘量
@@ -395,7 +395,7 @@ def pest_control_remaining_quantity(pest_control_material_name, chemical_usage):
             print(f"⚠️ 沒有找到 {pest_control_material_name} 的庫存記錄，使用預設庫存500.00")
             previous_remaining = Decimal('500.00')  # 若無記錄，則使用預設庫存
 
-        # 施用量轉換為 Decimal
+        # 施用量轉換為 Decimal，chemical_usage藥劑使用量（公斤、公升）
         chemical_usage = Decimal(chemical_usage) if chemical_usage else Decimal('0.00')
 
         # 計算新的剩餘量
@@ -410,10 +410,10 @@ def pest_control_remaining_quantity(pest_control_material_name, chemical_usage):
 # 其他
 def other_remaining_quantity(other_material_name, usage_amount):
     try:
-        # 查詢該資材的最新庫存記錄 Form13
-        latest_record = db.session.query(Form13.remaining_quantity).filter(
-                Form13.other_material_name == other_material_name
-        ).order_by(Form13.date.desc(), Form13.id.desc()).first()  # 按日期和ID排序，確保獲取最新記錄
+        # 查詢該資材的最新庫存記錄 Form14
+        latest_record = db.session.query(Form14.remaining_quantity).filter(
+                Form14.other_material_name == other_material_name
+        ).order_by(Form14.date.desc(), Form14.id.desc()).first()  # 按日期和ID排序，確保獲取最新記錄
 
         if latest_record:
             previous_remaining = Decimal(latest_record.remaining_quantity)  # 使用最新剩餘量
@@ -857,7 +857,7 @@ def add_form06():
         # 先新增 Form06
         db.session.add(new_form)
         db.session.commit()  # 先提交，確保 `new_form.id` 可用
-        print(f"Form06，ID: {new_form.id}")
+        print(f"Form06 ID: {new_form.id}")
 
         # 呼叫計算庫存剩餘量的函數
         new_remaining, previous_remaining, fertilizer_amount = fertilizer_remaining_quantity(fertilizer_material_name, fertilizer_amount)
@@ -1299,11 +1299,9 @@ def add_form09():
 
       # 使用 `number` 查詢 `lands_id`
     lands = Lands.query.filter_by(number=field_code).first()
-    
     if not lands:
         print(f"❌ 錯誤: 找不到 field_code={field_code} 對應的 lands_id")  # ← 新增錯誤提示
         return jsonify({'error': f'找不到 field_code={field_code} 對應的農地'}), 400
-    
     lands_id = lands.id  # 取得 lands_id
     print(f"✅ 成功找到 lands_id={lands_id} 對應的 field_code={field_code}")
 
@@ -1325,10 +1323,11 @@ def add_form09():
             notes=notes
         )
         print(f"Form09 : {new_form.__dict__}")  # Debug
+
         # 先新增 Form09
         db.session.add(new_form)
         db.session.commit()  # 先提交，確保 `new_form.id` 可用
-        print(f"Form09: {new_form.id}")
+        print(f"Form09 ID: {new_form.id}")
 
         # 呼叫計算庫存剩餘量的函數
         new_remaining, previous_remaining, chemical_usage = pest_control_remaining_quantity(pest_control_material_name, chemical_usage)
@@ -1337,7 +1336,7 @@ def add_form09():
         form10 = Form10.query.filter_by(pest_control_material_name=pest_control_material_name).first()
         if not form10:
             print(f"❌ 錯誤: 找不到對應的 Form10 記錄")
-            return jsonify({'error': '找不到對應的肥料資料'}), 400
+            return jsonify({'error': '找不到對應的【防治】資料'}), 400
 
         # 新增一筆 Form11 (庫存同步)
         new_form11 = Form11(
@@ -1346,9 +1345,12 @@ def add_form09():
             dosage_form=form10.dosage_form,
             brand_name=form10.brand_name,
             supplier=form10.supplier, 
+            packaging_unit=form10.packaging_unit,
+            packaging_volume=form10.packaging_volume,
+
             date=datetime.now(),
-            usage_quantity=chemical_usage,
-            remaining_quantity=new_remaining,
+            usage_quantity=chemical_usage, #     chemical_usage DECIMAL 藥劑使用量（公斤、公升）
+            remaining_quantity=new_remaining, # 剩餘量
             notes=f'自動新增，對應 form09 使用記錄，稀釋倍數: {dilution_factor if dilution_factor else "無"}'
         )
         db.session.add(new_form11)
