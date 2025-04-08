@@ -72,6 +72,7 @@ const HomePage =()=> {
   // 使用 AuthContext 來取得登入狀態
   const{ isAuthenticated } = useContext(AuthContext);
   // 使用 useState 來管理選擇的表單狀態
+  // eslint-disable-next-line no-unused-vars
   const [selectedForm, setSelectedForm] = useState(null);
   const [formData, setFormData] = useState(null); // 用來儲存從API獲得的資料
 
@@ -80,7 +81,7 @@ const HomePage =()=> {
 
 const fetchFormData = async (formName) => {
   try {
-    setFormData(null);  // 清空之前的資料
+    // setFormData(null);  // 清空之前的資料
     const response = await fetch(`http://127.0.0.1:5000/api/${formName}`);
     const data = await response.json();
     setFormData(data);  // 設定資料
@@ -252,8 +253,8 @@ const fetchFormData = async (formName) => {
       <UnitConverter />
       
       <div>
-        {/* {selectedForm} */} {/* 表格內容確認 */}
-        {renderTable()} {/* 顯示動態生成的表格 */}
+      {isAuthenticated && selectedForm} {/* 僅在已登入時渲染 selectedForm */}
+      {renderTable()} {/* 顯示動態生成的表格 */}
       </div>
 
       
