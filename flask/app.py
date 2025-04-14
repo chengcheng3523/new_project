@@ -1896,7 +1896,7 @@ def update_form12(id):
             return jsonify({'error': '找不到對應的其他資材庫存紀錄'}), 400
         
         # 更新其他資材庫存 (Form14)
-        form14.usage_amount += change_amount
+        form14.usage_quantity += (form14.usage_quantity or Decimal('0')) + change_amount
         form14.remaining_quantity -= change_amount
         form14.notes += f" | 更新使用量: {old_usage_amount} -> {new_usage_amount}"
 
