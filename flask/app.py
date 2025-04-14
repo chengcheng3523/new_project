@@ -1283,6 +1283,7 @@ def add_form09():
     data = request.get_json()
     print("收到的請求數據:", data)
     
+    # 取得 Form09 欄位
     user_id = data.get('user_id')
     date_used =  datetime.strptime(data.get('date_used'), '%Y-%m-%d') if data.get('date_used') not in ['', 'None', None] else None
     field_code = data.get('field_code')
@@ -1342,6 +1343,7 @@ def add_form09():
         new_form11 = Form11(
             user_id=user_id,
             pest_control_material_name=pest_control_material_name,
+
             dosage_form=form10.dosage_form,
             brand_name=form10.brand_name,
             supplier=form10.supplier, 
@@ -1535,11 +1537,11 @@ def update_form10(id):
 
     form10.pest_control_material_code = data['pest_control_material_code']
     form10.pest_control_material_name = data['pest_control_material_name']
-    form10.dosage_form = data['dosage_form']
-    form10.brand_name = data['brand_name']
-    form10.supplier = data['supplier']
-    form10.packaging_unit = data['packaging_unit']
-    form10.packaging_volume = data['packaging_volume']
+    form10.dosage_form = data['dosage_form']                # 劑型
+    form10.brand_name = data['brand_name']                  # 商品名(廠牌)
+    form10.supplier = data['supplier']                      # 供應商
+    form10.packaging_unit = data['packaging_unit']          # 包裝單位
+    form10.packaging_volume = data['packaging_volume']      # 包裝容量
     form10.notes = data.get('notes')
 
     # 更新 Form09 中所有對應的防治資材名稱
@@ -1602,6 +1604,7 @@ def get_all_form10():
 @app.route('/api/form11', methods=['POST'])
 def add_form11():
     data = request.get_json()
+    print("接收到資料：", data)
     if not data:
         return jsonify({'error': '請提供 JSON 數據'}), 400
     
@@ -1682,14 +1685,13 @@ def update_form11(id):
     
     try:
         # **保留原始數據**
-        form11.pest_control_material_name = data['pest_control_material_name']
-        form11.dosage_form = data['dosage_form']
-        form11.brand_name = data['brand_name']
-        form11.supplier = data['supplier']
-        form11.packaging_unit = data['packaging_unit']
-        form11.packaging_volume = data['packaging_volume']
-        form11.date = datetime.strptime(data['date'], '%Y-%m-%d') if data.get('date') not in ['', 'None', None] else None
-
+        form11.pest_control_material_name = data.get('pest_control_material_name', form11.pest_control_material_name)
+        form11.dosage_form = data.get('dosage_form', form11.dosage_form)
+        form11.brand_name = data.get('brand_name', form11.brand_name)
+        form11.supplier = data.get('supplier', form11.supplier)
+        form11.packaging_unit = data.get('packaging_unit', form11.packaging_unit)
+        form11.packaging_volume = data.get('packaging_volume', form11.packaging_volume)  # **保留完整字串**
+        form11.notes = data.get('notes', form11.notes)
         
         # **提取數字部分進行計算**
         numeric_packaging_volume = extract_number(form11.packaging_volume)
@@ -1817,13 +1819,14 @@ def add_form12():
         new_form14 = Form14(
             user_id=user_id,
             other_material_name=other_material_name,
-            other_material_code=form13.other_material_code,
+
             manufacturer=form13.manufacturer,
             supplier=form13.supplier,
             packaging_volume=form13.packaging_volume,
-            packaqing_unit=form13.packaging_unit,
+            packaging_unit=form13.packaging_unit,
+
             date=datetime.now(),
-            usage_amount=usage_amount,
+            usage_quantity=usage_amount,
             remaining_quantity=new_remaining,
             notes=f'自動新增，對應 form12 使用記錄'
         )
@@ -2890,7 +2893,8 @@ def get_material_pest(pest_control_material_name):
     
     # 回傳相關的欄位資料
     material_pest = {
-        "manufacturer": form.manufacturer or '',
+        "dosage_form": form.dosage_form or '',
+        "brand_name": form.brand_name or '',
         "supplier": form.supplier or '',
         "packaging_unit": form.packaging_unit or '',
         "packaging_volume": form.packaging_volume or ''

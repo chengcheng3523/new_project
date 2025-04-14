@@ -51,10 +51,11 @@ const Page11 = () => {
     try {
       const response = await axios.get(`http://127.0.0.1:5000/api/form10/material/${pestcontrolMaterialName}`);
       if (response.data) {
-        const { manufacturer, supplier, packaging_unit, packaging_volume } = response.data;
+        const { dosage_form, brand_name, supplier, packaging_unit, packaging_volume } = response.data;
         setFormData(prev => ({
           ...prev,
-          manufacturer,
+          dosage_form,
+          brand_name,
           supplier,
           packaging_unit,
           packaging_volume,
