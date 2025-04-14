@@ -276,7 +276,7 @@ const Page002 = () => {
           ))}
         </tbody>
       </table>
-      <Clearfix height="500px" />
+      <Clearfix height="100px" />
     </div>
   );
 };
