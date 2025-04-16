@@ -263,12 +263,17 @@ const Page12 = () => {
         </FieldSelect>
 
         <FormField
-          label="使用量"
+          label="使用量(單位:包裝容量)"
           name="usage_amount"
           value={formData.usage_amount}
           onChange={handleChange}
           disabled={loading}
         />
+
+        <div style={{ color: 'red', fontSize: '1em', marginBottom: '10px' }}>
+          使用量，將影響出入庫計算
+        </div>
+
         <FormField
           label="操作人員"
           name="operator"
@@ -298,7 +303,7 @@ const Page12 = () => {
             <th>田區代號</th>
             <th>作物</th> 
             <th>資材代碼或資材名稱</th>
-            <th>使用量</th> 
+            <th>使用量(單位:包裝容量)</th> 
             <th>操作人員</th> 
             <th>備註</th>
             {isAdmin && <th>操作</th>}

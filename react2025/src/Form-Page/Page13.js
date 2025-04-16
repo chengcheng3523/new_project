@@ -209,6 +209,10 @@ const Page13 = () => {
           onChange={handleChange}
         />
 
+        <div style={{ color: 'red', fontSize: '1em', marginBottom: '10px' }}>
+          下方欄位，將影響出入庫計算
+        </div>
+
         <FormField
           label="廠商"
           name="manufacturer"

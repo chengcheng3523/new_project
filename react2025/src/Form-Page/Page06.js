@@ -294,6 +294,11 @@ const Page06 = () => {
           onChange={handleChange}
           disabled={loading}
         />
+
+        <div style={{ color: 'red', fontSize: '1em', marginBottom: '10px' }}>
+          使用量，將影響出入庫計算
+        </div>
+
         <FormField
           label="稀釋倍數"
           name="dilution_factor"

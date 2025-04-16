@@ -213,6 +213,9 @@ const Page10 = () => {
           value={formData.pest_control_material_name}
           onChange={handleChange}
         />
+        <div style={{ color: 'red', fontSize: '1em', marginBottom: '10px' }}>
+          下方填寫資料將影響出入庫計算
+        </div>
         <FormField
           label="劑型"
           id="dosage_form"

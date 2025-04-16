@@ -252,7 +252,7 @@ const Page14 = () => {
           label="日期:"
         />
         <FormField
-          label="購入量"
+          label="購入量(單位:包裝單位)"
           name="purchase_quantity"
           value={formData.purchase_quantity}
           onChange={handleChange}
@@ -282,9 +282,9 @@ const Page14 = () => {
           <th>包裝單位</th>
           <th>包裝容量</th>
           <th>日期</th>
-          <th>購入量</th>
-          <th>使用量</th>
-          <th>剩餘量</th>
+          <th>購入量(單位:包裝單位)</th>
+          <th>使用量(單位:包裝容量)</th>
+          <th>剩餘量(單位:包裝容量)</th>
           <th>備註</th>
           {isAdmin && <th>操作</th>}
           </tr>

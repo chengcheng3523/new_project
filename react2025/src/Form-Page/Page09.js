@@ -303,15 +303,19 @@ const Page09 = () => {
         name="water_volume"
         value={formData.water_volume}
         onChange={handleChange}
-        
       />
+      
       <FormField
-        label="藥劑使用量(公斤.公升)"
+        label="藥劑使用量(公斤/公升)"
         name="chemical_usage"
         value={formData.chemical_usage}
         onChange={handleChange}
-        
       />
+
+      <div style={{ color: 'red', fontSize: '1em', marginBottom: '10px' }}>
+        藥劑使用量(公斤/公升)，將影響出入庫計算
+      </div>
+      
       <FormField
         label="稀釋倍數"
         name="dilution_factor"
