@@ -182,18 +182,27 @@ def update_users(id):
         return jsonify({'status': '使用者資料更新成功'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-# 刪除users
+# 刪除使用者
 @app.route('/api/users/<int:id>', methods=['DELETE'])
 def delete_users(id):
+    print(f"正在嘗試刪除使用者 ID: {id}")  # 新增打印資訊
     try:
+        # 檢查是否有綁定土地
+        lands = Lands.query.filter_by(user_id=id).first()
+        if lands:
+            return jsonify({'error': '該使用者仍有綁定土地，請先移除關聯'}), 400
+
+        # 查找使用者
         user = users.query.get(id) 
         if not user:
             return jsonify({'error': '使用者未找到'}), 404
 
-        db.session.delete(user)  
-        db.session.commit()  
+        # 執行刪除
+        db.session.delete(user)
+        db.session.commit()
+
         return jsonify({'status': '使用者已刪除'}), 200
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -271,7 +280,13 @@ def update_lands(id):
 @app.route('/api/lands/<int:id>', methods=['DELETE'])
 def delete_lands(id):
     print(f"Attempting to delete ID: {id}")  # 新增打印資訊
-    lands = Lands.query.get(id)
+    
+    # 找到所有與此 lands_id 有關的 form002
+    forms = Form002.query.filter_by(lands_id=id).all()
+    for form in forms:
+        db.session.delete(form)  # 或者 form.lands_id = new_id（如果你想保留資料）
+
+    lands = Lands.query.get_or_404(id)
     if not lands:
         print(f"ID {id} not found")  # 新增打印資訊
         return jsonify({'error': '農地資訊未找到'}), 404
