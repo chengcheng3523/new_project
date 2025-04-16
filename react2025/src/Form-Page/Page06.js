@@ -295,8 +295,8 @@ const Page06 = () => {
           disabled={loading}
         />
 
-        <div style={{ color: 'red', fontSize: '1em', marginBottom: '10px' }}>
-          使用量，將影響出入庫計算
+        <div style={{ color: 'blue', fontSize: '1em', marginBottom: '10px' }}>
+          肥料使用量 (公斤/公升)，將影響將影響入出庫計算，請務必確認資料正確無誤！
         </div>
 
         <FormField

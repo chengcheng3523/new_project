@@ -208,8 +208,8 @@ const Page07 = () => {
           value={formData.fertilizer_material_name}
           onChange={handleChange}
         />
-        <div style={{ color: 'red', fontSize: '1em', marginBottom: '10px' }}>
-          資材資料，將影響出入庫計算
+        <div style={{ color: 'blue', fontSize: '1em', marginBottom: '10px' }}>
+          下方填寫資料將影響入出庫計算，請務必確認資料正確無誤！
         </div>
         <FormField
           label="廠商"

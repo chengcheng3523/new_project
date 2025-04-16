@@ -213,9 +213,11 @@ const Page10 = () => {
           value={formData.pest_control_material_name}
           onChange={handleChange}
         />
-        <div style={{ color: 'red', fontSize: '1em', marginBottom: '10px' }}>
-          下方填寫資料將影響出入庫計算
+
+        <div style={{ color: 'blue', fontSize: '1em', marginBottom: '10px' }}>
+          下方填寫資料將影響入出庫計算，請務必確認資料正確無誤！
         </div>
+        
         <FormField
           label="劑型"
           id="dosage_form"
@@ -260,9 +262,9 @@ const Page10 = () => {
             name="packaging_unit_other"
             value={formData.packaging_unit_other}
             onChange={handleChange}
-            
           />
         )}
+        
         <FormField
           label="包裝容量 (數字)"
           name="volumeValue"
