@@ -163,7 +163,7 @@ const columnNameMap = {
   user_id: '使用者ID',
   land_id: '農地ID',
   number: '農地編號',
-  field_code: '田區代號',
+  field_code: '田區代碼',
   lands_number: '農地地籍號碼',
   area: '面積(單位：公頃)',
   crop: '作物',
@@ -175,14 +175,14 @@ const columnNameMap = {
   water_volume:'用水量（公升）',
   fertilizer_amount:'肥料使用量（公斤/公升）',
   date: '日期',
-  material_code: '資材代號',
+  material_code: '資材代碼',
   material_name: '資材名稱',
   operator: '操作人員、配製人員名稱',
   usage_amount:'使用量',
   operation: '作業內容',
   verification_status:'驗證狀態',
   dilution_factor: '稀釋倍數',
-  area_code:'場區代號',
+  area_code:'場區代碼',
   area_size: '場區面積(公頃)',
   month:'月份',
   crop_info:'種植作物種類、產期、預估產量（公斤）',
@@ -192,7 +192,7 @@ const columnNameMap = {
   seedling_purchase_date:'育苗(購入)日期',
   seedling_purchase_type:'育苗(購入)種類',
 
-  crop_content:'作物內容（工作代號及描述',
+  crop_content:'作物內容（工作代碼及描述',
   preparation_process:'配製流程簡述',
   final_ph_value:'最終pH值',
   final_ec_value:'最終EC值(mS/cm)',
@@ -242,11 +242,11 @@ const columnNameMap = {
   complaint:'客訴內容',
   resolution:'處理結果',
   processor:'處理人簽名/日期',
-  fertilizer_material_code:'肥料資材代號',
+  fertilizer_material_code:'肥料資材代碼',
   fertilizer_material_name:'肥料資材名稱',
-  pest_control_material_code:'防治資材代號',
+  pest_control_material_code:'防治資材代碼',
   pest_control_material_name:'防治資材名稱',
-  other_material_code:'其他資材代號',
+  other_material_code:'其他資材代碼',
   other_material_name:'其他資材名稱',
   // 依你的資料結構加入更多對應
 };
@@ -330,7 +330,7 @@ const columnNameMap = {
           <TitleCard title="肥料施用" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page07')}>
-          <TitleCard title="肥料資材與代號" />
+          <TitleCard title="肥料資材與代碼" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page08')}>
           <TitleCard title="肥料入出庫" />
@@ -339,7 +339,7 @@ const columnNameMap = {
           <TitleCard title="有害生物防治或環境消毒資材施用" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page10')}>
-          <TitleCard title="防治資材與代號" />
+          <TitleCard title="防治資材與代碼" />
         </ProductContainer>
 
         <ProductContainer onClick={() => handleCardClick('Page11')}>
@@ -349,7 +349,7 @@ const columnNameMap = {
           <TitleCard title="其他資材使用" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page13')}>
-          <TitleCard title="其他資材與代號" />
+          <TitleCard title="其他資材與代碼" />
         </ProductContainer>
         <ProductContainer onClick={() => handleCardClick('Page14')}>
           <TitleCard title="其他資材入出庫" />
