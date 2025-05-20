@@ -27,7 +27,6 @@ const Page03 = () => {
   });
   
   const [validFieldCodes, setvalidFieldCodes] = useState([]);  // 儲存有效的 field_code
-  const [validcrops, setvalidcrops] = useState([]);  // 儲存有效的 crop
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -101,7 +100,6 @@ const Page03 = () => {
         try {
           const response = await axios.get(`http://127.0.0.1:5000/api/valid_crops/${value}`);
           const crops = response.data;
-          setvalidcrops(crops); // 更新作物選項
   
           // 如果只有一個作物，直接填入
           if (crops.length === 1) {
@@ -114,8 +112,6 @@ const Page03 = () => {
           console.error('無法獲取對應的作物:', error);
           alert('無法載入對應的作物，請稍後再試！');
         }
-      } else {
-        setvalidcrops([]); // 如果田區代號為空，清空作物選項
       }
     } else {
       // 其他欄位直接更新

@@ -106,14 +106,29 @@ const fetchFormData = async (formName) => {
   // 動態渲染表格
   const renderTable = () => {
     if (!formData) return null;
-  
+
+    if (!Array.isArray(formData)) {
+      return <p>資料格式錯誤或無法顯示</p>;
+    }
+
     if (typeof formData === 'string') {
       if (!Array.isArray(formData)) return <p>資料格式錯誤</p>;
       
-      // return <p>{formData}</p>;  // 顯示錯誤訊息
     }
 
+  if (formData.length === 0) {
+    return   <div style={{
+      border: '1px solid red',
+      color: 'red',
+      padding: '1rem',
+      borderRadius: '0.5rem',
+      backgroundColor: '#ffe5e5'
+    }}>無資料</div>;
+  }
+
   const headers = Object.keys(formData[0]);
+
+  // 之後繼續渲染表格內容
 
   // 假設我們根據某個欄位排序 formData，例如按 name 排序
   const sortedData = [...formData].sort((a, b) => {
@@ -251,60 +266,86 @@ const columnNameMap = {
   // 依你的資料結構加入更多對應
 };
 
-  const handleCardClick = async (title) => {
 
-    // let formData = null;
-    // 根據 title 來決定要載入的表單
-    if (title === 'Page001') {
-      setSelectedForm(isAuthenticated ? <Page001 /> : 
-      <div className="text-red-500 p-4 border border-red-500">
-        請先登入才能查看此表單
-      </div>
-      );
-    } else if (title === 'Lands') {
-      setSelectedForm(isAuthenticated ? <Lands /> : await fetchFormData('lands'));
-    } else if (title === 'Page002') {
-      setSelectedForm(isAuthenticated ? <Page002 /> : await fetchFormData('form002'));
-    } else if (title === 'Page02') {
-      setSelectedForm(isAuthenticated ? <Page02 /> : await fetchFormData('form02'));
-    } else if (title === 'Page03') {
-      setSelectedForm(isAuthenticated ? <Page03 /> : await fetchFormData('form03'));
+const [loginWarning, setLoginWarning] = useState(false); // 新增狀態變數
 
-    } else if (title === 'Page06') {
-      setSelectedForm(isAuthenticated ? <Page06 /> : await fetchFormData('form06'));
-    } else if (title === 'Page07') {
-      setSelectedForm(isAuthenticated ? <Page07 /> : await fetchFormData('form07'));
-    } else if (title === 'Page08') {
-      setSelectedForm(isAuthenticated ? <Page08 /> : await fetchFormData('form08'));
-    } else if (title === 'Page09') {
-      setSelectedForm(isAuthenticated ? <Page09 /> : await fetchFormData('form09'));
-    } else if (title === 'Page10') {
-      setSelectedForm(isAuthenticated ? <Page10 /> : await fetchFormData('form10'));
 
-    } else if (title === 'Page11') {
-      setSelectedForm(isAuthenticated ? <Page11 /> : await fetchFormData('form11'));
-    } else if (title === 'Page12') {
-      setSelectedForm(isAuthenticated ? <Page12 /> : await fetchFormData('form12'));
-    } else if (title === 'Page13') {
-      setSelectedForm(isAuthenticated ? <Page13 /> : await fetchFormData('form13'));
-    } else if (title === 'Page14') {
-      setSelectedForm(isAuthenticated ? <Page14 /> : await fetchFormData('form14'));
-    } else if (title === 'Page15') {
-      setSelectedForm(isAuthenticated ? <Page15 /> : await fetchFormData('form15'));
-    } else if (title === 'Page16') {
-      setSelectedForm(isAuthenticated ? <Page16 /> : await fetchFormData('form16'));
-    } else if (title === 'Page17') {
-      setSelectedForm(isAuthenticated ? <Page17 /> : await fetchFormData('form17'));
-
-    } else if (title === 'Page22') {
-      setSelectedForm(isAuthenticated ? <Page22 /> : await fetchFormData('form22'));
-
-    } else {
+const handleCardClick = async (title) => {
+  if (title === 'Page001') {
+    // 如果是 Page001，檢查是否已登入
+    if (!isAuthenticated) {
       setSelectedForm(null);
-  
-      setSelectedForm(formData); // 設定選中的表單內容
+      setFormData(null); // 清空表單資料，避免殘留
+      setLoginWarning(true); // 顯示未登入的提示訊息
+      return;
     }
-  };
+    setLoginWarning(false); // 隱藏提示訊息
+    setSelectedForm(<Page001 />);
+  } else {
+    // 其他選項保持原有邏輯
+    setLoginWarning(false); // 點選其他選項時隱藏提示訊息
+    switch (title) {
+      case 'Lands':
+        setSelectedForm(isAuthenticated ? <Lands /> : await fetchFormData('lands'));
+        break;
+      case 'Page002':
+        setSelectedForm(isAuthenticated ? <Page002 /> : await fetchFormData('form002'));
+        break;
+      case 'Page02':
+        setSelectedForm(isAuthenticated ? <Page02 /> : await fetchFormData('form02'));
+        break;
+      case 'Page03':
+        setSelectedForm(isAuthenticated ? <Page03 /> : await fetchFormData('form03'));
+        break;
+      case 'Page06':
+        setSelectedForm(isAuthenticated ? <Page06 /> : await fetchFormData('form06'));
+        break;
+      case 'Page07':
+        setSelectedForm(isAuthenticated ? <Page07 /> : await fetchFormData('form07'));
+        break;
+      case 'Page08':
+        setSelectedForm(isAuthenticated ? <Page08 /> : await fetchFormData('form08'));
+        break;
+      case 'Page09':
+        setSelectedForm(isAuthenticated ? <Page09 /> : await fetchFormData('form09'));
+        break;
+      case 'Page10':
+        setSelectedForm(isAuthenticated ? <Page10 /> : await fetchFormData('form10'));
+        break;
+      case 'Page11':
+        setSelectedForm(isAuthenticated ? <Page11 /> : await fetchFormData('form11'));
+        break;
+      case 'Page12':
+        setSelectedForm(isAuthenticated ? <Page12 /> : await fetchFormData('form12'));
+        break;
+      case 'Page13':
+        setSelectedForm(isAuthenticated ? <Page13 /> : await fetchFormData('form13'));
+        break;
+      case 'Page14':
+        setSelectedForm(isAuthenticated ? <Page14 /> : await fetchFormData('form14'));
+        break;
+      case 'Page15':
+        setSelectedForm(isAuthenticated ? <Page15 /> : await fetchFormData('form15'));
+        break;
+      case 'Page16':
+        setSelectedForm(isAuthenticated ? <Page16 /> : await fetchFormData('form16'));
+        break;
+      case 'Page17':
+        setSelectedForm(isAuthenticated ? <Page17 /> : await fetchFormData('form17'));
+        break;
+      case 'Page22':
+        setSelectedForm(isAuthenticated ? <Page22 /> : await fetchFormData('form22'));
+        break;
+      default:
+        if (formData) {
+        setSelectedForm(formData); // 如果有資料，設定選中的表單內容
+      } else {
+        setSelectedForm(null); // 清空選中的表單
+        setFormData(null); // 清空表單資料
+      }
+    }
+  }
+};
 
     return  (
      <DefaultLayout fixedHeader>{/* 使用預設佈局，確保頁面一致性 */}
@@ -373,7 +414,21 @@ const columnNameMap = {
         </ProductContainer>
       </ProductCollectionContainer>
       
-
+      {/* ...existing code... */}
+      {loginWarning && (
+        <div
+          style={{
+            border: '1px solid red',
+            color: 'red',
+            padding: '1rem',
+            borderRadius: '0.5rem',
+            backgroundColor: '#ffe5e5',
+          }}
+        >
+          未登入不予提供資料
+        </div>
+      )}
+      {/* ...existing code... */}
       {loading && <LoadingText>資料載入中...</LoadingText>}
       {isAuthenticated && selectedForm} {/* 僅在已登入時渲染 selectedForm */}
       {renderTable()} {/* 顯示動態生成的表格 */}
