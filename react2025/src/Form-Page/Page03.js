@@ -262,14 +262,13 @@ const Page03 = () => {
           value={formData.crop}
           onChange={handleChange}
           label="作物:"
+          disabled // 這會讓 select 呈現灰底且無法互動
         >
-          <option value="">選擇作物</option>
-          {validcrops.map((crop) => (
-            <option key={crop} value={crop}>
-              {crop}
-            </option>
-          ))}
-        </FieldSelect>
+          <option value="" disabled hidden>
+            選擇作物
+          </option>
+          <option value={formData.crop}>{formData.crop}</option>
+          </FieldSelect>
 
         <MultiSelectField 
           label="作業內容(可填寫代碼)"
