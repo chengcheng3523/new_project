@@ -27,15 +27,28 @@ const Select = styled.select`
     border-color: #007bff;
     outline: none;
   }
+
+  &:disabled {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+  }
 `;
 
-const FieldSelect = ({ id, name, value, onChange, label, required, children }) => {
+const FieldSelect = ({ id, name, value, onChange, label, required, disabled, children }) => {
   return (
     <Container>
       <Label htmlFor={id}>
         {label} {required && <Required>*</Required>}
       </Label>
-      <Select id={id} name={name} value={value} onChange={onChange} required={required}>
+      <Select 
+        id={id} 
+        name={name} 
+        value={value} 
+        onChange={onChange} 
+        required={required}
+        disabled={disabled}
+        >
         {children}
       </Select>
     </Container>
