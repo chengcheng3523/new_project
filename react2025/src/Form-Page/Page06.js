@@ -47,17 +47,6 @@ const Page06 = () => {
     }
   }, []);
   
-  // 請求有效的 crop 
-  const fetchValidCrops = useCallback(async () => {
-    try {
-      const response = await axios.get('http://127.0.0.1:5000/api/valid_crops');
-      setvalidcrops(response.data);  // 設置有效的 crop
-    } catch (error) {
-      console.error('無法獲取有效的 crop:', error);
-      alert('無法載入有效的田區代號，請稍後再試！');
-    }
-  }, []);
-
   // 請求所有有效的資材名稱
   const fetchFertilizerOptions = useCallback(async () => {
     try {
@@ -108,21 +97,52 @@ const Page06 = () => {
       return;
     }
     fetchValidFieldCodes(); // 組件加載時獲取有效的 field_code
-    fetchValidCrops(); // 組件加載時獲取有效的 crop
     fetchFertilizerOptions(); // 組件加載時獲取有效的資材名稱
     fetchData(); // 組件加載時獲取數據
-  }, [fetchValidFieldCodes, fetchValidCrops, fetchFertilizerOptions, fetchData, navigate, userId]);
+  }, [fetchValidFieldCodes, fetchFertilizerOptions, fetchData, navigate, userId]);
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value } = e.target;
     // 如果不是管理员并且字段是 user_id，则不更新该字段
     if (!isAdmin && name === 'user_id') {
       return;
     }
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+      
+    if (name === 'field_code') {
+      setFormData({
+        ...formData,
+        field_code: value,
+        crop: '', // 清空作物選擇
+      });
+  
+      // 根據田區代號獲取對應的作物
+      if (value) {
+        try {
+          const response = await axios.get(`http://127.0.0.1:5000/api/valid_crops/${value}`);
+          const crops = response.data;
+          setvalidcrops(crops); // 更新作物選項
+  
+          // 如果只有一個作物，直接填入
+          if (crops.length === 1) {
+            setFormData((prevFormData) => ({
+              ...prevFormData,
+              crop: crops[0],
+            }));
+          }
+        } catch (error) {
+          console.error('無法獲取對應的作物:', error);
+          alert('無法載入對應的作物，請稍後再試！');
+        }
+      } else {
+        setvalidcrops([]); // 如果田區代號為空，清空作物選項
+      }
+      } else {
+        // 其他欄位直接更新
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
