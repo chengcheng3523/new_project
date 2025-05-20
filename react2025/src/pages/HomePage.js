@@ -256,8 +256,11 @@ const columnNameMap = {
     // let formData = null;
     // 根據 title 來決定要載入的表單
     if (title === 'Page001') {
-      setSelectedForm(isAuthenticated ? <Page001 /> : await fetchFormData('users/get'));
-
+      setSelectedForm(isAuthenticated ? <Page001 /> : 
+      <div className="text-red-500 p-4 border border-red-500">
+        請先登入才能查看此表單
+      </div>
+      );
     } else if (title === 'Lands') {
       setSelectedForm(isAuthenticated ? <Lands /> : await fetchFormData('lands'));
     } else if (title === 'Page002') {

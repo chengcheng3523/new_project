@@ -365,6 +365,25 @@ def get_land_area(number):
         return jsonify({'error': 'Land not found'}), 404
 
     return jsonify({'number': land.number, 'area': str(land.area)})
+
+# 選擇種苗登記的作物（依據田區代號）
+@app.route('/api/valid_crops/<number>', methods=['GET'])
+def get_crops_by_number(number):
+    try:
+        # 根據田區代號查詢對應的作物
+        crops = db.session.query(Lands.crop).filter(Lands.number == number, Lands.crop.isnot(None)).distinct().all()
+        
+        # 轉換為純作物列表
+        crops_list = [crop[0] for crop in crops]
+
+        if not crops_list:
+            return jsonify({'error': '找不到對應的作物'}), 404
+
+        return jsonify(crops_list), 200
+    except Exception as e:
+        print(f"Error in /api/valid_crops/<number>: {e}")  # 紀錄錯誤訊息
+        return jsonify({'error': str(e)}), 500
+
 # ----------------------------------------------------------------------------------------
 # 計算剩餘量的函數
 
