@@ -1,2 +1,0 @@
-pip install flask flask-mysqldb bcrypt
-pip install Flask-RESTX flask-mysqldb
