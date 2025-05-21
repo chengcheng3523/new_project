@@ -26,9 +26,6 @@ import Page14 from '../Form-Page/Page14';
 import Page15 from '../Form-Page/Page15';
 import Page16 from '../Form-Page/Page16';
 import Page17 from '../Form-Page/Page17';
-// import Page18 from '../Form-Page/Page18';
-// import Page19 from '../Form-Page/Page19';
-// import Page20 from '../Form-Page/Page20';
 
 import Page22 from '../Form-Page/Page22';
 
@@ -122,8 +119,10 @@ const fetchFormData = async (formName) => {
       color: 'red',
       padding: '1rem',
       borderRadius: '0.5rem',
-      backgroundColor: '#ffe5e5'
-    }}>無資料</div>;
+      backgroundColor: '#ffe5e5',
+    }}>
+      目前沒有任何資料
+      </div>;
   }
 
   const headers = Object.keys(formData[0]);
