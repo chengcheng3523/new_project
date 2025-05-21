@@ -1,7 +1,7 @@
-cd flask
+cd backend-flask
 flask run
 
-cd react2025
+cd frontend-react
 npm start
 
 npm install
