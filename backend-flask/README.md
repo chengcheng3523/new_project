@@ -3,6 +3,10 @@ cd backend-flask
 flask run
 ``` 
 
+podman build -t frontend:V1.0.1 .
+podman run -p 3000:80 -d  frontend:V1.0.1
+
+
 -p 5000：5000 
 第一個5000是你瀏覽器訪問的port
 第二個5000是你程式本身的port
