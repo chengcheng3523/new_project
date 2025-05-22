@@ -1,7 +1,16 @@
 ``` 
-cd flask
+cd backend-flask
 flask run
 ``` 
+
+-p 5000：5000 
+第一個5000是你瀏覽器訪問的port
+第二個5000是你程式本身的port
+第二個一定要跟你程式一樣
+第一個不一定要5000 隨便你用 只要別跟別的port衝突到就好
+
+podman build -t backend:V1.0.1 .
+podman run -p 5000:5000 -d  backend:V1.
 
 1. 生成 requirements.txt
 如果你已经安装了相关库，可以使用以下命令生成：

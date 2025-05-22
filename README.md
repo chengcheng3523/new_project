@@ -70,3 +70,11 @@ npm install tailwindcss
 ## GIT
 
 * git rebase 
+
+## Podman Machine
+podman machine init
+podman machine start
+podman machine list
+podman pull docker.io/mysql:latest
+* 創建並啟動 MySQL 容器，並設定 root 密碼為 root，容器名稱mysql
+podman run -d --name mysql -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 docker.io/mysql:latest

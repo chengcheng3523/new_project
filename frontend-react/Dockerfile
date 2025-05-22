@@ -8,7 +8,6 @@ COPY . .
 COPY package.json package-lock.json ./
 RUN npm install
 
-# 再複製其他檔案並執行建置
 COPY . .
 RUN npm run build
 
@@ -20,5 +19,15 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 
+
+# cd frontend-react
+# React 前端映像檔 
 # podman build -t frontend:V1.0.1 .
+
+# 建置完成後你會看到類似這樣的輸出結尾：
+# Successfully tagged localhost/frontend:V1.0.1
+
+# 指令啟動前端容器
 # podman run -p 3000:80 -d  frontend:V1.0.1
+# 開瀏覽器訪問
+# http://localhost:3000
