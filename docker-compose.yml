@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mydb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    volumes:
+      - ./initdb:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  backend:
+    image: backend:V1.0.1
+    container_name: backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: mydb
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: mydb
+    networks:
+      - app-network
+
+  frontend:
+    image: frontend:V1.0.1
+    container_name: frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
