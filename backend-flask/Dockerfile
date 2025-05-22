@@ -1,3 +1,5 @@
+# 這是一個 Dockerfile 用於建立 Flask 應用的容器映像
+
 # 使用較輕量但帶有 python 3.12 的官方映像
 FROM python:3.12-slim
 

@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   mysql:
-    image: mysql:8.0
+    image: docker.io/library/mysql:8.0
     container_name: mydb
     restart: always
     environment:
@@ -11,7 +11,7 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: root
     volumes:
-      - ./initdb:/docker-entrypoint-initdb.d
+      - ./initdb:/docker-entrypoint-initdb.d:Z  # SELinux 相容
     networks:
       - app-network
     ports:
@@ -22,9 +22,11 @@ services:
       timeout: 5s
       retries: 5
 
-
   backend:
-    image: backend:V1.0.1
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: localhost/backend:V1.0.1
     container_name: backend
     depends_on:
       mysql:
@@ -40,7 +42,10 @@ services:
       - app-network
 
   frontend:
-    image: frontend:V1.0.1
+    build:
+      context: ./frontend-react
+      dockerfile: Dockerfile
+    image: localhost/frontend:V1.0.1
     container_name: frontend
     depends_on:
       - backend
