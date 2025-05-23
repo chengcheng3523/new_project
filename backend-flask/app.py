@@ -8,18 +8,25 @@ from flask_jwt_extended import JWTManager, create_access_token
 import re
 from decimal import Decimal  # 確保引入 Decimal 類型
 from datetime import datetime
+import os
+from dotenv import load_dotenv
+load_dotenv()  # 載入 .env 檔案
 
-app = Flask(__name__)   # 創建 Flask 應用程式實例
+# ...existing code...
 
-CORS( app,resources={r"/api/*": {"origins": "http://localhost:3000"}}) # 針對特定 API 路徑設置 CORS，限制存取路徑
-ma = Marshmallow(app)   # 初始化 Marshmallow，提供資料序列化和驗證功能
+app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost/new_database'
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+ma = Marshmallow(app)
+
+# 從環境變數讀取設定
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'  # 設置 JWT 密鑰
-app.config['SECRET_KEY'] = 'your_secret_key'  # 設置 Flask 密鑰
-jwt = JWTManager(app)  # 初始化 JWTManager 並與 Flask 應用程式關聯
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+jwt = JWTManager(app)
 CORS(app)
+# ...existing code...
 
 # 初始化 SQLAlchemy
 # db = SQLAlchemy(app)

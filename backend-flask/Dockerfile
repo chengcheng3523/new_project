@@ -22,6 +22,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # 複製整個專案
 COPY . .
+COPY .env .
 
 # 避免 Python 緩存與輸出延遲
 ENV PYTHONDONTWRITEBYTECODE=1
