@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS new_database;
-USE new_database;
+CREATE DATABASE IF NOT EXISTS t1;
+USE t1;
 
 -- users（使用者基本資料）
 CREATE TABLE users(
