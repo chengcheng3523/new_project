@@ -15,15 +15,21 @@ load_dotenv()  # 載入 .env 檔案
 # ...existing code...
 
 app = Flask(__name__)
-
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 ma = Marshmallow(app)
 
-# 從環境變數讀取設定
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+#▼▼▼ 修改這裡 ▼▼▼
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@192.168.2.236:3306/new_database'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@mysql:3306/new_database'
+
+
+
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')  # 如果不用.env，這裡也要改
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')          # 同上
+#▲▲▲ 修改結束 ▲▲▲
+
 jwt = JWTManager(app)
 CORS(app)
 # ...existing code...

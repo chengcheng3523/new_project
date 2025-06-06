@@ -1,0 +1,16 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:latest
+    container_name: my-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: new_database # 預設建立的資料庫
+      TZ: Asia/Taipei
+    ports:
+      - "3306:3306"
+    volumes:
+      - /home/tgap/project/new_project/initdb/SQL:/docker-entrypoint-initdb.d:ro
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf:ro # 新增自訂 my.cnf 設定
+
