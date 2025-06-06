@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn instance to serve Flask backend
+After=network.target
+
+[Service]
+User=tgap
+Group=www-data
+WorkingDirectory=/home/tgap/project/new_project/backend-flask
+Environment="PATH=/home/tgap/project/new_project/backend-flask/venv/bin"
+ExecStart=/home/tgap/project/new_project/backend-flask/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:5000 app:app
+
+[Install]
+WantedBy=multi-user.target
+
